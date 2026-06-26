@@ -17,8 +17,29 @@ export async function logAudit(params: {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) return; // no auditing without an authenticated actor
+
+  // Multi-tenant: audit_logs.practice_id is NOT NULL and the RLS insert policy
+  // requires it to equal the caller's practice. Resolve it (staff first, then patient).
+  const { data: prac } = await supabase
+    .from("practitioners")
+    .select("practice_id")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  let practiceId = (prac?.practice_id as string | undefined) ?? null;
+  if (!practiceId) {
+    const { data: pt } = await supabase
+      .from("patients")
+      .select("practice_id")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+    practiceId = (pt?.practice_id as string | undefined) ?? null;
+  }
+  if (!practiceId) return; // authed user not linked to a practice — skip rather than throw
+
   await supabase.from("audit_logs").insert({
-    actor_auth_user_id: user?.id ?? null,
+    practice_id: practiceId,
+    actor_auth_user_id: user.id,
     patient_id: params.patientId ?? null,
     action: params.action,
     resource: params.resource,
