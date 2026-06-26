@@ -5,7 +5,7 @@ import { logAudit } from "@/lib/auth/audit";
 import { getServerLang } from "@/lib/i18n/getServerLang";
 import { t } from "@/lib/i18n/dictionary";
 import { buildReport } from "@/lib/report/build";
-import { ReportView } from "@/app/(patient)/report/page";
+import { ReportView } from "@/lib/report/components";
 
 export default async function StaffReportPage({
   params,

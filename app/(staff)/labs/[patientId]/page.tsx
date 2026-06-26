@@ -9,7 +9,7 @@ import {
   groupByCategory,
   type LabResult,
 } from "@/lib/labs/helpers";
-import { MarkerCard } from "@/app/(patient)/labs/page";
+import { MarkerCard } from "@/lib/labs/components";
 import LabEntry from "./LabEntry";
 
 export default async function StaffLabsPage({
