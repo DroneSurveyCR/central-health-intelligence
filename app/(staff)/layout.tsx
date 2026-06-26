@@ -45,6 +45,7 @@ export default async function StaffLayout({
           {unread ? <span className="badge unread" style={{ marginLeft: "auto" }}>{unread}</span> : null}
         </Link>
         {isAdmin && <Link href="/settings">{ICONS.settings}<span>Settings</span></Link>}
+        {isAdmin && <Link href="/settings/modules">{ICONS.settings}<span>Modules</span></Link>}
         {isAdmin && <Link href="/products">{ICONS.products}<span>Products</span></Link>}
         {isAdmin && <Link href="/articles">{ICONS.articles}<span>Articles</span></Link>}
         {isAdmin && <Link href="/analytics">{ICONS.analytics}<span>Analytics</span></Link>}

@@ -1,6 +1,8 @@
 import { getCurrentPractitioner } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getConnector } from "@/lib/connectors/registry";
+import { moduleForConnector } from "@/lib/modules";
+import { getEnabledModules } from "@/lib/modules/requireModule";
 import { NextResponse } from "next/server";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ importId: string }> }) {
@@ -13,6 +15,11 @@ export async function POST(_req: Request, { params }: { params: Promise<{ import
   const { data: job } = await admin.from("health_data_imports").select("*").eq("id", importId).maybeSingle();
   if (!job) return NextResponse.json({ error: "Import not found" }, { status: 404 });
   if (job.status === "confirmed") return NextResponse.json({ error: "Already confirmed" }, { status: 409 });
+
+  // Module gate: parsing uses the admin client (bypasses RLS), so enforce module ownership here.
+  const owner = moduleForConnector(job.connector_id);
+  if (owner && !(await getEnabledModules()).has(owner))
+    return NextResponse.json({ error: "Module not enabled for this connector" }, { status: 403 });
 
   // Download raw file.
   const { data: fileData, error: dlErr } = await admin.storage.from("patient-files").download(job.raw_storage_ref);

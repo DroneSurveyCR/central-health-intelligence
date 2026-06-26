@@ -1,6 +1,8 @@
 import { getCurrentPractitioner, getSessionUser } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getConnector } from "@/lib/connectors/registry";
+import { moduleForConnector } from "@/lib/modules";
+import { getEnabledModules } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -29,6 +31,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ imp
   }
 
   const job = claimed[0];
+
+  // Module gate: confirm uses the admin client (bypasses RLS), so enforce module ownership here.
+  // Release the claim back to pending_review on failure so the row isn't left locked.
+  const owner = moduleForConnector(job.connector_id);
+  if (owner && !(await getEnabledModules()).has(owner)) {
+    await admin.from("health_data_imports").update({ status: "pending_review" }).eq("id", importId);
+    return NextResponse.json({ error: "Module not enabled for this connector" }, { status: 403 });
+  }
+
   const parsedData = job.parsed_data as { rows?: Record<string, unknown>[]; summary?: string } | null;
   let rows: Record<string, unknown>[] = parsedData?.rows ?? [];
   if (body.edits?.length) rows = body.edits;

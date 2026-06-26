@@ -2,6 +2,8 @@ import { getCurrentPractitioner, getSessionUser } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getConnector } from "@/lib/connectors/registry";
+import { moduleForConnector } from "@/lib/modules";
+import { getEnabledModules } from "@/lib/modules/requireModule";
 import { rateLimit } from "@/lib/ratelimit";
 import { NextResponse } from "next/server";
 
@@ -31,6 +33,11 @@ export async function POST(request: Request) {
   let connector;
   try { connector = getConnector(connectorId); } catch { return NextResponse.json({ error: `Unknown connector: ${connectorId}` }, { status: 400 }); }
   if (connector.phase === "phase2") return NextResponse.json({ error: "This connector is not yet available." }, { status: 503 });
+
+  // Module gate: connector writes use the admin client (bypasses RLS), so enforce module ownership here.
+  const owner = moduleForConnector(connectorId);
+  if (owner && !(await getEnabledModules()).has(owner))
+    return NextResponse.json({ error: "Module not enabled for this connector" }, { status: 403 });
 
   // Batch importers (targetTable === "patients") have no single patient context.
   const isBatchImport = connector.targetTable === "patients";
