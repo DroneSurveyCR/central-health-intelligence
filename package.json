@@ -5,11 +5,13 @@
   "type": "module",
   "description": "HealthSync Cloud — multi-tenant SaaS build. Stage 1: tenancy foundation.",
   "scripts": {
-    "etl:dry": "node scripts/etl-casa-elev8.mjs",
-    "etl:apply": "node scripts/etl-casa-elev8.mjs --apply",
-    "test:tenant-isolation": "node scripts/test-tenant-isolation.mjs"
+    "migrate": "node --env-file=.env scripts/migrate.mjs",
+    "etl:dry": "node --env-file=.env scripts/etl-casa-elev8.mjs",
+    "etl:apply": "node --env-file=.env scripts/etl-casa-elev8.mjs --apply",
+    "test:tenant-isolation": "node --env-file=.env scripts/test-tenant-isolation.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "^2.45.0",
+    "pg": "^8.13.0"
   }
 }
