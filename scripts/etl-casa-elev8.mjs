@@ -42,7 +42,7 @@ const TABLES = [
   { name: "locations" },
   { name: "services" },
   { name: "products" },
-  { name: "practice_settings" },
+  { name: "practice_settings", dropCols: ["singleton"] },
   { name: "practice_connectors" },
   { name: "patients", nullAuth: true },
   { name: "role_assignments" },
@@ -108,6 +108,7 @@ async function run() {
       const out = { ...r };
       if (!cfg.global) out.practice_id = ELEV8;
       if (cfg.nullAuth) out.auth_user_id = null;
+      if (cfg.dropCols) for (const c of cfg.dropCols) delete out[c];
       return out;
     });
 
