@@ -8,3 +8,5 @@ baseline.sql
 .next/
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

@@ -38,6 +38,8 @@ export async function updateSession(request: NextRequest) {
   const isPublic =
     path === "/" ||
     path.startsWith("/login") ||
+    path.startsWith("/onboarding") ||
+    path.startsWith("/api/onboarding") ||
     path.startsWith("/auth") ||
     path.startsWith("/legal") ||
     path.startsWith("/api/ical") ||

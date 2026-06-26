@@ -5,10 +5,17 @@
 **Last action:** Seeded the Cloud Next.js app from Randi's minimal core; ported the 7 modules from
 `../healthsync-app@modules-for-cloud` with `requireModule` gating; built onboarding; gated module
 links on the patient record. `npm run build` PASS, `tsc` PASS, tenant-isolation PASS. Commit `a8db3a5`.
-**Next action:** Deploy (Vercel + point Supabase auth redirect allow-list) OR continue building
-(connectors gating, patient-experience, marketplace) — needs direction. Deploy needs the user's
-Vercel/Supabase-dashboard access.
-**Blockers:** deploy = external (Vercel project + Supabase auth URL config).
+**Next action:** Deploy (Vercel + Supabase auth redirect allow-list) — needs user. Core product is
+functionally complete + verified (reads, writes, audit, isolation, gating, onboarding).
+**Blockers:** deploy = external (Vercel project + Supabase auth URL config). Clinical-logic review = needs human.
+
+## Added since Phase 3 (this push)
+- **Connector/import gating** — import routes check `moduleForConnector` + enabled modules (closes the RLS-bypass gap).
+- **Admin Modules UI** — `/settings/modules` toggles a practice's modules on/off (admin-only).
+- **Positive login checkpoint PASS** — a practice-#1 user logs in and sees exactly their 168 patients.
+- **Audit logging fixed** — `logAudit` now sets `practice_id` (was silently failing on NOT NULL).
+- **Migration 004: `practice_id` default = `current_practice_id()`** — fixes ALL app inserts (writes
+  auto-fill the caller's own practice; isolation still holds). Verified with a real insert.
 
 ## Done this phase (verified)
 - Multi-tenant Next.js app (349 files) builds clean against the Cloud DB.
