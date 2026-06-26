@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/bodymap/">
+<title>Elev8 — 3D Body Map</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  html,body{height:100%;margin:0;background:#0E2017;overflow:hidden;}
+  #app{position:fixed;inset:0;color:var(--sand);font-family:var(--sans);}
+  #c{position:absolute;inset:0;touch-action:none;cursor:grab;} #c:active{cursor:grabbing;}
+  .glass{background:rgba(14,32,23,.6);border:1px solid rgba(255,246,234,.14);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border-radius:16px;}
+  .col{position:absolute;z-index:6;width:210px;}
+
+  /* top-left: overall score */
+  #overall{top:14px;left:14px;width:auto;display:flex;align-items:center;gap:13px;padding:12px 17px 12px 12px;}
+  #overall .ring{width:68px;height:68px;position:relative;flex-shrink:0;}
+  #overall .ring svg{position:absolute;inset:0;width:100%;height:100%;}
+  #overall .ring .num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--serif);font-size:19px;font-weight:600;}
+  #overall .st{white-space:nowrap;}
+  #overall .lbl{font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:rgba(255,246,234,.55);font-weight:700;}
+  #overall .st{font-size:15px;font-weight:800;margin-top:2px;}
+  #overall .tr{font-size:11px;color:rgba(255,246,234,.62);margin-top:1px;}
+
+  /* right column: parts + detail stacked (no overlap) */
+  #rightcol{position:absolute;top:16px;right:14px;width:214px;z-index:6;display:flex;flex-direction:column;gap:12px;max-height:calc(100% - 84px);}
+  #rightcol .col{position:static;width:auto;}
+  /* left column: layers */
+  #layers{left:14px;top:122px;padding:10px;}
+  #layers .h{font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:rgba(255,246,234,.5);font-weight:700;margin:2px 4px 8px;}
+  .lrow{display:flex;align-items:center;gap:9px;padding:7px 7px;border-radius:11px;cursor:pointer;}
+  .lrow.active{background:rgba(255,246,234,.10);}
+  .lrow .sw{width:30px;height:18px;border-radius:99px;background:rgba(255,246,234,.16);position:relative;flex-shrink:0;transition:.18s;}
+  .lrow .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:99px;background:#fff;transition:.18s;}
+  .lrow.on .sw{background:var(--berry);} .lrow.on .sw::after{left:14px;}
+  .lrow .nm{flex:1;font-size:13px;font-weight:600;}
+  .lrow .pip{width:9px;height:9px;border-radius:99px;}
+  .lrow .sc{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;width:24px;text-align:right;}
+
+  /* top-center: scan toggle (desktop) */
+  #scan{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:7;display:flex;padding:3px;}
+  #scan button{border:none;background:transparent;color:rgba(255,246,234,.65);font-family:var(--sans);font-weight:700;font-size:12px;padding:7px 12px;border-radius:9px;cursor:pointer;line-height:1;}
+  #scan button .d{display:block;font-size:9px;font-weight:600;opacity:.7;margin-top:2px;}
+  #scan button.on{background:var(--sand);color:var(--ink);}
+
+  /* parts squares */
+  #parts{padding:11px;}
+  #parts .h{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 2px 9px;}
+  #parts .h b{font-family:var(--serif);font-size:15px;font-weight:600;flex:1;text-align:center;}
+  .secnav{width:26px;height:26px;border-radius:8px;border:1px solid rgba(255,246,234,.2);background:rgba(255,246,234,.1);color:var(--sand);font-size:15px;font-weight:800;cursor:pointer;line-height:1;flex-shrink:0;padding:0;}
+  .secnav:hover{background:rgba(255,246,234,.2);}
+  #detail .dx{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:13px;cursor:pointer;line-height:1;padding:0;flex-shrink:0;}
+  #parts .grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .sq{background:rgba(255,251,244,.96);color:var(--ink);border:1.5px solid transparent;border-radius:12px;padding:9px 10px;cursor:pointer;transition:.12s;}
+  .sq.on{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 20%,transparent);}
+  .sq .n{font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:5px;line-height:1.1;}
+  .sq .n i{width:8px;height:8px;border-radius:99px;background:var(--c);flex-shrink:0;}
+  .sq .s{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--c);line-height:1;margin-top:5px;}
+  .sq .m{font-size:10px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums;}
+
+  /* detail (stacks under parts) */
+  #detail{padding:14px 15px;background:rgba(255,251,244,.97);color:var(--ink);display:none;overflow:auto;}
+  #detail.show{display:block;}
+  #detail .dh{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  #detail .dh b{font-family:var(--serif);font-size:16px;font-weight:600;}
+  #detail .chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px;}
+  #detail .mrow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:9px;}
+  #detail .mv{font-family:var(--serif);font-size:21px;font-weight:600;} #detail .mv small{font-size:12px;color:var(--muted);font-weight:600;}
+  #detail .mn{font-size:11px;color:var(--muted);} #detail .ref{text-align:right;font-size:11px;color:var(--muted);} #detail .ref b{color:var(--ink);}
+  #detail .plan{background:#E2F1E7;color:#2F5A3A;font-size:12px;line-height:1.45;margin-top:10px;padding:8px 10px;border-radius:10px;}
+  #detail .plan span{display:block;font-size:9px;letter-spacing:1.1px;text-transform:uppercase;font-weight:800;color:var(--berry);margin-bottom:2px;}
+  /* grouped findings: Bio Quantum + Bloodwork */
+  #detail .grp{margin-top:10px;padding:9px 10px;border-radius:11px;background:rgba(30,58,48,.045);border:1px solid rgba(30,58,48,.08);}
+  #detail .grp .gh{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  #detail .grp .gl{font-size:9px;letter-spacing:1.1px;text-transform:uppercase;font-weight:800;color:var(--berry);}
+  #detail .grp .mrow{margin-top:4px;}
+  #detail .grp .ba{font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:3px;color:var(--muted);}
+  #detail .grp .ba span:last-child{font-size:8.5px;letter-spacing:.5px;text-transform:uppercase;font-weight:800;}
+
+  /* cross-cutting badge row (toxins / micronutrients / hormones) */
+  #cross{position:absolute;left:14px;bottom:30px;z-index:6;display:flex;flex-direction:column;gap:6px;max-width:230px;}
+  #cross .cb{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;}
+  #cross .cb .pip{width:9px;height:9px;border-radius:99px;flex-shrink:0;}
+  #cross .cb .t{font-size:11.5px;font-weight:700;line-height:1.15;}
+  #cross .cb .t small{display:block;font-size:9px;font-weight:600;color:rgba(255,246,234,.55);letter-spacing:.2px;}
+  #cross .cb .st{margin-left:auto;font-size:8.5px;letter-spacing:.6px;text-transform:uppercase;font-weight:800;flex-shrink:0;}
+
+  /* bottom-center: tour + narration */
+  #tourbar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:7;display:flex;align-items:center;gap:8px;padding:8px 10px;}
+  #tourbar button{height:34px;border-radius:10px;border:1px solid rgba(255,246,234,.18);background:rgba(255,246,234,.08);color:var(--sand);font-size:14px;font-weight:800;cursor:pointer;display:grid;place-items:center;padding:0 11px;}
+  #tourbar #tplay{background:var(--berry);border-color:var(--berry);}
+  #tourbar #tcount{font-size:12px;font-weight:700;color:rgba(255,246,234,.7);min-width:42px;text-align:center;font-variant-numeric:tabular-nums;}
+  #tourbar .narr{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:rgba(255,246,234,.8);cursor:pointer;padding-left:8px;border-left:1px solid rgba(255,246,234,.16);}
+  #tourbar .narr .sw{width:30px;height:18px;border-radius:99px;background:var(--gold);position:relative;} #tourbar .narr .sw::after{content:"";position:absolute;top:2px;left:14px;width:14px;height:14px;border-radius:99px;background:#fff;transition:.18s;}
+  #tourbar .narr.off .sw{background:rgba(255,246,234,.18);} #tourbar .narr.off .sw::after{left:2px;}
+  #subtitle{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);z-index:7;max-width:min(560px,82vw);text-align:center;font-size:13.5px;line-height:1.5;color:#fff;background:rgba(14,32,23,.72);border:1px solid rgba(255,246,234,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:9px 16px;border-radius:13px;opacity:0;transition:opacity .25s;pointer-events:none;}
+  #subtitle.show{opacity:1;}
+
+  #loading{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,246,234,.82);font-size:14px;z-index:8;text-align:center;}
+  #loading .r{width:34px;height:34px;border-radius:99px;border:3px solid rgba(255,246,234,.2);border-top-color:var(--gold);animation:spin 1s linear infinite;margin:0 auto 12px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .attrib{position:absolute;bottom:3px;left:14px;font-size:9px;color:rgba(255,246,234,.32);z-index:4;}
+
+  @media (max-width:780px){
+    .col{width:auto;}
+    #rightcol{display:contents;} #rightcol .col{position:absolute;}
+    /* small overall pill, top-left */
+    #overall{left:8px;top:8px;padding:5px 12px 5px 5px;gap:8px;}
+    #overall .ring{width:42px;height:42px;} #overall .ring .num{font-size:15px;}
+    #overall .lbl,#overall .tr{display:none;} #overall .st{font-size:12.5px;}
+    /* small scan toggle, top-right corner */
+    #scan{position:fixed;top:8px;right:8px;left:auto;bottom:auto;transform:none;padding:2px;}
+    #scan button{padding:6px 11px;font-size:11.5px;} #scan button .d{display:none;}
+    /* section arrows switch layers; layer strip + cross badges hidden */
+    #layers{display:none;}
+    #cross{display:none;}
+    /* bottom dock: full-width, ALL part cards shown in a grid */
+    #parts{left:0;right:0;bottom:54px;top:auto;border-radius:16px 16px 0 0;padding:10px 11px 10px;}
+    #parts .h{margin-bottom:9px;} #parts .h b{font-size:15px;}
+    .secnav{width:30px;height:30px;font-size:17px;}
+    #parts .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+    .sq{padding:8px 9px;} .sq .n{font-size:11px;} .sq .s{font-size:19px;} .sq .m{font-size:9.5px;}
+    /* detail bottom sheet overlays the dock when a part is picked */
+    #detail{display:none;left:0;right:0;bottom:54px;top:auto;border-radius:16px 16px 0 0;z-index:11;max-height:62vh;overflow:auto;box-shadow:0 -14px 38px -8px rgba(0,0,0,.6);}
+    #detail.show{display:block;}
+    /* full-width Tour bar pinned to the very bottom */
+    #tourbar{position:fixed;left:0;right:0;bottom:0;top:auto;transform:none;border-radius:16px 16px 0 0;padding:9px 12px;gap:8px;justify-content:center;z-index:8;}
+    #tourbar #tplay{flex:1;height:38px;font-size:14px;}
+    #tourbar button{height:36px;} #tourbar #tcount{min-width:38px;}
+    #subtitle{bottom:240px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="c"></div>
+
+  <div class="col glass" id="overall">
+    <div class="ring" id="ovring"></div>
+    <div><div class="lbl">Marco Vega · overall score</div><div class="st" id="ovst">—</div><div class="tr" id="ovtr"></div></div>
+  </div>
+
+  <div class="col glass" id="layers"><div class="h">Layers · toggle &amp; pick</div></div>
+
+  <div id="cross"></div>
+
+  <div class="glass" id="scan">
+    <button data-scan="1" type="button">Baseline<span class="d">May 2026</span></button>
+    <button data-scan="2" class="on" type="button">Projected<span class="d">Day 90</span></button>
+  </div>
+
+  <div id="rightcol">
+    <div class="col glass" id="parts">
+      <div class="h"><button class="secnav" id="secPrev" type="button" title="Previous section">‹</button><b id="layerTitle">Organs</b><button class="secnav" id="secNext" type="button" title="Next section">›</button></div>
+      <div class="grid" id="partsGrid"></div>
+    </div>
+    <div class="col glass" id="detail"></div>
+  </div>
+
+  <div id="subtitle"></div>
+  <div class="glass" id="tourbar">
+    <button id="tprev" title="Previous">‹</button>
+    <button id="tplay" title="Play guided tour">► Tour</button>
+    <button id="tnext" title="Next">›</button>
+    <span id="tcount">0 / 0</span>
+    <div class="narr" id="narrToggle"><span class="sw"></span>Voice</div>
+  </div>
+
+  <div id="loading"><div><div class="r"></div>Loading real anatomy…</div></div>
+  <div class="attrib">Anatomy: HuBMAP HRA · CC BY 4.0 · on Elev8's own server</div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three":"https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/" }}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const SC={sage:'#4FA873',gold:'#F4A63C',rust:'#E0613B'}, LAB={sage:'Healthy',gold:'Watch',rust:'Out of range'};
+const worse=(a,b)=>({rust:0,gold:1,sage:2})[a]<=({rust:0,gold:1,sage:2})[b]?a:b;
+const PLAN={
+  skin:'Collagen peptides · Omega-3 (EPA 2g + DHA 1.5g) · daily SPF',
+  inflam:'Hibiscus 250mg BID · CoQ10 ubiquinol 200mg · Mg glycinate 400mg PM · red-light 660nm 10min BID',
+  elasticity:'Hibiscus 250mg BID · beetroot 5g/day (nitric oxide) · box breathing 4-4-4-4 2×/day',
+  viscosity:'Hydration 3 L/day + electrolytes · Omega-3 · taurine 1000mg BID',
+  lipids:'DASH-Mediterranean hybrid · CoQ10 ubiquinol 200mg · Omega-3 EPA/DHA',
+  cardio:'Hibiscus 250mg BID · CoQ10 ubiquinol 200mg · Mg glycinate 400mg PM · red-light 10min BID · walking 30min/day',
+  respiratory:'Box breathing 4-4-4-4 2×/day · red-light 660nm chest 10min BID · walking 30min/day',
+  liver:'Pause alcohol · NAC 600mg BID · IV glutathione (post-EBOO) 1400mg',
+  kidneys:'Hydration 3 L/day + LMNT electrolytes · maintain',
+  gut:'L-Glutamine 5g BID (empty stomach) · S. boulardii 5B CFU BID · Modified Citrus Pectin 5g HS',
+  spleen:'Maintain — immune markers calm',
+  cognition:'Omega-3 EPA/DHA · Methyl-B12 · Rife 117.5 Hz daily · strict 10pm bedtime',
+  nerve:'Methyl-B12 (B12-linked) · address gut absorption so it sticks',
+  bone:'Vitamin D3 5000 IU + K2 200mcg · osteocalcin support · resistance training 2×/week',
+  toxins:'Phase 1: NAC 600mg BID + Modified Citrus Pectin 5g HS → Phase 2: Chlorella 1g BID + R-ALA 300mg BID + EBOO + IV glutathione',
+  micronutrients:'Fix gut absorption first · Methyl-B12 · D3 5000+K2 · Iron/CoQ10/Vit C — supplementation sticks once gut heals',
+  hormones:'Ashwagandha 300mg BID · Zinc 30mg + Copper 2mg · cold exposure 3×/week · strict 10pm sleep'
+};
+
+// Each part carries a Bio Quantum coefficient (metric/value/ref/grade) + a `labs` Bloodwork tie-in.
+// s1 = baseline (May 29 2026), s2 = projected Day-90 target. Status ∈ {rust,gold,sage}. Data = ELEV8-PATIENT-DATA.md §2.
+const LAYERS=[
+  {id:'skin',name:'Skin · Collagen',kind:'shell',files:['models/skin.glb'],parts:[
+    {id:'skin',name:'Collagen',metric:'Collagen coeff.',unit:'',ref:'normal higher',s1:{st:'gold',v:'2.405',score:72},s2:{st:'gold',v:'3.2',score:84},note:'Collagen coefficient is low — skin elasticity and hydration reduced; supports the dermal repair plan.',
+      labs:{metric:'Skin hydration / elasticity',unit:'',ref:'normal',s1:{st:'gold',v:'reduced'},s2:{st:'sage',v:'improved'}}}]},
+  {id:'blood',name:'Vascular · Blood',kind:'tinted',files:['models/blood.glb'],parts:[
+    {id:'inflam',name:'Vascular resistance',metric:'Vascular Resistance',unit:'',ref:'0.327–0.937',s1:{st:'rust',v:'1.764',score:42},s2:{st:'gold',v:'0.95',score:74},note:'Vascular resistance is severely out of range (+++) — the primary driver of the hypertension.',
+      labs:{metric:'Blood Pressure',unit:'mmHg',ref:'< 120/80',s1:{st:'rust',v:'148/96'},s2:{st:'gold',v:'128/82'}}},
+    {id:'elasticity',name:'Vascular elasticity',metric:'Vascular Elasticity',unit:'',ref:'1.672–1.978',s1:{st:'rust',v:'1.158',score:50},s2:{st:'gold',v:'1.55',score:76},note:'Vessels are stiff — low elasticity compounds the resistance. Nitric-oxide support targets this.',
+      labs:{metric:'LDL-C',unit:'mg/dL',ref:'< 100',s1:{st:'rust',v:'151'},s2:{st:'gold',v:'118'}}},
+    {id:'viscosity',name:'Blood viscosity',metric:'Blood Viscosity',unit:'',ref:'48.264–65.371',s1:{st:'gold',v:'71.139',score:60},s2:{st:'gold',v:'64.0',score:78},note:'Blood is moderately viscous (++) — thicker blood raises the pressure the heart works against.',
+      labs:{metric:'Triglycerides',unit:'mg/dL',ref:'< 150',s1:{st:'rust',v:'189'},s2:{st:'sage',v:'138'}}},
+    {id:'lipids',name:'Blood fat',metric:'Blood Fat (lipids coeff.)',unit:'',ref:'0.48–1.04',s1:{st:'gold',v:'1.688',score:62},s2:{st:'gold',v:'1.05',score:80},note:'Lipid coefficient mildly elevated (+) — diet template and CoQ10 bring it back toward range.',
+      labs:{metric:'LDL-C',unit:'mg/dL',ref:'< 100',s1:{st:'rust',v:'151'},s2:{st:'gold',v:'118'}}},
+  ]},
+  {id:'organs',name:'Organs',kind:'organs',parts:[
+    {id:'cardio',name:'Heart',files:['models/heart.glb'],metric:'Vascular Resistance',unit:'',ref:'0.327–0.937',s1:{st:'rust',v:'1.764',score:44},s2:{st:'gold',v:'0.95',score:74},note:'Cardiovascular load is high — driven by vascular resistance and stiff, viscous blood.',
+      labs:{metric:'Blood Pressure',unit:'mmHg',ref:'< 120/80',s1:{st:'rust',v:'148/96'},s2:{st:'gold',v:'128/82'}}},
+    {id:'respiratory',name:'Lungs',files:['models/lung.glb'],metric:'Vital Capacity',unit:'mL',ref:'normal higher',s1:{st:'gold',v:'3307',score:66},s2:{st:'gold',v:'3600',score:82},note:'Vital capacity is low and PaCO₂ runs high — breathing drills and red-light support gas exchange.',
+      labs:{metric:'SpO₂ (resting)',unit:'%',ref:'> 95',s1:{st:'sage',v:'96'},s2:{st:'sage',v:'98'}}},
+    {id:'liver',name:'Liver',files:['models/liver.glb'],metric:'Liver panel',unit:'',ref:'in range',s1:{st:'sage',v:'in range',score:84},s2:{st:'sage',v:'in range',score:90},note:'Liver panel is mostly in range — held healthy through the detox phases.',
+      labs:{metric:'ALT / GGT',unit:'U/L',ref:'<33 / <40',s1:{st:'gold',v:'31 / 38'},s2:{st:'sage',v:'22 / 28'}}},
+    {id:'kidneys',name:'Kidneys',files:['models/kidney_l.glb','models/kidney_r.glb'],metric:'BUN',unit:'',ref:'normal lower',s1:{st:'gold',v:'9.361',score:74},s2:{st:'sage',v:'7.5',score:88},note:'BUN runs mildly high (+) — hydration and lower vascular strain bring it back down.',
+      labs:{metric:'Creatinine · eGFR',unit:'',ref:'eGFR > 90',s1:{st:'sage',v:'1.0 · 92'},s2:{st:'sage',v:'1.0 · 95'}}},
+    {id:'gut',name:'Gut',files:['models/small_intestine.glb','models/large_intestine.glb'],metric:'Gastric Absorption',unit:'',ref:'normal higher',s1:{st:'rust',v:'29.641',score:46},s2:{st:'gold',v:'38.0',score:76},note:'Gastric + small-intestine absorption are low with dysbiosis — minerals aren\'t being taken up.',
+      labs:{metric:'Calprotectin',unit:'µg/g',ref:'< 50',s1:{st:'rust',v:'96'},s2:{st:'gold',v:'55'}}},
+    {id:'spleen',name:'Immune',files:['models/spleen.glb'],metric:'Immune panel',unit:'',ref:'in range',s1:{st:'sage',v:'in range',score:86},s2:{st:'sage',v:'in range',score:88},note:'Immune markers are calm and healthy — no change needed.',
+      labs:{metric:'Zonulin',unit:'ng/mL',ref:'< 48',s1:{st:'gold',v:'58'},s2:{st:'sage',v:'44'}}},
+  ]},
+  {id:'nervous',name:'Nervous',kind:'organs',parts:[
+    {id:'cognition',name:'Cognition',files:['models/brain.glb'],metric:'Memory Index',unit:'',ref:'normal higher',s1:{st:'gold',v:'0.318',score:62},s2:{st:'gold',v:'0.55',score:80},note:'Memory index and cerebrovascular O₂ are low — vascular strain is starting to reduce brain oxygenation.',
+      labs:{metric:'Homocysteine',unit:'µmol/L',ref:'< 10',s1:{st:'gold',v:'13.8'},s2:{st:'sage',v:'9.2'}}},
+    {id:'nerve',name:'Nerve',files:['models/spinal_cord.glb'],metric:'Cerebrovascular O₂ Sat.',unit:'',ref:'normal higher',s1:{st:'gold',v:'0.614',score:64},s2:{st:'gold',v:'0.78',score:82},note:'Cerebrovascular oxygen saturation is low; B12-linked nerve support backs conduction and recovery.',
+      labs:{metric:'B12 (serum)',unit:'',ref:'> 400 pg/mL',s1:{st:'rust',v:'2.618 (low)'},s2:{st:'gold',v:'4.5'}}},
+  ]},
+  {id:'skeletal',name:'Skeletal',kind:'bone',files:['models/pelvis.glb','models/sternum.glb','models/manubrium.glb','models/knee_l.glb','models/knee_r.glb'],parts:[
+    {id:'bone',name:'Bone',metric:'Bone Hyperplasia',unit:'',ref:'normal lower',s1:{st:'gold',v:'0.52',score:66},s2:{st:'gold',v:'0.40',score:82},note:'Bone hyperplasia is severely graded (+++) and osteocalcin is low — D3+K2 and osteocalcin support rebuild the matrix.',
+      labs:{metric:'25-OH Vitamin D',unit:'ng/mL',ref:'40–60',s1:{st:'rust',v:'24'},s2:{st:'sage',v:'48'}}}]},
+];
+
+// Cross-cutting result groups (no single organ) — overlay badges. Data = ELEV8-PATIENT-DATA.md §3.
+const CROSS=[
+  {id:'toxins',name:'Toxic burden',st:'rust',sub:'Lead · Mercury · Cadmium · Pesticides · Free radicals',
+    items:[['Lead','0.945','0.45'],['Mercury','0.743','0.35'],['Cadmium','1.581','0.9'],['Pesticide residue','0.491','0.25'],['Free radicals','0.469','0.22']],
+    note:'Heavy-metal + oxidative burden is out of range and is damaging the vessel lining — a key amplifier of the hypertension.'},
+  {id:'micronutrients',name:'Micronutrients',st:'gold',sub:'Iron · Calcium · A · B1 · B12 · C · D3 · CoQ10 — all low',
+    items:[['Iron','0.561','0.85'],['Calcium','0.774','0.95'],['Vitamin A','0.304','0.6'],['B1','1.086','1.4'],['B12','2.618','4.5'],['Vitamin C','3.34','5.5'],['Vitamin D3','4.575','7.5'],['CoQ10','0.56','1.1']],
+    note:'Low across the board — downstream of the poor gut absorption. Fixing the gut is what makes supplementation stick.'},
+  {id:'hormones',name:'Hormones',st:'gold',sub:'Thyroid · Adrenal · Testosterone — low output',
+    items:[['Thyroid secretion','1.96','2.6'],['Adrenal index','1.992','2.5'],['Testosterone','3.275','4.6']],
+    note:'Low thyroid, adrenal and testosterone output weakens blood-pressure regulation. Ashwagandha, Zinc+Copper and sleep target this.'},
+];
+const layerScore=(l,sc)=>Math.round(l.parts.reduce((a,p)=>a+p[`s${sc}`].score,0)/l.parts.length);
+const layerStatus=(l,sc)=>l.parts.map(p=>p[`s${sc}`].st).reduce((a,b)=>worse(a,b));
+const overall=sc=>Math.round(LAYERS.reduce((a,l)=>a+layerScore(l,sc),0)/LAYERS.length);
+const band=s=>s>=80?'sage':s>=66?'gold':'rust';
+
+let scan=2, activeLayer='organs', selectedPart=null, narration=true;
+const visible=new Set(['organs','skin']);
+
+// three.js
+const host=document.getElementById('c'), W=()=>innerWidth, H=()=>innerHeight;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(42,W()/H(),0.01,100);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(W(),H()); host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff,0x32402f,1.05));
+const k=new THREE.DirectionalLight(0xffffff,1.05);k.position.set(2,4,5);scene.add(k);
+const f=new THREE.DirectionalLight(0xF4A63C,0.5);f.position.set(-4,1,-3);scene.add(f);
+const controls=new OrbitControls(camera,renderer.domElement); controls.enableDamping=true;controls.dampingFactor=0.09;controls.enablePan=false;
+const pivot=new THREE.Group(); scene.add(pivot);
+const loader=new GLTFLoader();
+const groups={}, partObjs={}, raycast=[]; let framed=false,bodyR=1,bodyC=new THREE.Vector3();
+const camGoal={target:new THREE.Vector3(),pos:new THREE.Vector3()}; let camActive=false;
+
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:o.rough??0.55,metalness:0.05,transparent:o.opacity!=null,opacity:o.opacity??1,depthWrite:!(o.opacity!=null&&o.opacity<0.5),side:o.opacity!=null?THREE.DoubleSide:THREE.FrontSide});
+const load=fp=>new Promise((res,rej)=>loader.load(fp,g=>res(g.scene),undefined,rej));
+
+async function ensureLayer(l){
+  if(groups[l.id])return; const g=new THREE.Group(); pivot.add(g); groups[l.id]=g;
+  if(l.kind==='organs'){
+    const light=l.parts.filter(p=>!p.files.some(x=>x.includes('lung'))), heavy=l.parts.filter(p=>p.files.some(x=>x.includes('lung')));
+    for(const p of light) await addPart(g,p);
+    if(!framed)frameAll();
+    heavy.forEach(p=>addPart(g,p));
+  } else {
+    for(const fp of l.files){ const s=await load(fp); s.traverse(m=>{ if(m.isMesh){ m.userData.layer=l.id;
+      m.material = l.kind==='shell'?M(new THREE.Color(0xF0D9BE),{opacity:0.12}) : l.kind==='bone'?M(new THREE.Color(0xEDE6D6),{rough:0.85}) : M(new THREE.Color(SC[layerStatus(l,scan)]));
+      if(l.kind!=='shell') raycast.push(m); }}); g.add(s); }
+    if(!framed)frameAll();
+  }
+  applyView();
+}
+async function addPart(g,p){ const pg=new THREE.Group(); pg.userData.part=p.id; pg.userData.layer=g===groups.nervous?'nervous':'organs'; g.add(pg); partObjs[p.id]=pg;
+  for(const fp of p.files){ const s=await load(fp); s.traverse(m=>{ if(m.isMesh){ m.userData.part=p.id; raycast.push(m);} }); pg.add(s);} applyView(); }
+function frameAll(){ const b=new THREE.Box3().setFromObject(pivot); if(b.isEmpty())return;
+  bodyC=b.getCenter(new THREE.Vector3()); const sz=b.getSize(new THREE.Vector3()); pivot.position.sub(bodyC); bodyC.set(0,0,0);
+  bodyR=Math.max(sz.x,sz.y,sz.z); camera.near=bodyR/100;camera.far=bodyR*20;camera.updateProjectionMatrix();
+  controls.minDistance=bodyR*0.45;controls.maxDistance=bodyR*3.2; controls.target.copy(bodyC); camera.position.set(0,0,bodyR*1.75);
+  camGoal.target.copy(bodyC);camGoal.pos.copy(camera.position); framed=true; document.getElementById('loading').style.display='none'; }
+const centroid=o=>{const b=new THREE.Box3().setFromObject(o);return b.isEmpty()?null:b.getCenter(new THREE.Vector3());};
+
+function applyView(){
+  LAYERS.forEach(l=>{ const g=groups[l.id]; if(!g)return; const vis=visible.has(l.id);
+    g.visible=vis;
+    if(!vis)return;
+    if(l.id==='skin'){ g.traverse(m=>{if(m.isMesh)m.material.opacity=activeLayer==='skin'?0.30:0.10;}); return; }
+    const isActive=l.id===activeLayer;
+    if(l.kind==='organs'){ l.parts.forEach(p=>{ const pg=partObjs[p.id]; if(!pg)return; const sel=isActive&&selectedPart===p.id; const c=new THREE.Color(SC[p[`s${scan}`].st]);
+      pg.traverse(m=>{if(m.isMesh){ m.material.color.copy(c); m.material.emissive.copy(c); m.material.emissiveIntensity=sel?0.62:(isActive?0.12:0.05); const dim=isActive&&selectedPart&&!sel; m.material.opacity=dim?0.4:(isActive?1:0.85); m.material.transparent=dim||!isActive; }});});
+    } else { const fp=l.parts.find(p=>p.id===selectedPart); const st=(isActive&&fp)?fp[`s${scan}`].st:layerStatus(l,scan); const c=new THREE.Color(SC[st]);
+      g.traverse(m=>{if(m.isMesh){ m.material.color.copy(c); m.material.emissive.copy(c); m.material.emissiveIntensity=isActive?0.3:0.12; m.material.opacity=isActive?1:0.8; m.material.transparent=!isActive; }}); }
+  });
+  renderUI();
+}
+function focusPart(p){ const pg=partObjs[p.id]; if(!pg){camGoal.target.copy(bodyC);camGoal.pos.set(0,0,bodyR*1.75);camActive=true;return;}
+  const c=centroid(pg); if(!c)return; const dir=camera.position.clone().sub(controls.target).normalize();
+  camGoal.target.copy(c); camGoal.pos.copy(c.clone().add(dir.multiplyScalar(bodyR*1.0))); camActive=true; }
+
+// UI
+function renderOverall(){ const s=overall(scan),st=band(s),col=SC[st],prev=overall(scan===2?1:2);
+  // pie: SVG donut, one wedge per layer (colored by that layer's status)
+  const R=28, sw=9, c=34, C=2*Math.PI*R, n=LAYERS.length, seg=C/n, gap=2.6;
+  const arcs=LAYERS.map((l,i)=>`<circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="${SC[layerStatus(l,scan)]}" stroke-width="${sw}" stroke-dasharray="${(seg-gap).toFixed(2)} ${(C-seg+gap).toFixed(2)}" stroke-dashoffset="${(-i*seg).toFixed(2)}"/>`).join('');
+  document.getElementById('ovring').innerHTML=`<svg viewBox="0 0 68 68" style="transform:rotate(-90deg)">${arcs}</svg><span class="num" style="color:${col}">${s}</span>`;
+  const o=document.getElementById('ovst');o.textContent=LAB[st];o.style.color=col;
+  document.getElementById('ovtr').textContent=scan===2?(s>=prev?`▲ +${s-prev} projected by Day 90`:'projected · Day 90'):'baseline · May 2026'; }
+function renderLayers(){ const host=document.getElementById('layers'); host.querySelectorAll('.lrow').forEach(n=>n.remove());
+  LAYERS.forEach(l=>{ const st=layerStatus(l,scan),sc=layerScore(l,scan); const r=document.createElement('div');
+    r.className='lrow'+(visible.has(l.id)?' on':'')+(l.id===activeLayer?' active':'');
+    r.innerHTML=`<span class="sw"></span><span class="pip" style="background:${SC[st]}"></span><span class="nm">${l.name}</span><span class="sc" style="color:${SC[st]}">${sc}</span>`;
+    r.querySelector('.sw').onclick=e=>{e.stopPropagation();toggleVisible(l.id);};
+    r.onclick=()=>setActive(l.id); host.appendChild(r); }); }
+function renderParts(){ const L=LAYERS.find(l=>l.id===activeLayer); document.getElementById('layerTitle').textContent=L.name;
+  const g=document.getElementById('partsGrid'); g.innerHTML='';
+  L.parts.forEach(p=>{ const cur=p[`s${scan}`]; const el=document.createElement('div'); el.className='sq'+(selectedPart===p.id?' on':''); el.style.setProperty('--c',SC[cur.st]);
+    el.innerHTML=`<div class="n"><i></i>${p.name}</div><div class="s">${cur.score}</div><div class="m">${p.metric} ${cur.v}${p.unit?' '+p.unit:''}</div>`;
+    el.onclick=()=>{ stopTour(); pickPart(p.id); }; g.appendChild(el); }); }
+// renders one grouped finding block (Bio Quantum or Bloodwork): label · baseline→projected · ref · status colors
+function findingBlock(label,f){ const cur=f[`s${scan}`],prev=f[`s${scan===2?1:2}`],col=SC[cur.st],colP=SC[prev.st];
+  return `<div class="grp"><div class="gh"><span class="gl">${label}</span><span class="chip" style="background:${col}22;color:${col}"><span style="width:6px;height:6px;border-radius:99px;background:${col};display:inline-block"></span>${LAB[cur.st]}</span></div>`+
+    `<div class="mrow"><div><div class="mn">${f.metric}</div><div class="mv">${cur.v} <small>${f.unit||''}</small></div>`+
+    `<div class="ba"><span style="color:${colP}">${prev.v}</span> <span style="opacity:.5">→</span> <span style="color:${col}">${cur.v}</span> <span style="opacity:.5">baseline→projected</span></div></div>`+
+    `<div class="ref">ref<br><b>${f.ref}</b></div></div></div>`; }
+function renderDetail(){ const d=document.getElementById('detail'); const L=LAYERS.find(l=>l.id===activeLayer); const p=L.parts.find(x=>x.id===selectedPart);
+  if(!p){d.classList.remove('show');return;} const cur=p[`s${scan}`],prev=p[`s${scan===2?1:2}`],col=SC[cur.st],imp=scan===2&&cur.score>prev.score; d.classList.add('show');
+  d.innerHTML=`<div class="dh"><b>${p.name}</b><div style="display:flex;align-items:center;gap:7px"><span class="chip" style="background:${col}22;color:${col}"><span style="width:6px;height:6px;border-radius:99px;background:${col};display:inline-block"></span>${LAB[cur.st]}</span><button class="dx" type="button">✕</button></div></div>`+
+    findingBlock('Bio Quantum',p)+
+    (p.labs?findingBlock('Bloodwork',p.labs):'')+
+    (imp?`<div class="plan" style="background:#E2F1E7;color:#2F5A3A;margin-top:8px"><span style="color:#2F5A3A">▲ +${cur.score-prev.score} projected by Day 90</span>${p.note}</div>`:`<div class="plan" style="background:var(--sand);color:var(--ink-70);margin-top:8px"><span style="color:var(--clay)">What we found</span>${p.note}</div>`)+
+    `<div class="plan"><span>Your plan</span>${PLAN[p.id]||'Maintain.'}</div>`;
+  const x=d.querySelector('.dx'); if(x) x.onclick=()=>{ stopTour(); selectedPart=null; camGoal.target.copy(bodyC); camGoal.pos.set(0,0,bodyR*1.75); camActive=true; applyView(); }; }
+let activeCross=null;
+function renderCross(){ const host=document.getElementById('cross'); host.innerHTML='';
+  CROSS.forEach(c=>{ const col=SC[c.st]; const el=document.createElement('div');
+    el.className='cb glass'+(activeCross===c.id?' active':'');
+    el.innerHTML=`<span class="pip" style="background:${col}"></span><div class="t">${c.name}<small>${c.sub}</small></div><span class="st" style="color:${col}">${LAB[c.st]}</span>`;
+    el.onclick=()=>{ stopTour(); selectedPart=null; activeCross=activeCross===c.id?null:c.id; renderCrossDetail(); renderCross(); };
+    host.appendChild(el); }); }
+function renderCrossDetail(){ const d=document.getElementById('detail'); if(!activeCross){ renderDetail(); return; }
+  const c=CROSS.find(x=>x.id===activeCross); const col=SC[c.st]; d.classList.add('show');
+  const rows=c.items.map(([n,b,p])=>`<div class="mrow" style="margin-top:6px"><div class="mn">${n}</div><div class="ref" style="text-align:right"><span style="opacity:.6">${b}</span> → <b style="color:${col}">${p}</b></div></div>`).join('');
+  d.innerHTML=`<div class="dh"><b>${c.name}</b><div style="display:flex;align-items:center;gap:7px"><span class="chip" style="background:${col}22;color:${col}"><span style="width:6px;height:6px;border-radius:99px;background:${col};display:inline-block"></span>${LAB[c.st]}</span><button class="dx" type="button">✕</button></div></div>`+
+    `<div class="plan" style="background:var(--sand);color:var(--ink-70);margin-top:8px"><span style="color:var(--clay)">Cross-cutting · baseline → projected (Day 90)</span>${c.note}</div>`+
+    `<div class="grp">${rows}</div>`+
+    `<div class="plan"><span>Your plan</span>${PLAN[c.id]||'Maintain.'}</div>`;
+  const x=d.querySelector('.dx'); if(x) x.onclick=()=>{ activeCross=null; renderCross(); renderDetail(); }; }
+function renderUI(){ renderOverall(); renderLayers(); renderParts(); renderCross(); if(activeCross) renderCrossDetail(); else renderDetail(); }
+
+// state changes
+async function ensureAndShow(id){ visible.add(id); document.getElementById('loading').style.display=groups[id]?'none':(framed?'none':'grid'); await ensureLayer(LAYERS.find(l=>l.id===id)); }
+// click a layer name = isolate it (just that layer + faint skin shell)
+async function setActive(id){ stopTour(); activeLayer=id; selectedPart=null; camActive=true; camGoal.target.copy(bodyC); camGoal.pos.set(0,0,bodyR*1.75);
+  visible.clear(); visible.add('skin'); visible.add(id); await ensureAndShow(id); applyView(); }
+// click the switch = add/remove that layer as an overlay (peel several at once)
+async function toggleVisible(id){ stopTour();
+  if(id==='skin'){ if(visible.has('skin')) visible.delete('skin'); else visible.add('skin'); applyView(); return; }
+  if(visible.has(id)){ visible.delete(id); if(activeLayer===id) activeLayer=[...visible].find(x=>x!=='skin')||'organs'; selectedPart=null; }
+  else { await ensureAndShow(id); activeLayer=id; selectedPart=null; }
+  applyView(); }
+function pickPart(id){ activeCross=null; const L=LAYERS.find(l=>l.id===activeLayer); selectedPart=selectedPart===id?null:id; const p=L.parts.find(x=>x.id===id);
+  if(selectedPart&&p)focusPart(p); else {camGoal.target.copy(bodyC);camGoal.pos.set(0,0,bodyR*1.75);camActive=true;} applyView(); }
+function selectForTour(id){ selectedPart=id; const p=LAYERS.find(l=>l.id===activeLayer).parts.find(x=>x.id===id); if(p)focusPart(p); applyView(); }
+
+// picking in 3D
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2(); let down=null;
+host.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
+host.addEventListener('pointerup',e=>{ if(!down)return; const mv=Math.hypot(e.clientX-down[0],e.clientY-down[1]); down=null; if(mv>6)return;
+  const r=host.getBoundingClientRect(); ptr.x=((e.clientX-r.left)/r.width)*2-1; ptr.y=-((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(ptr,camera);
+  const vis=raycast.filter(m=>{let x=m;while(x){if(x.visible===false)return false;x=x.parent;}return true;});
+  const hit=ray.intersectObjects(vis,false)[0]; if(!hit)return; stopTour(); const u=hit.object.userData;
+  if(u.part){ const lyr=LAYERS.find(l=>l.parts.some(p=>p.id===u.part)).id; if(lyr!==activeLayer){ activeLayer=lyr; } pickPart(u.part); }
+  else if(u.layer){ const L=LAYERS.find(l=>l.id===u.layer); if(L){ activeLayer=L.id; if(L.parts.length===1) pickPart(L.parts[0].id); else applyView(); } } });
+
+// scan toggle
+document.querySelectorAll('#scan button').forEach(b=>b.onclick=()=>{ scan=+b.dataset.scan; document.querySelectorAll('#scan button').forEach(x=>x.classList.toggle('on',+x.dataset.scan===scan)); applyView(); });
+// section switcher (click through top-level layers)
+function cycleSection(d){ const i=LAYERS.findIndex(l=>l.id===activeLayer); setActive(LAYERS[(i+d+LAYERS.length)%LAYERS.length].id); }
+document.getElementById('secPrev').onclick=()=>cycleSection(-1);
+document.getElementById('secNext').onclick=()=>cycleSection(1);
+
+// ---- guided tour + narration ----
+const TOUR=[]; LAYERS.forEach(l=>l.parts.forEach(p=>TOUR.push({l:l.id,p:p.id})));
+let ti=-1,playing=false,timer=null;
+const sub=document.getElementById('subtitle');
+function speakText(p){ const cur=p[`s${scan}`]; return `${p.name}. Score ${cur.score} out of 100. ${LAB[cur.st]}. ${p.note} Your plan: ${PLAN[p.id]||'maintain.'}`; }
+function updateTourUI(){ const c=document.getElementById('tcount'); if(c)c.textContent=(ti<0?'0':ti+1)+' / '+TOUR.length; const b=document.getElementById('tplay'); if(b)b.innerHTML=playing?'❚❚':'► Tour'; }
+function clearTimer(){ if(timer){clearTimeout(timer);timer=null;} }
+function stopTour(){ playing=false; clearTimer(); try{speechSynthesis.cancel();}catch(e){} sub.classList.remove('show'); updateTourUI(); }
+async function gotoStep(i){ ti=(i+TOUR.length)%TOUR.length; const s=TOUR[ti];
+  if(activeLayer!==s.l){ activeLayer=s.l; selectedPart=null; visible.clear(); visible.add('skin'); visible.add(s.l); await ensureAndShow(s.l); }
+  selectForTour(s.p); updateTourUI();
+  const p=LAYERS.find(l=>l.id===s.l).parts.find(x=>x.id===s.p);
+  sub.textContent=`${p.name} · ${p[`s${scan}`].score}/100 · ${p.note}`; sub.classList.add('show');
+}
+function advance(){ gotoStep(ti+1).then(()=>{ if(!playing)return; const p=LAYERS.find(l=>l.id===TOUR[ti].l).parts.find(x=>x.id===TOUR[ti].p);
+  if(narration && 'speechSynthesis' in window){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(speakText(p)); u.rate=1.0; u.pitch=1.0;
+    const vs=speechSynthesis.getVoices(); const pref=vs.find(v=>/Samantha|Google US English|Jenny|Aria|female/i.test(v.name)); if(pref)u.voice=pref;
+    let done=false; const go=()=>{ if(done)return; done=true; if(playing){ clearTimer(); timer=setTimeout(advance,700); } };
+    u.onend=go; speechSynthesis.speak(u); clearTimer(); timer=setTimeout(go,9000); /* fallback */
+  }catch(e){ clearTimer(); timer=setTimeout(advance,5200); } }
+  else { clearTimer(); timer=setTimeout(advance,5200); } }); }
+function playTour(){ playing=!playing; if(playing){ try{speechSynthesis.resume();}catch(e){} advance(); } else stopTour(); updateTourUI(); }
+function manual(d){ playing=false; clearTimer(); try{speechSynthesis.cancel();}catch(e){} gotoStep(ti<0?(d>0?0:TOUR.length-1):ti+d); }
+document.getElementById('tplay').onclick=playTour;
+document.getElementById('tnext').onclick=()=>manual(1);
+document.getElementById('tprev').onclick=()=>manual(-1);
+document.getElementById('narrToggle').onclick=e=>{ narration=!narration; e.currentTarget.classList.toggle('off',!narration); if(!narration){try{speechSynthesis.cancel();}catch(e){}} };
+
+addEventListener('resize',()=>{camera.aspect=W()/H();camera.updateProjectionMatrix();renderer.setSize(W(),H());});
+
+// ---- per-patient data (RLS-scoped API): override status/values; empty state when no scan ----
+function applyData(d){ LAYERS.forEach(l=>l.parts.forEach(p=>{ const v=d.parts&&d.parts[p.id]; if(v){ if(v.s1)p.s1=v.s1; if(v.s2)p.s2=v.s2; if(v.note)p.note=v.note; } })); if(d.cross&&d.cross.length){ CROSS.splice(0,CROSS.length,...d.cross); } }
+function showEmpty(t,s){ const l=document.getElementById('loading'); l.innerHTML='<div style="max-width:330px;padding:22px"><div style="font-family:var(--serif);font-size:21px;font-weight:600;margin-bottom:8px">'+t+'</div><div style="color:rgba(255,246,234,.62);line-height:1.55">'+s+'</div></div>'; l.style.display='grid'; }
+(async()=>{
+  let d=null;
+  try{ const r=await fetch('/api/bodymap'+location.search,{credentials:'same-origin'}); d=await r.json(); }catch(e){}
+  if(!d||!d.hasScan){ showEmpty('No scan on file yet','The 3D body map appears after the first Bio Quantum scan is uploaded and reviewed.'); return; }
+  applyData(d);
+  await ensureLayer(LAYERS.find(l=>l.id==='organs')); await ensureLayer(LAYERS.find(l=>l.id==='skin')); applyView(); updateTourUI();
+})();
+let spin=0;
+(function loop(){ requestAnimationFrame(loop);
+  if(framed){ spin+=0.0015; if(!down&&!camActive&&!playing) pivot.rotation.y=Math.sin(spin)*0.22;
+    if(camActive){ controls.target.lerp(camGoal.target,0.08); camera.position.lerp(camGoal.pos,0.08); if(camera.position.distanceTo(camGoal.pos)<bodyR*0.02)camActive=false; } }
+  controls.update(); renderer.render(scene,camera);
+})();
+window.__ready=true;
+</script>
+</body>
+</html>

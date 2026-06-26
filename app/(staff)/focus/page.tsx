@@ -1,0 +1,176 @@
+import Link from "next/link";
+import Snapshot from "@/components/Snapshot";
+import { requireStaff } from "@/lib/auth/roles";
+import { createClient } from "@/lib/supabase/server";
+import { logAudit } from "@/lib/auth/audit";
+import VoiceNotePanel from "@/lib/ai/VoiceNotePanel";
+import AiSynthesisButton from "@/lib/ai/AiSynthesisButton";
+import { aiEnabled, transcribeEnabled } from "@/lib/ai";
+
+export default async function FocusPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ current?: string }>;
+}) {
+  const me = await requireStaff();
+  const sp = await searchParams;
+  const supabase = await createClient();
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const { data: appts } = await supabase
+    .from("appointments")
+    .select(
+      "id, start_time, type, modality, status, patient_id, patients(id, first_name, last_name, status_cached)",
+    )
+    .eq("practitioner_id", me.id)
+    .gte("start_time", todayStart.toISOString())
+    .neq("status", "cancelled")
+    .order("start_time")
+    .limit(20);
+
+  const list = appts ?? [];
+  const current = list.find((a) => a.id === sp.current) ?? list[0] ?? null;
+  const upNext = list.filter((a) => a.id !== current?.id).slice(0, 4);
+
+  if (!current) {
+    return (
+      <div>
+        <h1 className="serif" style={{ fontSize: 26 }}>No one in the chair</h1>
+        <p className="muted">No upcoming appointments today. Enjoy the calm.</p>
+      </div>
+    );
+  }
+
+  // `patients` comes back as an object (one-to-one) or array depending on the join.
+  const p = (Array.isArray(current.patients) ? current.patients[0] : current.patients) as
+    | { id: string; first_name: string; last_name: string; status_cached: string }
+    | null;
+
+  let visitCount = 0;
+  let intakeDone = false;
+  if (p) {
+    const { count } = await supabase
+      .from("visits")
+      .select("id", { count: "exact", head: true })
+      .eq("patient_id", p.id);
+    visitCount = count ?? 0;
+    const { data: intake } = await supabase
+      .from("intake_forms")
+      .select("completed")
+      .eq("patient_id", p.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    intakeDone = Boolean(intake?.completed);
+    await logAudit({ action: "view", resource: "focus", resourceId: p.id, patientId: p.id });
+  }
+
+  const isExisting = visitCount > 0 || p?.status_cached === "existing";
+
+  return (
+    <div>
+      {/* Next up strip */}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginBottom: 14 }}>
+        {upNext.length > 0 && (
+          <div className="muted" style={{ fontSize: 13 }}>
+            Next up:{" "}
+            {upNext.map((a, i) => {
+              const np = (Array.isArray(a.patients) ? a.patients[0] : a.patients) as
+                | { first_name: string; last_name: string }
+                | null;
+              return (
+                <Link key={a.id} href={`/focus?current=${a.id}`} style={{ marginLeft: i ? 10 : 4, color: "var(--berry)", fontWeight: 600 }}>
+                  {np?.first_name} {np?.last_name?.[0] ?? ""}.{" "}
+                  <span className="muted">{fmtTime(a.start_time)}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Focus card */}
+      <div className="card" style={{ maxWidth: 760 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <h1 className="serif" style={{ fontSize: 30, margin: 0 }}>
+            {p ? `${p.first_name} ${p.last_name}` : "Patient"}
+          </h1>
+          <span className={`badge ${isExisting ? "existing" : "new"}`}>
+            {isExisting ? "Existing" : "New"}
+          </span>
+        </div>
+        <p className="muted" style={{ marginTop: 4 }}>
+          {labelType(current.type)} · {current.modality === "online" ? "Online" : "In person"} · {fmtTime(current.start_time)}
+        </p>
+
+        <div style={{ marginTop: 16, padding: 16, background: "var(--paper)", borderRadius: 12 }}>
+          {isExisting ? (
+            <p style={{ margin: 0 }}>
+              <b>{visitCount}</b> past visit{visitCount === 1 ? "" : "s"} on file ·{" "}
+              {intakeDone ? "intake complete" : "intake incomplete"}.
+            </p>
+          ) : (
+            <p style={{ margin: 0 }}>
+              First visit. {intakeDone ? "Intake is complete — review it before the session." : "Intake not yet completed."}
+            </p>
+          )}
+        </div>
+
+        {/* Quick actions */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 18 }}>
+          <Link className="btn" href={p ? `/patients/${p.id}` : "#"} style={{ textDecoration: "none" }}>
+            Open full record
+          </Link>
+          {p && <AiSynthesisButton patientId={p.id} aiEnabled={aiEnabled} />}
+          <Link className="btn ghost" href={p ? `/scans/${p.id}` : "#"} style={{ textDecoration: "none" }}>Body map / scan</Link>
+          <Link className="btn ghost" href={p ? `/plan/${p.id}` : "#"} style={{ textDecoration: "none" }}>90-day plan</Link>
+        </div>
+
+        {/* Voice note */}
+        {p && transcribeEnabled && (
+          <VoiceNotePanel patientId={p.id} />
+        )}
+        {p && !transcribeEnabled && (
+          <p className="muted" style={{ fontSize: 13, marginTop: 12 }}>
+            Voice notes: add <code>TRANSCRIBE_URL</code> to enable (Whisper / OpenAI).
+          </p>
+        )}
+      </div>
+
+      {p && (
+        <div style={{ maxWidth: 760, marginTop: 18 }}>
+          <Snapshot patientId={p.id} />
+        </div>
+      )}
+
+      {/* Advance */}
+      {upNext[0] && (
+        <p style={{ marginTop: 18 }}>
+          <Link className="btn" href={`/focus?current=${upNext[0].id}`} style={{ textDecoration: "none" }}>
+            Next patient →
+          </Link>
+        </p>
+      )}
+    </div>
+  );
+}
+
+function fmtTime(iso: string) {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      weekday: "short",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+function labelType(t: string) {
+  return (
+    { consult: "Consult", follow_up: "Follow-up", scan_review: "Scan review", other: "Visit" }[t] ??
+    "Visit"
+  );
+}

@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/bodymap/">
+<title>Elev8 — 2D Body Map</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  :root{ --sage:#6fae84; --gold:#f4a63c; --rust:#e0613b; }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:#0E2017;color:var(--sand,#fff6ea);font-family:var(--sans,system-ui);overflow:hidden;}
+  #app{position:fixed;inset:0;display:grid;grid-template-columns:230px 1fr 250px;gap:12px;padding:14px;}
+  .glass{background:rgba(14,32,23,.62);border:1px solid rgba(255,246,234,.14);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border-radius:16px;}
+  .col{padding:12px;overflow:auto;}
+  .h{font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:rgba(255,246,234,.5);font-weight:700;margin:2px 2px 9px;}
+
+  /* overall */
+  #overall{display:flex;align-items:center;gap:13px;padding:13px 14px;margin-bottom:12px;}
+  #overall .ring{width:64px;height:64px;position:relative;flex-shrink:0;}
+  #overall .ring svg{position:absolute;inset:0;}
+  #overall .num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--serif,Georgia);font-size:18px;font-weight:600;}
+  #overall .lbl{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,246,234,.55);font-weight:700;}
+  #overall .st{font-size:15px;font-weight:800;margin-top:2px;}
+  #overall .tr{font-size:11px;color:rgba(255,246,234,.62);margin-top:2px;}
+
+  /* layers */
+  .lrow{display:flex;align-items:center;gap:9px;padding:7px;border-radius:11px;cursor:pointer;}
+  .lrow:hover{background:rgba(255,246,234,.06);}
+  .lrow .sw{width:30px;height:18px;border-radius:99px;background:rgba(255,246,234,.16);position:relative;flex-shrink:0;transition:.18s;}
+  .lrow .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:99px;background:#fff;transition:.18s;}
+  .lrow.on .sw{background:var(--berry,#14834e);} .lrow.on .sw::after{left:14px;}
+  .lrow .nm{flex:1;font-size:13px;font-weight:600;}
+  .lrow .pip{width:9px;height:9px;border-radius:99px;flex-shrink:0;}
+  .lrow .sc{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;width:22px;text-align:right;}
+
+  /* stage */
+  #stage{position:relative;display:flex;align-items:stretch;justify-content:center;}
+  #stagewrap{position:relative;width:100%;border-radius:18px;background:radial-gradient(120% 80% at 50% 18%, #16331f 0%, #0c1b13 75%);overflow:hidden;border:1px solid rgba(255,246,234,.10);}
+  svg#body{width:100%;height:100%;display:block;touch-action:none;}
+  .ovl{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;background:#0E2017;color:var(--sand,#fff6ea);z-index:9;font-size:14.5px;line-height:1.55;}
+  .ovl.hide{display:none;}
+  .ovl b{font-family:var(--serif,Georgia);font-size:21px;font-weight:600;display:block;margin-bottom:8px;}
+  .ovl .muted2{color:rgba(255,246,234,.62);max-width:320px;}
+  #scan{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:5;display:flex;padding:3px;}
+  #scan button{border:none;background:transparent;color:rgba(255,246,234,.65);font-family:inherit;font-weight:700;font-size:12px;padding:7px 12px;border-radius:9px;cursor:pointer;line-height:1.1;}
+  #scan button .d{display:block;font-size:9px;font-weight:600;opacity:.7;margin-top:2px;}
+  #scan button.on{background:var(--sand,#fff6ea);color:var(--ink,#1e3a30);}
+  #flip{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:4px;padding:3px;}
+  #flip button{border:none;background:transparent;color:rgba(255,246,234,.7);font-weight:700;font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;}
+  #flip button.on{background:var(--berry,#14834e);color:#fff;}
+  .legend{position:absolute;bottom:14px;right:14px;z-index:5;display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:600;color:rgba(255,246,234,.8);}
+  .legend span{display:flex;align-items:center;gap:6px;} .legend i{width:9px;height:9px;border-radius:99px;}
+
+  /* parts + detail */
+  .sq{width:100%;text-align:left;background:rgba(255,251,244,.96);color:var(--ink,#1e3a30);border:1.5px solid transparent;border-radius:12px;padding:9px 11px;cursor:pointer;margin-bottom:7px;display:block;}
+  .sq.on{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent);}
+  .sq .n{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;}
+  .sq .n i{width:8px;height:8px;border-radius:99px;background:var(--c);}
+  .sq .s{font-family:var(--serif,Georgia);font-size:18px;font-weight:600;color:var(--c);margin-top:3px;}
+  .sq .m{font-size:10px;color:var(--muted,#7b8a7e);margin-top:2px;}
+  #detail{margin-top:4px;}
+  #detail .card{background:#fff;color:var(--ink,#1e3a30);border-radius:13px;padding:13px;}
+  #detail h4{font-family:var(--serif,Georgia);font-size:16px;margin:0 0 3px;}
+  #detail .note{font-size:12.5px;color:#46554b;line-height:1.5;margin:8px 0 0;}
+  #detail .kv{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;border-top:1px solid #eee;padding-top:8px;}
+  #detail .kv b{font-variant-numeric:tabular-nums;}
+
+  /* mobile-only elements (hidden on desktop) */
+  #mscore,#mchips,#sheet,#sheet-scrim{display:none;}
+  #mscore{position:absolute;top:12px;left:12px;z-index:6;align-items:center;gap:9px;padding:9px 15px;white-space:nowrap;}
+  #mscore .dot{width:11px;height:11px;border-radius:99px;flex-shrink:0;}
+  #mscore .num{font-family:var(--serif,Georgia);font-size:19px;font-weight:700;color:var(--sand,#fff6ea);}
+  #mscore .t{font-size:13px;font-weight:800;}
+  #mchips{gap:7px;overflow-x:auto;padding:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  #mchips::-webkit-scrollbar{display:none;}
+  #mchips .chip{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:10px 14px;border-radius:13px;background:rgba(14,32,23,.6);border:1px solid rgba(255,246,234,.15);color:var(--sand,#fff6ea);font-size:13px;font-weight:700;cursor:pointer;}
+  #mchips .chip.on{background:var(--berry,#14834e);border-color:transparent;color:#fff;}
+  #mchips .chip i{width:9px;height:9px;border-radius:99px;flex-shrink:0;}
+  #mchips .chip .sc{opacity:.72;font-variant-numeric:tabular-nums;font-size:12px;}
+  #sheet-scrim{position:fixed;inset:0;z-index:19;background:rgba(8,18,12,.4);opacity:0;transition:opacity .26s;}
+  #sheet-scrim.open{opacity:1;}
+  #sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;color:var(--ink,#1e3a30);border-radius:22px 22px 0 0;box-shadow:0 -14px 44px rgba(0,0,0,.32);transform:translateY(101%);transition:transform .28s cubic-bezier(.4,0,.2,1);max-height:74%;overflow:auto;padding:8px 18px 26px;}
+  #sheet.open{transform:translateY(0);}
+  #sheet .grip{width:42px;height:4px;border-radius:99px;background:#dcdcd6;margin:6px auto 12px;}
+  #sheet .shead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  #sheet .shead b{font-family:var(--serif,Georgia);font-size:20px;line-height:1.15;}
+  #sheet .shead .sub{font-size:11.5px;color:var(--muted,#7b8a7e);font-weight:700;margin-top:3px;}
+  #sheet .x{flex-shrink:0;border:none;background:#f1efe9;width:34px;height:34px;border-radius:99px;font-size:17px;cursor:pointer;color:var(--muted,#7b8a7e);}
+  #sheet .pchips{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0 2px;}
+  #sheet .pchip{padding:8px 13px;border-radius:99px;border:1.5px solid var(--line,#ece1ce);background:#fff;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--ink,#1e3a30);}
+  #sheet .pchip i{width:8px;height:8px;border-radius:99px;}
+  #sheet .pchip.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 10%,#fff);}
+  #sheet .vals{display:flex;gap:10px;margin-top:14px;}
+  #sheet .vals .v{flex:1;background:#f7f5ef;border-radius:13px;padding:11px 13px;}
+  #sheet .vals .v .l{font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted,#7b8a7e);font-weight:800;}
+  #sheet .vals .v .n{font-family:var(--serif,Georgia);font-size:19px;font-weight:600;margin-top:3px;}
+  #sheet .note{font-size:13.5px;line-height:1.55;color:#46554b;margin:14px 0 0;}
+
+  @media (max-width:820px){
+    #left,#right{display:none;}
+    #app{grid-template-columns:1fr;grid-template-rows:1fr auto;padding:8px;gap:8px;height:100%;}
+    #stage{min-height:0;}
+    #stagewrap{border-radius:20px;}
+    #mscore,#mchips{display:flex;}
+    #sheet{display:block;}
+    .legend{display:none;}
+    #scan{top:auto;bottom:12px;}
+    #flip{top:12px;bottom:auto;left:auto;right:12px;transform:none;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="left" class="glass col">
+    <div id="overall">
+      <div class="ring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,246,234,.14)" stroke-width="6"/><circle id="oarc" cx="32" cy="32" r="27" fill="none" stroke="var(--sage)" stroke-width="6" stroke-linecap="round" transform="rotate(-90 32 32)"/></svg><div class="num" id="onum">—</div></div>
+      <div><div class="lbl">Overall</div><div class="st" id="ost">—</div><div class="tr" id="otr"></div></div>
+    </div>
+    <div class="h">Layers · toggle &amp; pick</div>
+    <div id="layers"></div>
+  </div>
+
+  <div id="stage">
+    <div id="stagewrap">
+      <div id="scan" class="glass"><button type="button" data-s="1"><span>Baseline</span><span class="d">May 2026</span></button><button type="button" data-s="2" class="on"><span>Projected</span><span class="d">Day 90</span></button></div>
+      <div id="mscore" class="glass"><span class="dot" id="mdot"></span><span class="num" id="mnum">—</span><span class="t" id="mst">—</span></div>
+      <svg id="body" viewBox="0 0 460 940" preserveAspectRatio="xMidYMid meet" aria-label="2D anatomical body map"></svg>
+      <div id="ovl" class="ovl">Loading…</div>
+      <div id="flip" class="glass"><button data-v="front" class="on">Front</button><button data-v="back">Back</button></div>
+      <div class="legend"><span><i style="background:var(--sage)"></i>Healthy</span><span><i style="background:var(--gold)"></i>Watch</span><span><i style="background:var(--rust)"></i>Out of range</span></div>
+    </div>
+  </div>
+
+  <div id="right" class="glass col">
+    <div class="h" id="rhead">Systems</div>
+    <div id="parts"></div>
+    <div id="detail"></div>
+  </div>
+
+  <div id="mchips"></div>
+</div>
+<div id="sheet-scrim"></div>
+<div id="sheet" role="dialog" aria-label="System detail"></div>
+
+<script>
+const SC = { sage:'var(--sage)', gold:'var(--gold)', rust:'var(--rust)' };
+const HEX = { sage:'#6fae84', gold:'#f4a63c', rust:'#e0613b' };
+const worse=(a,b)=>{const o={sage:0,gold:1,rust:2};return o[a]>=o[b]?a:b;};
+
+// Marco's Bio Quantum scan — s1 baseline, s2 projected Day-90. Mirrors the 3D map.
+const LAYERS=[
+  {id:'skin',name:'Skin',pip:'gold',parts:[
+    {id:'skin',name:'Collagen',metric:'Collagen coeff.',s1:{st:'gold',v:'2.405',score:72},s2:{st:'gold',v:'3.2',score:84},note:'Collagen is low — skin elasticity and hydration reduced. The dermal-repair plan targets this.'}]},
+  {id:'skeletal',name:'Skeletal',pip:'gold',parts:[
+    {id:'bone',name:'Bone density',metric:'Bone hyperplasia',s1:{st:'gold',v:'0.52',score:66},s2:{st:'gold',v:'0.40',score:82},note:'Bone hyperplasia is graded high and osteocalcin is low — D3+K2 and resistance training rebuild the matrix.'},
+    {id:'joints',name:'Joints',metric:'Joint load',s1:{st:'sage',v:'in range',score:84},s2:{st:'sage',v:'in range',score:88},note:'Joints are healthy — maintained with mobility work.'}]},
+  {id:'muscular',name:'Muscular',pip:'sage',parts:[
+    {id:'mass',name:'Muscle mass',metric:'Lean mass',s1:{st:'sage',v:'normal',score:80},s2:{st:'sage',v:'normal',score:86},note:'Lean mass is healthy. Strength work 2×/week keeps it climbing through the plan.'},
+    {id:'recovery',name:'Recovery',metric:'Recovery index',s1:{st:'gold',v:'reduced',score:68},s2:{st:'sage',v:'improved',score:84},note:'Recovery runs slightly low while micronutrients are down — improves as gut absorption is fixed.'}]},
+  {id:'nervous',name:'Nervous',pip:'gold',parts:[
+    {id:'cognition',name:'Cognition',metric:'Memory index',s1:{st:'gold',v:'0.318',score:62},s2:{st:'gold',v:'0.55',score:80},note:'Memory index and cerebrovascular O₂ are low — vascular strain is reducing brain oxygenation.'},
+    {id:'nerve',name:'Nerve conduction',metric:'Cerebrovascular O₂',s1:{st:'gold',v:'0.614',score:64},s2:{st:'gold',v:'0.78',score:82},note:'Low B12 limits nerve conduction — methyl-B12 backs recovery.'}]},
+  {id:'circulatory',name:'Circulatory',pip:'rust',parts:[
+    {id:'resistance',name:'Vascular resistance',metric:'Vascular resistance',s1:{st:'rust',v:'1.764',score:42},s2:{st:'gold',v:'0.95',score:74},note:'Severely out of range (+++) — the primary driver of the hypertension. Nitric-oxide support targets it.'},
+    {id:'elasticity',name:'Vessel elasticity',metric:'Vascular elasticity',s1:{st:'rust',v:'1.158',score:50},s2:{st:'gold',v:'1.55',score:76},note:'Vessels are stiff — low elasticity compounds the resistance.'},
+    {id:'viscosity',name:'Blood viscosity',metric:'Blood viscosity',s1:{st:'gold',v:'71.1',score:60},s2:{st:'gold',v:'64.0',score:78},note:'Blood is moderately viscous — thicker blood raises the pressure the heart works against.'}]},
+  {id:'organs',name:'Organs',pip:'gold',parts:[
+    {id:'cardio',name:'Heart',metric:'Cardiac load',s1:{st:'rust',v:'1.764',score:44},s2:{st:'gold',v:'0.95',score:74},note:'Cardiovascular load is high — driven by vascular resistance and viscous blood.'},
+    {id:'respiratory',name:'Lungs',metric:'Vital capacity',s1:{st:'gold',v:'3307',score:66},s2:{st:'gold',v:'3600',score:82},note:'Vital capacity is low and PaCO₂ runs high — breathing drills support gas exchange.'},
+    {id:'liver',name:'Liver',metric:'Liver panel',s1:{st:'sage',v:'in range',score:84},s2:{st:'sage',v:'in range',score:90},note:'Liver panel is mostly in range — held healthy through the detox phases.'},
+    {id:'kidneys',name:'Kidneys',metric:'BUN',s1:{st:'gold',v:'9.36',score:74},s2:{st:'sage',v:'7.5',score:88},note:'BUN runs mildly high — hydration and lower vascular strain bring it down.'},
+    {id:'gut',name:'Gut',metric:'Gastric absorption',s1:{st:'rust',v:'29.6',score:46},s2:{st:'gold',v:'38.0',score:76},note:'Absorption is low with dysbiosis — minerals are not being taken up.'},
+    {id:'spleen',name:'Immune',metric:'Immune panel',s1:{st:'sage',v:'in range',score:86},s2:{st:'sage',v:'in range',score:88},note:'Immune markers are calm and healthy — no change needed.'}]},
+];
+
+let scan=2, view='front', selected=null;
+const visible=new Set(['skin','organs']);
+const layerScore=(l,sc)=>Math.round(l.parts.reduce((a,p)=>a+p['s'+sc].score,0)/l.parts.length);
+const layerStatus=(l,sc)=>l.parts.map(p=>p['s'+sc].st).reduce(worse);
+const overall=sc=>Math.round(LAYERS.reduce((a,l)=>a+layerScore(l,sc),0)/LAYERS.length);
+const band=s=>s>=80?'sage':s>=66?'gold':'rust';
+
+// ---------- SVG anatomy ----------
+const NS='http://www.w3.org/2000/svg';
+const el=(n,a={})=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const body=document.getElementById('body');
+
+// Reusable bone (stroked) and organ (filled) helpers
+function group(id){const g=el('g',{'data-layer':id,class:'sys'});body.appendChild(g);return g;}
+
+// Clean, symmetric body silhouette composed of smooth primitives (centred on x=230).
+function buildSkin(){const g=group('skin');
+  const add=(n,a)=>{a.fill='#d9b48f';a.opacity=0.13;a.stroke='rgba(233,201,163,.45)';a['stroke-width']=1.3;a['stroke-linejoin']='round';a['data-part']='skin';g.appendChild(el(n,a));};
+  add('ellipse',{cx:230,cy:80,rx:40,ry:48});                                   // head
+  add('path',{d:'M214 120 C214 138 246 138 246 120 L246 150 L214 150 Z'});      // neck
+  // torso
+  add('path',{d:'M170 178 C152 184 150 214 158 252 L170 360 C175 412 184 452 206 468 L254 468 C276 452 285 412 290 360 L302 252 C310 214 308 184 290 178 C264 170 196 170 170 178 Z'});
+  // arms (mirror)
+  add('path',{d:'M172 184 C150 206 142 268 138 336 C136 380 135 416 136 436 C136 449 153 449 156 436 C161 402 170 350 180 300 C188 258 192 216 190 188 Z'});
+  add('path',{d:'M288 184 C310 206 318 268 322 336 C324 380 325 416 324 436 C324 449 307 449 304 436 C299 402 290 350 280 300 C272 258 268 216 270 188 Z'});
+  // legs (mirror)
+  add('path',{d:'M200 462 C190 540 188 640 190 722 C192 802 196 860 199 898 C200 913 226 913 226 898 C229 820 230 700 230 600 L230 466 Z'});
+  add('path',{d:'M260 462 C270 540 272 640 270 722 C268 802 264 860 261 898 C260 913 234 913 234 898 C231 820 230 700 230 600 L230 466 Z'});
+}
+
+function buildSkeletal(){const g=group('skeletal');const C='#ECE6D6';const S={fill:'none',stroke:C,'stroke-width':4.5,'stroke-linecap':'round','stroke-linejoin':'round'};
+  // skull + jaw
+  g.appendChild(el('ellipse',{cx:230,cy:86,rx:36,ry:42,fill:C,opacity:.96}));
+  // spine
+  g.appendChild(el('line',Object.assign({x1:230,y1:150,x2:230,y2:470},S)));
+  for(let i=0;i<11;i++) g.appendChild(el('line',{x1:222,y1:165+i*27,x2:238,y2:165+i*27,stroke:C,'stroke-width':5,'stroke-linecap':'round'}));
+  // clavicles
+  g.appendChild(el('path',Object.assign({d:'M230 168 L176 182 M230 168 L284 182'},S)));
+  // ribcage
+  for(let i=0;i<6;i++){const y=196+i*24, w=70-i*4;
+    g.appendChild(el('path',{d:`M230 ${y} C${230-w} ${y+2} ${230-w} ${y+26} ${214} ${y+30}`,fill:'none',stroke:C,'stroke-width':3.4,'stroke-linecap':'round'}));
+    g.appendChild(el('path',{d:`M230 ${y} C${230+w} ${y+2} ${230+w} ${y+26} ${246} ${y+30}`,fill:'none',stroke:C,'stroke-width':3.4,'stroke-linecap':'round'}));}
+  // sternum
+  g.appendChild(el('line',{x1:230,y1:196,x2:230,y2:320,stroke:C,'stroke-width':6,'stroke-linecap':'round'}));
+  // pelvis
+  g.appendChild(el('path',{d:'M180 470 C176 510 206 524 230 524 C254 524 284 510 280 470 C268 500 192 500 180 470 Z',fill:C,opacity:.95}));
+  // arms (humerus + forearm)
+  g.appendChild(el('path',Object.assign({d:'M180 184 L150 320 M150 320 L134 430'},S)));
+  g.appendChild(el('path',Object.assign({d:'M280 184 L310 320 M310 320 L326 430'},S)));
+  // legs (femur + tibia)
+  g.appendChild(el('path',Object.assign({d:'M206 520 L196 716 M196 716 L184 892'},S)));
+  g.appendChild(el('path',Object.assign({d:'M254 520 L264 716 M264 716 L276 892'},S)));
+  // knees
+  g.appendChild(el('circle',{cx:196,cy:716,r:11,fill:C}));
+  g.appendChild(el('circle',{cx:264,cy:716,r:11,fill:C}));
+  hit(g,'bone',[[230,260,150],[230,470,90]]); hit(g,'joints',[[196,716,40],[264,716,40]]);
+}
+
+function buildMuscular(){const g=group('muscular');const M='#c8694f';const o=.82;
+  const m=(d)=>g.appendChild(el('path',{d,fill:M,opacity:o,'data-part':'mass'}));
+  // deltoids, pecs, abs, obliques, biceps, quads, calves
+  m('M196 176 C176 176 164 196 168 222 C188 214 196 196 196 176Z');           // L deltoid
+  m('M264 176 C284 176 296 196 292 222 C272 214 264 196 264 176Z');           // R deltoid
+  m('M200 200 C214 196 230 196 230 196 L230 270 C212 270 200 250 200 200Z');  // L pec
+  m('M260 200 C246 196 230 196 230 196 L230 270 C248 270 260 250 260 200Z');  // R pec
+  m('M210 286 L250 286 L246 410 L214 410 Z');                                  // abs
+  // biceps
+  g.appendChild(el('path',{d:'M168 230 C156 270 152 300 156 326 C170 300 174 264 168 230Z',fill:M,opacity:o,'data-part':'recovery'}));
+  g.appendChild(el('path',{d:'M292 230 C304 270 308 300 304 326 C290 300 286 264 292 230Z',fill:M,opacity:o,'data-part':'recovery'}));
+  // quads
+  g.appendChild(el('path',{d:'M200 532 C188 590 188 650 196 700 C210 650 212 588 200 532Z',fill:M,opacity:o,'data-part':'mass'}));
+  g.appendChild(el('path',{d:'M260 532 C272 590 272 650 264 700 C250 650 248 588 260 532Z',fill:M,opacity:o,'data-part':'mass'}));
+  // calves
+  g.appendChild(el('path',{d:'M192 726 C184 770 184 820 190 858 C202 820 202 766 192 726Z',fill:M,opacity:o,'data-part':'mass'}));
+  g.appendChild(el('path',{d:'M268 726 C276 770 276 820 270 858 C258 820 258 766 268 726Z',fill:M,opacity:o,'data-part':'mass'}));
+  hit(g,'mass',[[230,348,90]]); hit(g,'recovery',[[162,280,40],[298,280,40]]);
+}
+
+function buildNervous(){const g=group('nervous');const N='#9ad0b0';
+  // brain
+  g.appendChild(el('path',{d:'M214 70 C214 54 246 54 246 70 C258 70 258 92 246 96 C246 108 214 108 214 96 C202 92 202 70 214 70Z',fill:N,opacity:.95,'data-part':'cognition'}));
+  // spinal cord
+  g.appendChild(el('line',{x1:230,y1:104,x2:230,y2:486,stroke:N,'stroke-width':5,'stroke-linecap':'round','data-part':'nerve'}));
+  // peripheral nerves (branches)
+  const br=(d)=>g.appendChild(el('path',{d,fill:'none',stroke:N,'stroke-width':2.2,opacity:.85,'data-part':'nerve','stroke-linecap':'round'}));
+  br('M230 210 C200 226 168 260 150 330'); br('M230 210 C260 226 292 260 310 330');
+  br('M230 470 C212 540 200 680 188 880'); br('M230 470 C248 540 260 680 272 880');
+  hit(g,'cognition',[[230,84,46]]); hit(g,'nerve',[[230,320,60]]);
+}
+
+function buildCirculatory(){const g=group('circulatory');const R='#d8584a';
+  // heart
+  g.appendChild(el('path',{d:'M224 250 C214 238 196 244 196 262 C196 282 222 298 228 304 C234 298 260 282 260 262 C260 244 242 238 232 250 C230 252 226 252 224 250Z',fill:R,opacity:.95,'data-part':'resistance'}));
+  const v=(d,w)=>g.appendChild(el('path',{d,fill:'none',stroke:R,'stroke-width':w||3,opacity:.85,'data-part':'elasticity','stroke-linecap':'round'}));
+  // aortic arch + carotids to head
+  v('M226 252 C226 220 224 170 224 120',3.4); v('M224 150 C210 140 196 120 196 100',2.4); v('M232 150 C246 140 260 120 262 100',2.4);
+  // subclavian to arms
+  v('M222 256 C190 250 162 280 150 340',2.6); v('M236 256 C268 250 296 280 308 340',2.6);
+  // descending aorta to legs
+  v('M230 300 C230 380 226 440 224 470',3.2); v('M224 470 C212 560 200 720 190 884',2.6); v('M226 470 C240 560 256 720 268 884',2.6);
+  hit(g,'resistance',[[228,278,40]]); hit(g,'elasticity',[[224,420,60]]); hit(g,'viscosity',[[224,360,50]]);
+}
+
+function buildOrgans(){const g=group('organs');
+  const o=(d,fill,part)=>g.appendChild(el('path',{d,fill,opacity:.95,'data-part':part}));
+  // lungs
+  o('M214 196 C190 198 180 240 184 300 C200 300 214 280 216 250 L214 196Z','#e89a86','respiratory');
+  o('M246 196 C270 198 280 240 276 300 C260 300 246 280 244 250 L246 196Z','#e89a86','respiratory');
+  // heart
+  o('M224 252 C214 240 198 246 198 264 C198 282 222 296 228 302 C234 296 258 282 258 264 C258 246 242 240 232 252 C230 254 226 254 224 252Z','#d8584a','cardio');
+  // liver
+  o('M198 318 C236 312 286 318 300 332 C300 360 250 372 214 364 C200 360 196 338 198 318Z','#b5654a','liver');
+  // stomach/gut area
+  o('M214 372 C246 368 268 380 268 404 C268 430 240 442 218 436 C204 432 204 392 214 372Z','#e0a36a','gut');
+  // intestines
+  o('M204 430 C262 430 270 470 256 492 C212 500 200 470 204 430Z','#e7b074','gut');
+  o('M210 452 C250 452 256 478 240 488 C214 492 206 472 210 452Z','#d99a5e','gut');
+  // kidneys
+  o('M196 360 C184 360 180 384 188 402 C200 400 202 376 196 360Z','#9c5f48','kidneys');
+  o('M264 360 C276 360 280 384 272 402 C260 400 258 376 264 360Z','#9c5f48','kidneys');
+  // spleen
+  o('M282 350 C292 352 294 368 286 376 C278 372 276 356 282 350Z','#8a5aa0','spleen');
+  hit(g,'respiratory',[[200,250,40],[260,250,40]]); hit(g,'cardio',[[228,276,34]]);
+  hit(g,'liver',[[250,340,46]]); hit(g,'gut',[[232,440,46]]); hit(g,'kidneys',[[192,382,30],[268,382,30]]); hit(g,'spleen',[[284,364,22]]);
+}
+
+// invisible hit targets per part (for easy tap on mobile)
+function hit(g,part,circles){circles.forEach(([cx,cy,r])=>g.appendChild(el('circle',{cx,cy,r,fill:'transparent','data-part':part,'data-hit':'1',style:'cursor:pointer'})));}
+
+buildSkin(); buildSkeletal(); buildMuscular(); buildNervous(); buildCirculatory(); buildOrgans();
+
+// ---------- render ----------
+function recolor(){
+  document.querySelectorAll('#body .sys').forEach(g=>{
+    const lid=g.getAttribute('data-layer'); const layer=LAYERS.find(l=>l.id===lid);
+    const on=visible.has(lid); g.style.display=on?'':'none'; g.style.opacity=on?1:0;
+    if(!layer) return;
+    g.querySelectorAll('[data-part]').forEach(node=>{
+      const p=layer.parts.find(x=>x.id===node.getAttribute('data-part')); if(!p)return;
+      const st=p['s'+scan].st; const col=HEX[st];
+      if(node.getAttribute('data-hit')) return;
+      const isStroke = node.getAttribute('fill')==='none' || lid==='skeletal' && node.tagName==='line';
+      if(lid==='organs'||lid==='muscular'||lid==='skin'){ /* keep tissue tones, tint slightly */ node.setAttribute('fill', tint(node, col)); }
+      else if(node.getAttribute('fill')==='none'){ node.setAttribute('stroke', col); }
+      else { node.setAttribute('fill', col); }
+      const sel = selected && selected.layer===lid && selected.part===p.id;
+      node.setAttribute('stroke-width', node.getAttribute('data-bw')|| node.getAttribute('stroke-width')||'');
+      node.style.filter = sel ? 'drop-shadow(0 0 6px '+col+')' : '';
+    });
+  });
+}
+// organ/muscle/skin keep their tissue color but shift toward status hue when not healthy
+function tint(node,col){const base=node.getAttribute('data-base')||node.getAttribute('fill');if(!node.getAttribute('data-base'))node.setAttribute('data-base',base);
+  return col; }
+
+function renderLayers(){const box=document.getElementById('layers');box.innerHTML='';
+  LAYERS.forEach(l=>{const sc=layerScore(l,scan), st=layerStatus(l,scan);
+    const row=el2('div','lrow'+(visible.has(l.id)?' on':''));
+    row.innerHTML=`<span class="sw"></span><span class="pip" style="background:${HEX[st]}"></span><span class="nm">${l.name}</span><span class="sc">${sc}</span>`;
+    row.onclick=()=>{visible.has(l.id)?visible.delete(l.id):visible.add(l.id); selectLayer(l.id); renderLayers(); recolor();};
+    box.appendChild(row);});
+}
+function renderParts(){const box=document.getElementById('parts');box.innerHTML='';
+  const lid=(selected&&selected.layer)|| 'organs'; const layer=LAYERS.find(l=>l.id===lid)||LAYERS[5];
+  document.getElementById('rhead').textContent=layer.name;
+  layer.parts.forEach(p=>{const st=p['s'+scan].st;const on=selected&&selected.part===p.id;
+    const b=el2('button','sq'+(on?' on':'')); b.style.setProperty('--c',HEX[st]);
+    b.innerHTML=`<div class="n"><i></i>${p.name}</div><div class="s">${p['s'+scan].score}</div><div class="m">${p.metric}</div>`;
+    b.onclick=()=>{selected={layer:lid,part:p.id};visible.add(lid);renderLayers();renderParts();renderDetail();recolor();};
+    box.appendChild(b);});
+}
+function renderDetail(){const box=document.getElementById('detail');
+  if(!selected){box.innerHTML='';return;}
+  const layer=LAYERS.find(l=>l.id===selected.layer);const p=layer.parts.find(x=>x.id===selected.part);if(!p){box.innerHTML='';return;}
+  const a=p.s1,b=p.s2;
+  box.innerHTML=`<div class="card"><h4>${p.name}</h4><div style="font-size:11px;color:#7b8a7e;font-weight:700">${layer.name} · ${p.metric}</div>
+    <div class="kv"><span>Baseline</span><b style="color:${HEX[a.st]}">${a.v} · ${a.score}</b></div>
+    <div class="kv"><span>Projected · Day 90</span><b style="color:${HEX[b.st]}">${b.v} · ${b.score}</b></div>
+    <p class="note">${p.note}</p></div>`;
+}
+function renderOverall(){const s=overall(scan);const st=band(s);
+  document.getElementById('onum').textContent=s;
+  document.getElementById('ost').textContent= st==='sage'?'Healthy':st==='gold'?'Improving':'Needs work';
+  document.getElementById('ost').style.color=HEX[st];
+  const arc=document.getElementById('oarc');const c=2*Math.PI*27;arc.setAttribute('stroke',HEX[st]);arc.setAttribute('stroke-dasharray',`${c*s/100} ${c}`);
+  const d=overall(2)-overall(1);document.getElementById('otr').textContent=(d>=0?'▲ +':'▼ ')+Math.abs(d)+' projected by Day 90';
+}
+function selectLayer(lid){selected={layer:lid,part:LAYERS.find(l=>l.id===lid).parts[0].id};renderParts();renderDetail();}
+function el2(t,c){const e=document.createElement(t);if(c)e.className=c;return e;}
+
+// body click → select part
+body.addEventListener('click',e=>{const t=e.target.closest('[data-part]');if(!t)return;
+  const g=t.closest('.sys');const lid=g&&g.getAttribute('data-layer');const part=t.getAttribute('data-part');
+  if(!lid)return; visible.add(lid); selected={layer:lid,part}; renderLayers();renderParts();renderDetail();recolor();renderMChips();renderMScore();if(isMobile())openSheet();});
+
+document.querySelectorAll('#scan button').forEach(b=>b.onclick=()=>{scan=+b.dataset.s;document.querySelectorAll('#scan button').forEach(x=>x.classList.toggle('on',x===b));renderAll();});
+document.querySelectorAll('#flip button').forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll('#flip button').forEach(x=>x.classList.toggle('on',x===b));body.style.transform=view==='back'?'scaleX(-1)':'';});
+
+// ---------- mobile UI (chips + bottom sheet) ----------
+const isMobile=()=>matchMedia('(max-width:820px)').matches;
+function renderMScore(){const s=overall(scan),st=band(s);
+  document.getElementById('mnum').textContent=s;
+  document.getElementById('mdot').style.background=HEX[st];
+  const m=document.getElementById('mst');m.textContent=st==='sage'?'Healthy':st==='gold'?'Improving':'Needs work';m.style.color=HEX[st];
+}
+function renderMChips(){const box=document.getElementById('mchips');box.innerHTML='';
+  LAYERS.forEach(l=>{const st=layerStatus(l,scan);const on=visible.has(l.id);
+    const c=document.createElement('button');c.type='button';c.className='chip'+(on?' on':'');
+    c.innerHTML='<i style="background:'+HEX[st]+'"></i>'+l.name+'<span class="sc">'+layerScore(l,scan)+'</span>';
+    c.onclick=()=>{const active=selected&&selected.layer===l.id;
+      if(visible.has(l.id)&&active){visible.delete(l.id);closeSheet();}
+      else{visible.add(l.id);selected={layer:l.id,part:l.parts[0].id};openSheet();}
+      renderLayers();renderParts();renderDetail();recolor();renderMChips();renderMScore();};
+    box.appendChild(c);});
+}
+function openSheet(){if(!isMobile()||!selected)return;renderSheet();
+  const sc=document.getElementById('sheet-scrim');sc.style.display='block';
+  requestAnimationFrame(()=>{document.getElementById('sheet').classList.add('open');sc.classList.add('open');});}
+function closeSheet(){document.getElementById('sheet').classList.remove('open');
+  const sc=document.getElementById('sheet-scrim');sc.classList.remove('open');setTimeout(()=>{sc.style.display='none';},280);}
+function renderSheet(){const sh=document.getElementById('sheet');if(!selected)return;
+  const layer=LAYERS.find(l=>l.id===selected.layer);const p=layer.parts.find(x=>x.id===selected.part)||layer.parts[0];
+  const a=p.s1,b=p.s2;
+  sh.innerHTML='<div class="grip"></div>'+
+    '<div class="shead"><div><b>'+layer.name+'</b><div class="sub">'+p.name+' · '+p.metric+'</div></div><button type="button" class="x" id="sx">✕</button></div>'+
+    '<div class="pchips">'+layer.parts.map(pp=>'<button type="button" class="pchip'+(pp.id===p.id?' on':'')+'" data-p="'+pp.id+'" style="--c:'+HEX[pp['s'+scan].st]+'"><i style="background:'+HEX[pp['s'+scan].st]+'"></i>'+pp.name+'</button>').join('')+'</div>'+
+    '<div class="vals"><div class="v"><div class="l">Baseline · May</div><div class="n" style="color:'+HEX[a.st]+'">'+a.v+'</div></div><div class="v"><div class="l">Projected · Day 90</div><div class="n" style="color:'+HEX[b.st]+'">'+b.v+'</div></div></div>'+
+    '<p class="note">'+p.note+'</p>';
+  sh.querySelector('#sx').onclick=closeSheet;
+  sh.querySelectorAll('.pchip').forEach(ch=>ch.onclick=()=>{selected={layer:layer.id,part:ch.dataset.p};renderSheet();recolor();renderDetail();renderParts();});
+}
+document.getElementById('sheet-scrim').onclick=closeSheet;
+
+function renderAll(){renderOverall();renderLayers();renderParts();renderDetail();recolor();renderMScore();renderMChips();
+  if(document.getElementById('sheet').classList.contains('open'))renderSheet();}
+
+// ---------- per-patient data (RLS-scoped API) ----------
+function applyData(d){ LAYERS.forEach(l=>l.parts.forEach(p=>{ const v=d.parts&&d.parts[p.id]; if(v){ if(v.s1)p.s1=v.s1; if(v.s2)p.s2=v.s2; if(v.note)p.note=v.note; } })); }
+function setOverlay(html){ const o=document.getElementById('ovl'); if(html===null){o.classList.add('hide');return;} o.classList.remove('hide'); o.innerHTML=html; }
+async function load(){
+  setOverlay('Loading…');
+  try{
+    const r=await fetch('/api/bodymap'+location.search,{credentials:'same-origin'});
+    const d=await r.json();
+    if(!d||!d.hasScan){ setOverlay('<div><b>No scan on file yet</b><div class="muted2">The body map appears here after the first Bio Quantum scan is uploaded and reviewed.</div></div>'); return; }
+    applyData(d);
+    selected={layer:'circulatory',part:'resistance'}; visible.add('circulatory');
+    renderAll(); setOverlay(null);
+  }catch(e){ setOverlay('<div><b>Couldn’t load the scan</b><div class="muted2">Please try again in a moment.</div></div>'); }
+}
+load();
+</script>
+</body>
+</html>

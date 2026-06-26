@@ -1,0 +1,151 @@
+/* ============================================================
+   ELEV8 HEALTH — Shared Design System
+   Used by every mockup screen so the whole set reads as ONE product.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Brand tokens — Costa Rica jungle + sunset */
+  --ink:     #1E3A30;   /* deep rainforest green (text + dark surfaces) */
+  --berry:   #14834E;   /* PRIMARY · palm/jungle green */
+  --berry-l: #54BD89;   /* jade */
+  --sand:    #FFF6EA;   /* sunlit cream */
+  --gold:    #F4A63C;   /* sunset amber */
+  --clay:    #EE7A4F;   /* sunset coral */
+  --sage:    #4FA873;   /* leaf green · in-range */
+  --rust:    #E0613B;   /* sunset · out-of-range */
+  --sky:     #1FA9B8;   /* caribbean teal accent */
+
+  /* Derived neutrals */
+  --paper:   #FFFBF4;
+  --card:    #FFFFFF;
+  --line:    #ECE1CE;
+  --line-2:  #F3EADA;
+  --muted:   #7B8A7E;
+  --ink-70:  rgba(30,58,48,.70);
+  --ink-50:  rgba(30,58,48,.48);
+
+  /* Tints */
+  --sage-bg:  #E2F1E7;
+  --gold-bg:  #FCEED4;
+  --rust-bg:  #FBE2D7;
+  --berry-bg: #DBF1E5;
+  --sky-bg:   #D9F1F3;
+
+  /* Type */
+  --serif: 'Fraunces', Georgia, serif;
+  --sans:  'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
+
+  /* Shape */
+  --r-sm: 10px;
+  --r:    16px;
+  --r-lg: 22px;
+  --r-xl: 30px;
+
+  /* Shadow */
+  --sh-sm: 0 1px 2px rgba(51,33,43,.06), 0 1px 3px rgba(51,33,43,.05);
+  --sh:    0 6px 20px -6px rgba(51,33,43,.18), 0 2px 6px rgba(51,33,43,.06);
+  --sh-lg: 0 24px 60px -18px rgba(51,33,43,.30);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------- Phone canvas (390x844 patient screens) ---------- */
+.phone {
+  width: 390px;
+  min-height: 844px;
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.statusbar {
+  height: 50px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px 0 28px;
+  font-size: 14px; font-weight: 600; color: var(--ink);
+  flex-shrink: 0;
+}
+.statusbar .dots { display: flex; gap: 5px; align-items: center; }
+.statusbar .dots svg { display: block; }
+.app { flex: 1; display: flex; flex-direction: column; padding: 4px 20px 22px; }
+
+/* Bottom tab bar */
+.tabbar {
+  position: sticky; bottom: 0;
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 12px 8px calc(12px + env(safe-area-inset-bottom));
+  background: rgba(251,248,244,.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+}
+.tabbar .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--ink-50); }
+.tabbar .tab.active { color: var(--berry); }
+.tabbar .tab svg { width: 22px; height: 22px; }
+
+/* ---------- Desktop canvas (1440x900 clinician) ---------- */
+.desk { width: 1440px; min-height: 900px; background: var(--paper); display: flex; }
+.sidebar {
+  width: 248px; flex-shrink: 0; background: var(--ink); color: var(--sand);
+  padding: 26px 18px; display: flex; flex-direction: column; gap: 4px;
+}
+.sidebar .brand { display: flex; align-items: center; gap: 11px; padding: 4px 10px 22px; }
+.sidebar .brand .mark { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg,var(--berry),var(--clay)); display: grid; place-items: center; color: #fff; font-family: var(--serif); font-weight: 600; font-size: 19px; }
+.sidebar .brand b { font-family: var(--serif); font-size: 20px; font-weight: 600; letter-spacing: .2px; }
+.navitem { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 11px; font-size: 14px; font-weight: 500; color: rgba(244,239,234,.66); }
+.navitem svg { width: 19px; height: 19px; opacity: .85; }
+.navitem.active { background: rgba(84,189,137,.28); color: #fff; }
+.navitem.active svg { opacity: 1; }
+.sidebar .spacer { flex: 1; }
+.deskmain { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 74px; flex-shrink: 0; background: rgba(251,248,244,.86); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 34px; }
+.topbar h1 { font-family: var(--serif); font-size: 25px; font-weight: 600; letter-spacing: -.2px; }
+.topbar .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.deskbody { padding: 28px 34px 40px; overflow: auto; }
+
+/* ---------- Reusable atoms ---------- */
+.card { background: var(--card); border: 1px solid var(--line-2); border-radius: var(--r); box-shadow: var(--sh-sm); }
+.card.pad { padding: 18px; }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: .2px; }
+.chip .dot { width: 7px; height: 7px; border-radius: 999px; }
+.chip.sage { background: var(--sage-bg); color: #46522F; } .chip.sage .dot { background: var(--sage); }
+.chip.gold { background: var(--gold-bg); color: #8A6A2E; } .chip.gold .dot { background: var(--gold); }
+.chip.rust { background: var(--rust-bg); color: var(--rust); } .chip.rust .dot { background: var(--rust); }
+.chip.berry{ background: var(--berry-bg);color: var(--berry);} .chip.berry .dot{ background: var(--berry); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--sans); font-weight: 600; font-size: 14px; padding: 12px 18px; border-radius: 12px; border: none; cursor: pointer; }
+.btn-primary { background: var(--berry); color: #fff; box-shadow: 0 6px 16px -6px rgba(20,131,78,.5); }
+.btn-ghost { background: transparent; color: var(--berry); border: 1.5px solid var(--line); }
+.btn-gold { background: var(--gold); color: #3A2B12; }
+.btn-sage { background: var(--sage); color: #fff; }
+.btn-rust { background: transparent; color: var(--rust); border: 1.5px solid #E4C9BF; }
+.btn-sm { padding: 8px 13px; font-size: 12.5px; border-radius: 10px; }
+
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--berry-l); }
+.display { font-family: var(--serif); font-weight: 600; letter-spacing: -.3px; }
+.serif { font-family: var(--serif); }
+
+/* Range / reference bar */
+.rangebar { position: relative; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--rust-bg), var(--sage-bg) 28% 72%, var(--gold-bg)); }
+.rangebar .marker { position: absolute; top: 50%; width: 13px; height: 13px; border-radius: 999px; background: #fff; border: 3px solid var(--ink); transform: translate(-50%,-50%); }
+
+/* Progress ring helper (set --p as 0-100 via inline style) */
+.ring { --p: 0; width: 120px; height: 120px; border-radius: 999px;
+  background: conic-gradient(var(--berry) calc(var(--p)*1%), var(--line) 0);
+  display: grid; place-items: center; }
+.ring::before { content: ""; position: absolute; width: 92px; height: 92px; border-radius: 999px; background: var(--card); }
+.ring .ring-val { position: relative; text-align: center; }
+
+.divider { height: 1px; background: var(--line); border: 0; }
+.muted { color: var(--muted); }
+.tnum { font-variant-numeric: tabular-nums; }

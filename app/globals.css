@@ -1,0 +1,731 @@
+@import "tailwindcss";
+
+/* HealthSync default theme — Casa Elev8 (jungle green + sunset).
+   White-label defaults; per-practice values come from
+   practice_settings.brand_tokens at runtime. */
+
+:root {
+  --ink: #1e3a30;
+  --berry: #14834e;
+  --berry-l: #54bd89;
+  --sand: #fff6ea;
+  --gold: #f4a63c;
+  --clay: #ee7a4f;
+  --sage: #4fa873;
+  --rust: #e0613b;
+  --paper: #fffbf4;
+  --card: #ffffff;
+  --line: #ece1ce;
+  --muted: #7b8a7e;
+  --serif: var(--font-serif), "Fraunces", Georgia, serif;
+  --sans: var(--font-sans), "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- auth screen ---- */
+.auth-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.auth-brand .mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--berry-l), var(--gold));
+  color: #143a2a;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+}
+.auth-brand b {
+  font-family: var(--serif);
+  font-size: 20px;
+}
+.auth-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 30px;
+  margin: 6px 0 0;
+}
+.auth-sub {
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+}
+.side-main .card {
+  max-width: none;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 16px;
+}
+.tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 9px;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.tab.on {
+  background: var(--berry);
+  color: #fff;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.form input,
+.form select,
+.form textarea {
+  padding: 12px 13px;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink);
+  background: #fff;
+}
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+  outline: none;
+  border-color: var(--berry);
+}
+.btn {
+  border: 0;
+  background: var(--berry);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--berry);
+  border: 1.5px solid var(--line);
+}
+.hint {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 2px 0 0;
+}
+.msg {
+  font-size: 13.5px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  margin: 0 0 14px;
+}
+.msg.ok {
+  background: #e2f1e7;
+  color: #46522f;
+}
+.msg.err {
+  background: #fbe2d7;
+  color: var(--rust);
+}
+
+/* ---- app shells ---- */
+.app-top {
+  height: 60px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  background: var(--card);
+}
+.app-top .brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--serif);
+  font-weight: 600;
+}
+.app-main {
+  padding: 24px 22px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 680px) {
+  .app-top {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    padding: 10px 16px;
+  }
+  .app-top nav {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px 16px !important;
+    font-size: 13px;
+  }
+}
+/* ---- clinician sidebar shell (the "control room") ---- */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  align-items: stretch;
+}
+.side-nav {
+  width: 224px;
+  flex-shrink: 0;
+  background: #14352a;
+  color: #e8f0ea;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 20px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.side-nav .brand {
+  color: #fff;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 20px;
+  padding: 4px 10px 18px;
+  text-decoration: none;
+}
+.side-nav a {
+  color: #c4d8cc;
+  text-decoration: none;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.side-nav a svg {
+  flex-shrink: 0;
+  opacity: 0.78;
+}
+.side-nav a:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+.side-nav a:hover svg {
+  opacity: 1;
+}
+.side-nav .who {
+  margin-top: auto;
+  padding: 12px 6px 2px;
+  font-size: 12.5px;
+  color: #93b3a3;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.side-nav .who-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2f7d57, var(--gold));
+  color: #0f2c1f;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.side-main {
+  flex: 1;
+  min-width: 0;
+  background: var(--sand);
+}
+.side-main .app-main {
+  padding: 30px 32px 56px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+@media (max-width: 760px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .side-nav {
+    width: auto;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 6px;
+    padding: 10px 14px;
+  }
+  .side-nav .brand {
+    padding: 0 10px 0 2px;
+    font-size: 17px;
+  }
+  .side-nav a {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .side-nav .who {
+    margin: 0 2px 0 auto;
+    border: none;
+    padding: 0;
+  }
+  .side-main .app-main {
+    padding: 20px 16px 40px;
+  }
+}
+/* ---- patient bottom tab bar (mobile app feel) ---- */
+.pn-primary {
+  display: contents;
+}
+.bottom-tabs {
+  display: none;
+}
+@media (max-width: 760px) {
+  .pn-primary {
+    display: none;
+  }
+  .bottom-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -8px 24px rgba(30, 58, 48, 0.07);
+  }
+  .bottom-tabs .bt {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-decoration: none;
+    color: #88998f;
+    font-size: 10.5px;
+    padding: 4px 2px;
+  }
+  .bottom-tabs .bt.active {
+    color: var(--berry);
+    font-weight: 700;
+  }
+  .with-tabs {
+    padding-bottom: 88px !important;
+  }
+}
+.serif {
+  font-family: var(--serif);
+}
+.muted {
+  color: var(--muted);
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.badge.new {
+  background: var(--gold);
+  color: #3a2b12;
+}
+.badge.existing {
+  background: #e2f1e7;
+  color: #46522f;
+}
+.badge.unread {
+  background: var(--berry);
+  color: #fff;
+}
+
+/* ---- data-viz + dashboard polish ---- */
+/* Calm section label — sentence case, no shouty tracking (de-slopped kicker). */
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--berry);
+  margin: 0 0 10px;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 14px;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.stat .label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.stat .value {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.05;
+  margin-top: 4px;
+}
+.stat .delta {
+  font-size: 12px;
+  font-weight: 700;
+}
+.stat .delta.up {
+  color: var(--berry);
+}
+.stat .delta.down {
+  color: var(--rust);
+}
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+/* ---- Legal / policy pages ---- */
+.legal h2 {
+  font-size: 19px;
+  margin: 30px 0 8px;
+}
+.legal p,
+.legal li {
+  font-size: 15px;
+}
+.legal ul {
+  padding-left: 20px;
+}
+.legal li {
+  margin: 4px 0;
+}
+.legal a {
+  color: var(--berry);
+}
+
+/* ---- 3D body text-alternative findings list (a11y) ---- */
+.findings-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.findings-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.findings-list .fl-region {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.findings-list .fl-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+.findings-list .fl-text {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+}
+.sev-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #7a9e8b;
+  padding: 2px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+.sev-chip.mild {
+  background: var(--gold);
+  color: #3a2b12;
+}
+.sev-chip.moderate {
+  background: var(--clay);
+}
+.sev-chip.high {
+  background: #c0392b;
+}
+
+/* ---- accessibility: keyboard focus ---- */
+:focus-visible {
+  outline: 2px solid var(--berry);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip link — visually hidden until focused, then jumps to top. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--berry);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 0 0 10px 0;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: 0;
+}
+
+/* ---- toast notifications ---- */
+.toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  left: auto;
+  bottom: auto;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--muted);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px -18px rgba(30, 58, 48, 0.35);
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--ink);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.toast.toast-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.toast.toast-out {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+}
+.toast-success {
+  border-left-color: var(--berry);
+}
+.toast-error {
+  border-left-color: var(--rust);
+}
+.toast-info {
+  border-left-color: var(--gold);
+}
+.toast-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: var(--muted);
+  margin-top: 1px;
+}
+.toast-success .toast-icon {
+  background: var(--berry);
+}
+.toast-error .toast-icon {
+  background: var(--rust);
+}
+.toast-info .toast-icon {
+  background: var(--gold);
+  color: #3a2b12;
+}
+.toast-msg {
+  flex: 1;
+  line-height: 1.35;
+  font-weight: 500;
+}
+.toast-close {
+  flex: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 2px;
+  margin: -2px -2px 0 0;
+}
+.toast-close:hover {
+  color: var(--ink);
+}
+
+/* On small screens, dock toasts to bottom-center, above the mobile tab bar. */
+@media (max-width: 760px) {
+  .toast-container {
+    top: auto;
+    right: 0;
+    left: 0;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    margin: 0 12px;
+    align-items: stretch;
+  }
+  .toast {
+    transform: translateY(8px) scale(0.98);
+  }
+  .toast.toast-in {
+    transform: translateY(0) scale(1);
+  }
+  .toast.toast-out {
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: opacity 0.18s ease;
+    transform: none;
+  }
+  .toast.toast-in,
+  .toast.toast-out {
+    transform: none;
+  }
+}
+
+/* ---- progress report (print / PDF capstone) ---- */
+.report {
+  width: 100%;
+}
+/* A grouped lab/scan/plan row should never split across pages. */
+.report-row {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+/* Utility: anything that must not appear in print/PDF. */
+.no-print {
+}
+
+@media print {
+  /* Chrome — hide the app frame so the report stands alone. */
+  .app-top,
+  .side-nav,
+  .bottom-tabs,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  /* Let the report use the full printable width. */
+  .app-main,
+  .side-main .app-main {
+    padding: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  .with-tabs {
+    padding-bottom: 0 !important;
+  }
+  .report {
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  /* Cards print flat — drop heavy shadows, keep a light hairline. */
+  .card,
+  .report-row {
+    box-shadow: none !important;
+    border: 1px solid #d8d2c6 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Keep section headings with their content. */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Preserve brand colors / gradients in print. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
