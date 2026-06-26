@@ -5,9 +5,22 @@
 **Last action:** Seeded the Cloud Next.js app from Randi's minimal core; ported the 7 modules from
 `../healthsync-app@modules-for-cloud` with `requireModule` gating; built onboarding; gated module
 links on the patient record. `npm run build` PASS, `tsc` PASS, tenant-isolation PASS. Commit `a8db3a5`.
-**Next action:** Deploy (Vercel + Supabase auth redirect allow-list) — needs user. Core product is
-functionally complete + verified (reads, writes, audit, isolation, gating, onboarding).
-**Blockers:** deploy = external (Vercel project + Supabase auth URL config). Clinical-logic review = needs human.
+**DEPLOYED & LIVE:** https://healthsync-cloud-mu.vercel.app (personalhealthintelligence Vercel team).
+Public pages 200; protected routes 307→/login (auth enforced by layouts); onboarding API validates.
+**Next action:** clinical-logic review (human); re-add a proper edge-safe middleware (session refresh);
+set NEXT_PUBLIC_APP_URL; subdomain routing for public marketing pages.
+**Blockers:** none for the working app. Clinical review = needs human.
+
+### Deploy notes (what it took)
+- Vercel project under personalhealthintelligence (token-based CLI deploy). Supabase auth redirect
+  allow-list set via Management API. Vercel Deployment Protection disabled (public SaaS access).
+- **Root cause of all the 500s/404s:** the bare `vercel project add` left `framework: null`, so Vercel
+  ran `next build` but never wired Next's routing → static-only → 404 on every SSR route. Fix: set
+  project `framework: "nextjs"`. The earlier `__dirname` 500 was the edge middleware in that broken build.
+- **Middleware currently DISABLED** (`middleware.ts.disabled`) — auth is enforced by the (staff)/(patient)
+  layouts, so the app is functional + secure without it. Re-add a proper edge-safe middleware later
+  (session refresh + early bounce). The seeded Supabase-SSR middleware is rejected by Vercel's Edge bundler.
+- Webpack prod build required extracting page-exported helpers into `lib/{labs,report}/components.tsx`.
 
 ## Added since Phase 3 (this push)
 - **Connector/import gating** — import routes check `moduleForConnector` + enabled modules (closes the RLS-bypass gap).
