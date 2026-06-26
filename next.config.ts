@@ -66,10 +66,6 @@ const nextConfig: NextConfig = {
   // so Next.js requires it at runtime rather than trying to webpack it.
   serverExternalPackages: ["pdf-parse"],
 
-  // Run middleware on the Node.js runtime — the Supabase SSR client isn't accepted
-  // by Vercel's Edge bundler. (Pairs with `runtime: "nodejs"` in middleware.ts.)
-  experimental: { nodeMiddleware: true },
-
   async headers() {
     return [
       { source: "/bodymap/:path*", headers: bodymapHeaders },
