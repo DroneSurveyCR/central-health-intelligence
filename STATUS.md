@@ -1,12 +1,21 @@
 # HealthSync Cloud — STATUS
 
 **Updated:** this session
-**Phase:** Pre-Phase-1 (foundation done; app not yet started)
-**Last action:** Adopted Karpathy-lean methodology. Reverted Randi's app + DB to minimal
-(module work parked on `../healthsync-app` branch `modules-for-cloud`; her module tables dropped).
-**Next action:** Define + execute **Phase 1** — stand up the Cloud Next.js *app* (multi-tenant core
-only, no vertical modules) running against the Cloud DB, one tenant can log in and see their data.
-**Blockers:** none.
+**Phase:** Phases 1–3 DONE (app stood up, modules ported + gated, onboarding) — not deployed.
+**Last action:** Seeded the Cloud Next.js app from Randi's minimal core; ported the 7 modules from
+`../healthsync-app@modules-for-cloud` with `requireModule` gating; built onboarding; gated module
+links on the patient record. `npm run build` PASS, `tsc` PASS, tenant-isolation PASS. Commit `a8db3a5`.
+**Next action:** Deploy (Vercel + point Supabase auth redirect allow-list) OR continue building
+(connectors gating, patient-experience, marketplace) — needs direction. Deploy needs the user's
+Vercel/Supabase-dashboard access.
+**Blockers:** deploy = external (Vercel project + Supabase auth URL config).
+
+## Done this phase (verified)
+- Multi-tenant Next.js app (349 files) builds clean against the Cloud DB.
+- 7 vertical modules ported + **gated** (`requireModule` → `/upgrade` if practice lacks it).
+- Module links on the patient record show only enabled modules.
+- Onboarding flow: new practice → creates practice + owner practitioner + auth user (default modules).
+- Tenant-isolation gate still PASS.
 
 ---
 
