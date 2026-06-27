@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSyncProvider } from "@/lib/connectors/sync/registry";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,8 @@ export async function POST(request: Request, ctx: { params: Promise<{ slug: stri
   // Read the raw body once — HMAC verification needs the exact bytes the provider signed.
   const rawBody = await request.text();
 
-  // If the provider can verify authenticity, it MUST pass before we enqueue anything.
+  // HMAC verification runs FIRST — reject unauthenticated requests with zero DB cost.
+  // Rate limiting only applies to providers without HMAC (our sole pre-auth defense there).
   if (provider.webhookVerify) {
     let ok = false;
     try {
@@ -24,6 +26,12 @@ export async function POST(request: Request, ctx: { params: Promise<{ slug: stri
       ok = false;
     }
     if (!ok) return NextResponse.json({ error: "invalid signature" }, { status: 401 });
+    // Verified provider — no rate limit; dropping 429s would lose patient health data
+    // since Withings/Dexcom batch deliveries don't retry on 429.
+  } else {
+    // No HMAC — rate limit as sole pre-auth defense. High limit avoids dropping batched events.
+    const allowed = await rateLimit(`webhook:${clientIp(request.headers)}`, 300, 60);
+    if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   // TODO(per-provider): map external user -> token, enqueue delta job from rawBody.

@@ -6,8 +6,20 @@ import { NextResponse, type NextRequest } from "next/server";
  * Route-level access control lives in the (staff)/(patient) layouts; this only
  * keeps the session alive and bounces fully-unauthenticated users off app routes.
  */
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+export async function updateSession(
+  request: NextRequest,
+  forward?: Record<string, string>,
+) {
+  // Build a NextResponse.next that forwards extra request headers (e.g. x-request-id)
+  // to route handlers. Called at init and inside setAll so cookies + headers coexist.
+  const makeNext = () => {
+    if (!forward) return NextResponse.next({ request });
+    const h = new Headers(request.headers);
+    Object.entries(forward).forEach(([k, v]) => h.set(k, v));
+    return NextResponse.next({ request: { headers: h } });
+  };
+
+  let response = makeNext();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +33,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          response = NextResponse.next({ request });
+          response = makeNext();
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );

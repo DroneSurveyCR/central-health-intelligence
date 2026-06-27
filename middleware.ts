@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { randomUUID } from "crypto";
 
 // Keeps the Supabase session fresh on every navigation (so users aren't logged out
 // at the access-token TTL) and bounces unauthenticated PAGE requests to /login.
@@ -27,6 +28,9 @@ export async function middleware(request: NextRequest) {
     host.endsWith(".vercel.app") ||
     host.endsWith(".localhost");
 
+  // Generate or propagate a correlation ID for every request.
+  const requestId = request.headers.get("x-request-id") ?? randomUUID();
+
   if (!isAppDomain && path === "/") {
     // tenant label: left-most subdomain label, else the bare host (custom domain).
     // TODO(custom_domain): replace with a practices.custom_domain -> slug lookup.
@@ -35,11 +39,21 @@ export async function middleware(request: NextRequest) {
     if (tenant) {
       const url = request.nextUrl.clone();
       url.pathname = `/p/${tenant}`;
-      return NextResponse.rewrite(url);
+      // Refresh auth cookies before rewriting so near-expiry sessions survive.
+      const sessionResponse = await updateSession(request, { "x-request-id": requestId });
+      const rewriteResponse = NextResponse.rewrite(url);
+      // Copy any Set-Cookie headers from the session refresh into the rewrite response.
+      sessionResponse.headers.getSetCookie().forEach((c) =>
+        rewriteResponse.headers.append("set-cookie", c),
+      );
+      rewriteResponse.headers.set("x-request-id", requestId);
+      return rewriteResponse;
     }
   }
 
-  return await updateSession(request);
+  const response = await updateSession(request, { "x-request-id": requestId });
+  response.headers.set("x-request-id", requestId);
+  return response;
 }
 
 export const config = {
