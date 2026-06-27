@@ -12,7 +12,12 @@ import {
 import { getServerLang } from "@/lib/i18n/getServerLang";
 import { t, type Lang } from "@/lib/i18n/dictionary";
 import { getPractice } from "@/lib/practice";
+import { getEnabledModules } from "@/lib/modules/requireModule";
+import { logAudit } from "@/lib/auth/audit";
+import { computeStreak, checkMilestones, type MilestoneRow } from "@/lib/engagement/streaks";
 import TodayClient, { type TodayItem, type TodayLevelGroup } from "./TodayClient";
+import EngagementHeader from "./EngagementHeader";
+import ProtocolQuickLog from "./ProtocolQuickLog";
 
 const LEVEL_KEY: Record<PlanLevel, string> = {
   supplement: "level_supplement",
@@ -70,11 +75,26 @@ export default async function PatientTodayPage() {
     .maybeSingle()) as { data: Plan | null };
 
   if (!plan) {
+    // No active plan — still surface engagement (streak/milestones/nudge) so
+    // logging activity is recognised even before a plan is built.
+    const engagementOn = (await getEnabledModules()).has("engagement");
+    const engagement = engagementOn
+      ? await loadEngagement(supabase, me.id, tz, lang)
+      : null;
     return (
       <div style={{ maxWidth: 680 }}>
         <h1 className="serif" style={{ fontSize: 28, margin: "0 0 6px" }}>
           {t("today_label", lang)} · {weekday}
         </h1>
+        {engagement && (
+          <EngagementHeader
+            current={engagement.current}
+            longest={engagement.longest}
+            milestones={engagement.milestones}
+            nudge={engagement.nudge}
+            lang={lang}
+          />
+        )}
         <div className="card" style={{ marginTop: 16 }}>
           <p style={{ margin: 0 }}>{t("today_no_plan", lang)}</p>
         </div>
@@ -143,6 +163,29 @@ export default async function PatientTodayPage() {
     ? currentPhase.name ?? `${t("plan_phase_word", lang)} ${currentPhase.phase_number}`
     : null;
 
+  // ---- ENGAGEMENT (always-on `engagement` module): streak + milestones + nudge ----
+  const engagementOn = (await getEnabledModules()).has("engagement");
+  const engagement = engagementOn
+    ? await loadEngagement(supabase, me.id, tz, lang)
+    : null;
+
+  // Protocol-aware quick-log appears only with an active plan + engagement on.
+  // (We have a plan here — this branch only renders when `plan` exists.)
+  const peptideOn = engagementOn && (await getEnabledModules()).has("peptide");
+  const showProtocolQuickLog = engagementOn && (levelGroups.length > 0 || peptideOn);
+  // Did the patient already record a protocol dose today? (an 'adherence' log)
+  let protocolLoggedToday = false;
+  if (showProtocolQuickLog) {
+    const { data: doseRows } = await supabase
+      .from("progress_logs")
+      .select("logged_at")
+      .eq("patient_id", me.id)
+      .eq("kind", "adherence")
+      .gte("logged_at", `${todayISO}T00:00:00`)
+      .limit(1);
+    protocolLoggedToday = (doseRows ?? []).length > 0;
+  }
+
   return (
     <div style={{ maxWidth: 680 }}>
       <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", color: "var(--berry)" }}>
@@ -158,6 +201,23 @@ export default async function PatientTodayPage() {
           : t("today_fresh_day", lang)}
       </p>
 
+      {engagement && (
+        <EngagementHeader
+          current={engagement.current}
+          longest={engagement.longest}
+          milestones={engagement.milestones}
+          nudge={engagement.nudge}
+          lang={lang}
+        />
+      )}
+
+      {showProtocolQuickLog && (
+        <ProtocolQuickLog
+          alreadyLoggedToday={protocolLoggedToday}
+          protocolLabel={phaseLabel}
+        />
+      )}
+
       <TodayClient
         todayISO={todayISO}
         phaseLabel={phaseLabel}
@@ -166,4 +226,54 @@ export default async function PatientTodayPage() {
       />
     </div>
   );
+}
+
+type NudgeTone = "keep_streak" | "first" | "logged" | "sync_stale";
+
+/**
+ * Server-side engagement read: streak, recent milestones (idempotently topping
+ * up any newly-earned ones), and ONE contextual nudge. RLS-scoped; the
+ * milestone + log reads are audited as PHI access.
+ */
+async function loadEngagement(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  patientId: string,
+  tz: string,
+  _lang: Lang,
+): Promise<{
+  current: number;
+  longest: number;
+  milestones: MilestoneRow[];
+  nudge: NudgeTone;
+}> {
+  const streak = await computeStreak(supabase, patientId, tz);
+
+  // Top up any milestone this visit just qualified for (idempotent, best-effort).
+  try {
+    await checkMilestones(supabase, patientId, tz);
+  } catch {
+    /* never break the page over a milestone insert */
+  }
+
+  const { data: milestoneRows } = await supabase
+    .from("patient_milestones")
+    .select("kind, label, value, achieved_at")
+    .eq("patient_id", patientId)
+    .order("achieved_at", { ascending: false })
+    .limit(3);
+
+  await logAudit({ action: "view", resource: "patient_milestones", patientId });
+
+  // Contextual nudge selection.
+  let nudge: NudgeTone;
+  if (streak.loggedToday) nudge = "logged";
+  else if (streak.totalDays === 0) nudge = "first";
+  else nudge = "keep_streak";
+
+  return {
+    current: streak.current,
+    longest: streak.longest,
+    milestones: (milestoneRows ?? []) as MilestoneRow[],
+    nudge,
+  };
 }

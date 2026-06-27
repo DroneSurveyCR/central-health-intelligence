@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useT } from "@/lib/i18n/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
 
+// Core items always rendered, regardless of which modules a practice has bought.
 const PRIMARY: [string, string][] = [
   ["/today", "today"],
   ["/plan", "plan"],
@@ -12,7 +13,7 @@ const PRIMARY: [string, string][] = [
   ["/book", "book"],
   ["/appointments", "appointments"],
 ];
-const MORE: [string, string][] = [
+const MORE_CORE: [string, string][] = [
   ["/home", "home"],
   ["/messages", "messages"],
   ["/progress", "progress"],
@@ -31,10 +32,28 @@ const MORE: [string, string][] = [
   ["/privacy", "privacy"],
 ];
 
-export default function PatientNav() {
+/**
+ * Module flags resolved server-side (via getEnabledModules) and passed down so
+ * this client component can stay interactive while remaining module-driven.
+ * Undefined props degrade to "off" — the link simply isn't shown.
+ */
+export type PatientNavProps = {
+  /** wearables module → "Connections" (/connections) */
+  wearables?: boolean;
+  /** engagement module → "Assistant" (/assistant) */
+  engagement?: boolean;
+};
+
+export default function PatientNav({ wearables = false, engagement = false }: PatientNavProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Build the "More" menu: core items + module-gated extras (Connections when
+  // wearables is enabled, Assistant when engagement is enabled).
+  const more: [string, string][] = [...MORE_CORE];
+  if (wearables) more.push(["/connections", "connections"]);
+  if (engagement) more.push(["/assistant", "assistant"]);
 
   useEffect(() => {
     if (!open) return;
@@ -100,7 +119,7 @@ export default function PatientNav() {
               boxShadow: "0 12px 34px rgba(30,58,48,.12)",
             }}
           >
-            {MORE.map(([href, key]) => (
+            {more.map(([href, key]) => (
               <Link
                 key={href}
                 href={href}

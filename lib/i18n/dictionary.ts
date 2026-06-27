@@ -36,6 +36,8 @@ export const DICT: Dict = {
   privacy: { en: "Privacy", es: "Privacidad" },
   more: { en: "More", es: "Más" },
   messages: { en: "Messages", es: "Mensajes" },
+  connections: { en: "Connections", es: "Conexiones" },
+  assistant: { en: "Assistant", es: "Asistente" },
 
   // ---- common UI ----
   welcome: { en: "Welcome", es: "Bienvenido" },
@@ -189,6 +191,49 @@ export const DICT: Dict = {
     en: "Couldn't save that — please try again.",
     es: "No se pudo guardar — inténtelo de nuevo.",
   },
+
+  // ---- engagement (streaks · milestones · nudge · protocol quick-log) ----
+  engagement_streak_suffix: { en: "day streak", es: "días seguidos" },
+  engagement_streak_longest: { en: "Best", es: "Mejor" },
+  engagement_streak_start: {
+    en: "Log today to start a streak",
+    es: "Registre hoy para iniciar una racha",
+  },
+  engagement_milestones_title: { en: "Milestones", es: "Logros" },
+  engagement_milestone_first_log: { en: "First log", es: "Primer registro" },
+  engagement_nudge_keep_streak: {
+    en: "Log today to keep your streak alive.",
+    es: "Registre hoy para mantener viva su racha.",
+  },
+  engagement_nudge_first: {
+    en: "Take a moment to log how today went — it only takes a few seconds.",
+    es: "Tómese un momento para registrar cómo le fue hoy — solo toma unos segundos.",
+  },
+  engagement_nudge_logged: {
+    en: "You're logged for today. Nicely done.",
+    es: "Ya registró su día. Bien hecho.",
+  },
+  engagement_nudge_sync_stale: {
+    en: "Reconnect your device — we haven't seen a sync in a while.",
+    es: "Reconecte su dispositivo — no hemos visto una sincronización en un tiempo.",
+  },
+  engagement_protocol_title: { en: "Today's protocol", es: "Protocolo de hoy" },
+  engagement_protocol_hint: {
+    en: "Tap when you've taken today's dose, and tag how it landed.",
+    es: "Toque cuando haya tomado la dosis de hoy y etiquete cómo le sentó.",
+  },
+  engagement_protocol_taken: { en: "Dose taken", es: "Dosis tomada" },
+  engagement_protocol_logged: { en: "Logged for today", es: "Registrado para hoy" },
+  engagement_tag_energized: { en: "Energized", es: "Con energía" },
+  engagement_tag_calm: { en: "Calm", es: "Tranquilo/a" },
+  engagement_tag_focused: { en: "Focused", es: "Concentrado/a" },
+  engagement_tag_tired: { en: "Tired", es: "Cansado/a" },
+  engagement_tag_anxious: { en: "Anxious", es: "Ansioso/a" },
+  engagement_tag_sore: { en: "Sore", es: "Adolorido/a" },
+  engagement_tag_nauseous: { en: "Nauseous", es: "Con náuseas" },
+  engagement_tag_great: { en: "Great", es: "Excelente" },
+  engagement_quicklog_save: { en: "Save", es: "Guardar" },
+  engagement_milestone_earned: { en: "Milestone unlocked!", es: "¡Logro desbloqueado!" },
 
   // ---- plan page ----
   plan_title_default: { en: "My 90-Day Plan", es: "Mi plan de 90 días" },
