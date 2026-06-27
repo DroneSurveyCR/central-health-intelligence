@@ -31,6 +31,17 @@ set NEXT_PUBLIC_APP_URL; subdomain routing for public marketing pages.
   Plans starter/growth/network/enterprise → module entitlements. Activation-ready: needs `STRIPE_SECRET_KEY`,
   `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*`. Degrades cleanly today (checkout 503, UI shows reference).
 
+### Billing is TWO layers (do not conflate)
+- **Platform / SaaS billing** (clinic → HealthSync subscription): the platform's **single** Stripe account.
+  Built + proven (test mode): products/prices/webhook, `entitlementsForPlan`, webhook flips `practices.plan`+`modules`.
+- **Patient billing** (patient → their clinic): each clinic's **OWN** Stripe via **Stripe Connect (Standard)**.
+  Built: `/api/connect/{authorize,callback,disconnect}` OAuth, `/settings/payments` UI, and the patient-invoice
+  checkout now charges on the clinic's connected account (`stripeAccount`) — it no longer (incorrectly) used the
+  platform key. **0% application fee** (configurable via `STRIPE_APPLICATION_FEE_BPS`). Webhook verifies platform
+  AND connect secrets. **Activation (one-time):** enable Connect in the platform Stripe dashboard → set
+  `STRIPE_CONNECT_CLIENT_ID` (ca_…) → register a Connect webhook → set `STRIPE_CONNECT_WEBHOOK_SECRET`.
+  Until then `/settings/payments` shows "not configured" and patient card checkout 503s gracefully.
+
 ### Deploy notes (what it took)
 - Vercel project under personalhealthintelligence (token-based CLI deploy). Supabase auth redirect
   allow-list set via Management API. Vercel Deployment Protection disabled (public SaaS access).
