@@ -10,13 +10,13 @@ import { ToastProvider } from "@/components/Toast";
 import { getServerLang } from "@/lib/i18n/getServerLang";
 
 export const metadata: Metadata = {
-  title: { default: "HealthSync", template: "%s · HealthSync" },
+  title: { default: "Personal Health Intelligence", template: "%s · PHI" },
   description: "Your practice, on one platform.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "HealthSync",
+    title: "PHI",
   },
   icons: {
     icon: "/icon.svg",

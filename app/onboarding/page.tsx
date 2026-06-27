@@ -15,7 +15,7 @@ export default function OnboardingPage() {
     >
       <div className="card" style={{ width: "100%", maxWidth: 440, padding: 28 }}>
         <h1 className="serif" style={{ marginTop: 0, marginBottom: 6 }}>
-          Start your HealthSync practice
+          Start your Personal Health Intelligence practice
         </h1>
         <p className="muted" style={{ marginTop: 0, marginBottom: 22, fontSize: 14 }}>
           Create your workspace in a few seconds.

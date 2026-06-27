@@ -9,8 +9,8 @@ export default async function LoginPage({
   return (
     <main className="auth-shell">
       <div className="auth-brand">
-        <div className="mark">H</div>
-        <b>HealthSync</b>
+        <div className="mark">P</div>
+        <b>Personal Health Intelligence</b>
       </div>
       <h1 className="auth-title">Welcome</h1>
       <p className="auth-sub">Your practice, on one platform.</p>
