@@ -204,6 +204,8 @@ export default async function StaffLongevityPage({
         latestPanelMarkers={latestMarkers.map((m) => ({
           name: m.name,
           value: Number(m.value),
+          // Thread the lab-reported unit so PhenoAge can convert to SI.
+          unit: m.unit ?? null,
         }))}
       />
 

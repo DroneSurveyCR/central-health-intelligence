@@ -82,6 +82,7 @@ export default function ScreeningForm({
   );
   const [flags, setFlags] = useState<Record<BoolKey, boolean>>(emptyFlags());
   const [ecgQtMs, setEcgQtMs] = useState("");
+  const [ecgHrBpm, setEcgHrBpm] = useState("");
   const [currentMedications, setCurrentMedications] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
@@ -105,6 +106,7 @@ export default function ScreeningForm({
         screening_date: screeningDate || null,
         ...flags,
         ecg_qt_ms: ecgQtMs.trim() === "" ? null : ecgQtMs,
+        ecg_hr_bpm: ecgHrBpm.trim() === "" ? null : ecgHrBpm,
         current_medications: currentMedications.trim() || null,
         notes: notes.trim() || null,
       }),
@@ -119,6 +121,7 @@ export default function ScreeningForm({
     setResult(j.screening_result || "");
     setFlags(emptyFlags());
     setEcgQtMs("");
+    setEcgHrBpm("");
     setCurrentMedications("");
     setNotes("");
     setBusy(false);
@@ -206,16 +209,33 @@ export default function ScreeningForm({
           </fieldset>
         ))}
 
-        <label style={labelStyle}>
-          ECG QT (ms)
-          <input
-            value={ecgQtMs}
-            onChange={(e) => setEcgQtMs(e.target.value)}
-            inputMode="numeric"
-            placeholder="420"
-            style={fieldStyle}
-          />
-        </label>
+        <div style={row2}>
+          <label style={labelStyle}>
+            ECG QT (ms)
+            <input
+              value={ecgQtMs}
+              onChange={(e) => setEcgQtMs(e.target.value)}
+              inputMode="numeric"
+              placeholder="420"
+              style={fieldStyle}
+            />
+          </label>
+          <label style={labelStyle}>
+            ECG heart rate (bpm)
+            <input
+              value={ecgHrBpm}
+              onChange={(e) => setEcgHrBpm(e.target.value)}
+              inputMode="numeric"
+              placeholder="60"
+              style={fieldStyle}
+            />
+          </label>
+        </div>
+        <p className="muted" style={{ margin: "-4px 0 0", fontSize: 12 }}>
+          For ibogaine, a rate-corrected QTc (Bazett) is computed from QT and
+          heart rate. Both are required — without them, ibogaine cannot be
+          cleared.
+        </p>
 
         <label style={labelStyle}>
           Current medications

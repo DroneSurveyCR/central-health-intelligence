@@ -1,6 +1,7 @@
 import type { AnySupabaseClient } from "../types";
 import type { DailySummary, TokenSet } from "./types";
 import { getSyncProvider } from "./registry";
+import { encryptToken, decryptToken } from "./crypto";
 
 // The sync worker. Runs with the ADMIN (service-role) client — it bypasses RLS, so
 // every write MUST carry an explicit practice_id taken from the job/token row.
@@ -44,8 +45,8 @@ export async function storeToken(
         practice_id: args.practice_id,
         patient_id: args.patient_id,
         connector_slug: args.slug,
-        access_token: args.token.access_token,
-        refresh_token: args.token.refresh_token ?? null,
+        access_token: encryptToken(args.token.access_token),
+        refresh_token: args.token.refresh_token ? encryptToken(args.token.refresh_token) : null,
         token_expires_at: args.token.expires_at ?? null,
         scopes: args.token.scopes ?? null,
         status: "connected",
@@ -140,8 +141,8 @@ export async function runDueJobs(
           : new Date(Date.now() - 7 * 24 * 3600 * 1000);
 
       const tokenSet: TokenSet = {
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
+        access_token: decryptToken(token.access_token),
+        refresh_token: token.refresh_token ? decryptToken(token.refresh_token) : token.refresh_token,
         expires_at: token.token_expires_at,
       };
       const summaries = await provider.pull(tokenSet, since);
@@ -221,12 +222,12 @@ export async function refreshExpiringTokens(admin: AnySupabaseClient): Promise<n
     const provider = getSyncProvider(t.connector_slug);
     if (!provider?.refresh || !t.refresh_token) continue;
     try {
-      const next = await provider.refresh(t.refresh_token);
+      const next = await provider.refresh(decryptToken(t.refresh_token));
       await admin
         .from("connector_oauth_tokens")
         .update({
-          access_token: next.access_token,
-          refresh_token: next.refresh_token ?? t.refresh_token,
+          access_token: encryptToken(next.access_token),
+          refresh_token: next.refresh_token ? encryptToken(next.refresh_token) : t.refresh_token,
           token_expires_at: next.expires_at ?? null,
           updated_at: new Date().toISOString(),
         })

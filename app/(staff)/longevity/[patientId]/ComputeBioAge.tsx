@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { phenoAge, extractMarkerMap } from "@/lib/longevity/biological-age";
 
-type PanelMarker = { name: string; value: number };
+type PanelMarker = { name: string; value: number; unit?: string | null };
 
 export default function ComputeBioAge({
   patientId,

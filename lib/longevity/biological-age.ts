@@ -10,10 +10,17 @@
  * They should be VALIDATED against a reference implementation before clinical use —
  * lab unit conventions vary and small coefficient/units mismatches shift results.
  *
+ * UNITS: inputs are expected in SI. extractMarkerMap() now CONVERTS recognised
+ * conventional/US units to SI (see the unit-conversion block below) before
+ * scoring, and the SI-bounds check in phenoAge() remains as a final sanity net.
+ *
  * All functions are pure.
  */
 
 export type BioMarker = { name: string; value: number };
+
+/** A panel marker that may carry a lab-reported unit string. */
+export type PanelMarker = { name: string; value: number; unit?: string | null };
 
 /**
  * Canonical marker keys this module understands, with the input units assumed.
@@ -57,6 +64,123 @@ const SI_BOUNDS: Record<CanonicalKey, [number, number]> = {
   alk_phos: [10, 1000], // U/L
   wbc: [1, 100], // 1000/uL
 };
+
+/**
+ * ── Unit conversion (conventional / US → SI) ────────────────────────────────
+ *
+ * The PhenoAge formula expects SI units. Labs frequently report US-conventional
+ * units, so we CONVERT to SI before scoring. Conversions applied:
+ *
+ *   albumin     g/dL  → g/L      ( × 10    )
+ *   creatinine  mg/dL → µmol/L   ( × 88.42 )
+ *   glucose     mg/dL → mmol/L   ( ÷ 18    )   (≈ /18.0182, MW glucose)
+ *   crp         mg/L  → mg/dL    ( ÷ 10    )   (note: phenoAge takes ln(mg/dL))
+ *
+ * The remaining 5 markers (lymphocyte %, MCV fL, RDW %, alk phos U/L, WBC
+ * 10^3/µL) use the same numeric units in both conventions — no conversion.
+ *
+ * How we decide SI vs conventional (per marker, when NO explicit unit is given):
+ *   1. If the value already sits inside its plausible SI range, assume SI — leave it.
+ *   2. Else if it matches the marker's known CONVENTIONAL range, convert it.
+ *   3. Else (ambiguous / unknown) we leave it as-is and let the SI-bounds
+ *      fail-safe in phenoAge() refuse it. We never guess into a wild result.
+ * When an explicit `unit` string IS provided, we trust it (after recognising it).
+ *
+ * A clinician / lab-config should confirm this unit handling before clinical use.
+ * The SI-bounds check in phenoAge() remains a FINAL sanity net after conversion.
+ */
+const CONVENTIONAL_BOUNDS: Partial<Record<CanonicalKey, [number, number]>> = {
+  albumin: [1, 8], // g/dL   (typical 3.5–5.5)
+  creatinine: [0.1, 15], // mg/dL  (typical 0.6–1.3)
+  glucose: [40, 600], // mg/dL  (typical 70–110)
+  // CRP is intentionally OMITTED from range-inference: mg/L (SI) and mg/dL
+  // (conventional) ranges overlap heavily at low values, so the value alone is
+  // ambiguous. CRP is only converted when an EXPLICIT mg/dL unit is supplied;
+  // otherwise it is treated as the module's SI input (mg/L).
+};
+
+/** Per-marker SI converter from a recognised conventional unit. */
+const TO_SI: Partial<Record<CanonicalKey, (v: number) => number>> = {
+  albumin: (v) => v * 10, // g/dL  -> g/L
+  creatinine: (v) => v * 88.42, // mg/dL -> µmol/L
+  glucose: (v) => v / 18, // mg/dL -> mmol/L
+  // crp is converted to mg/dL inside phenoAge() (it takes ln(mg/dL)); here we
+  // only normalise its scale to mg/L (the module's SI input). mg/L IS the SI
+  // input, so no conversion is applied at extract time.
+};
+
+/**
+ * Recognise an explicit unit string as SI ("si"), conventional ("conv"), or
+ * unknown (null) for a given canonical marker. Tolerant of casing / micro signs.
+ */
+function classifyUnit(
+  key: CanonicalKey,
+  unit: string | null | undefined,
+): "si" | "conv" | null {
+  if (!unit || typeof unit !== "string") return null;
+  const u = unit
+    .toLowerCase()
+    .replace(/µ|μ/g, "u")
+    .replace(/\s+/g, "");
+  switch (key) {
+    case "albumin":
+      if (u === "g/l") return "si";
+      if (u === "g/dl") return "conv";
+      return null;
+    case "creatinine":
+      if (u === "umol/l" || u === "µmol/l") return "si";
+      if (u === "mg/dl") return "conv";
+      return null;
+    case "glucose":
+      if (u === "mmol/l") return "si";
+      if (u === "mg/dl") return "conv";
+      return null;
+    case "crp":
+      // The module's SI input for CRP is mg/L; mg/dL is "conventional" here.
+      if (u === "mg/l") return "si";
+      if (u === "mg/dl") return "conv";
+      return null;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Convert one marker value to the module's expected SI input.
+ *
+ * Priority: explicit unit (trusted) → range-based inference → leave as-is.
+ * For CRP, "conventional" means mg/dL: we multiply by 10 to reach mg/L (the SI
+ * input this module expects), which phenoAge() then divides back to mg/dL.
+ * Returns the (possibly converted) value; ambiguous inputs pass through unchanged
+ * so the SI-bounds fail-safe can reject them.
+ */
+function toSiValue(
+  key: CanonicalKey,
+  value: number,
+  unit: string | null | undefined,
+): number {
+  const toSi = TO_SI[key];
+  const explicit = classifyUnit(key, unit);
+
+  if (explicit === "si") return value; // already SI per the label.
+  if (explicit === "conv") {
+    if (key === "crp") return value * 10; // mg/dL -> mg/L (module SI input)
+    return toSi ? toSi(value) : value;
+  }
+
+  // No usable explicit unit: infer from the value's range.
+  const si = SI_BOUNDS[key];
+  const conv = CONVENTIONAL_BOUNDS[key];
+  const inSi = si && value >= si[0] && value <= si[1];
+  if (inSi) return value; // plausibly already SI — leave it.
+  const inConv = conv && value >= conv[0] && value <= conv[1];
+  if (inConv) {
+    if (key === "crp") return value * 10; // mg/dL -> mg/L
+    return toSi ? toSi(value) : value;
+  }
+  // Ambiguous / unknown — leave as-is; phenoAge() SI-bounds will refuse it.
+  return value;
+}
 
 /**
  * Map common lab synonyms / spellings onto our canonical keys. Names are first
@@ -106,11 +230,15 @@ function normalizeName(name: string): string {
 }
 
 /**
- * Normalize an array of panel markers into a map keyed by canonical marker name.
- * Unrecognized markers are dropped. Non-finite values are skipped.
+ * Normalize an array of panel markers into a map keyed by canonical marker name,
+ * CONVERTING each value to the module's expected SI input.
+ *
+ * Each marker may carry an optional `unit` string; conversion uses it when it is
+ * recognised, otherwise falls back to range-based SI-vs-conventional inference
+ * (see toSiValue). Unrecognized markers are dropped; non-finite values skipped.
  */
 export function extractMarkerMap(
-  panelMarkers: { name: string; value: number }[],
+  panelMarkers: PanelMarker[],
 ): Record<string, number> {
   const out: Record<string, number> = {};
   for (const m of panelMarkers ?? []) {
@@ -120,8 +248,9 @@ export function extractMarkerMap(
     if (!key) continue;
     const value = Number(m.value);
     if (!Number.isFinite(value)) continue;
+    const converted = toSiValue(key, value, m.unit ?? null);
     // First occurrence wins (panels are typically ordered most-relevant first).
-    if (!(key in out)) out[key] = value;
+    if (!(key in out)) out[key] = converted;
   }
   return out;
 }
@@ -181,11 +310,11 @@ export function phenoAge(
   if (required.some(([, v]) => v == null)) return null;
   if (!Number.isFinite(chronoAge) || chronoAge <= 0) return null;
 
-  // The formula REQUIRES SI units. We cannot safely convert without a trusted unit
-  // on each marker, so we FAIL-SAFE: if any value is outside its plausible SI range
-  // (the classic symptom of US-conventional units entered raw — e.g. glucose
-  // 90 mg/dL read as 90 mmol/L), refuse rather than emit a wild age. Full fix =
-  // unit-aware conversion threaded from the panel. [CLINICAL-REVIEW L1]
+  // The formula REQUIRES SI units. extractMarkerMap() converts recognised
+  // conventional/US units to SI before this point, but this SI-bounds check stays
+  // as a FINAL fail-safe net: any value still outside its plausible SI range
+  // (e.g. an unconverted/ambiguous entry, or glucose 90 mg/dL read as 90 mmol/L)
+  // is refused rather than emitting a wild age. [CLINICAL-REVIEW L1]
   for (const [key, v] of required) {
     const b = SI_BOUNDS[key];
     if (v == null || v < b[0] || v > b[1]) return null;
