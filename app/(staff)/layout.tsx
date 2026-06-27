@@ -19,6 +19,7 @@ const ICONS: Record<string, React.ReactNode> = {
   desk: (<svg {...S}><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 3v3h6V3M9 11h6M9 15h4" /></svg>),
   approvals: (<svg {...S}><path d="M4 12l5 5L20 6" /></svg>),
   modalities: (<svg {...S}><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3z" /></svg>),
+  reports: (<svg {...S}><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5M8 13h8M8 17h8M8 9h3" /></svg>),
 };
 
 export default async function StaffLayout({
@@ -54,6 +55,7 @@ export default async function StaffLayout({
         <Link href="/desk">{ICONS.desk}<span>Front desk</span></Link>
         <Link href="/approvals">{ICONS.approvals}<span>Approvals</span></Link>
         {mods.has("marketplace") && <Link href="/modalities">{ICONS.modalities}<span>Modalities</span></Link>}
+        {isAdmin && mods.has("reports") && <Link href="/reports">{ICONS.reports}<span>Reports</span></Link>}
         {isAdmin && <Link href="/settings">{ICONS.settings}<span>Settings</span></Link>}
         {isAdmin && <Link href="/settings/modules">{ICONS.settings}<span>Modules</span></Link>}
         {isAdmin && <Link href="/products">{ICONS.products}<span>Products</span></Link>}

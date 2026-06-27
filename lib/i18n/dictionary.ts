@@ -570,6 +570,27 @@ export const DICT: Dict = {
     en: "Deletion removes your access immediately; records are permanently erased after the legal retention window.",
     es: "La eliminación quita su acceso de inmediato; los registros se borran permanentemente después del período legal de retención.",
   },
+  privacy_own_title: { en: "You own your data", es: "Usted es dueño de sus datos" },
+  privacy_own_body: {
+    en: "Under GDPR Article 20 (right to data portability) you can take a complete, machine-readable copy of everything we hold about you at any time. The download is a single JSON file you can keep or move to another provider.",
+    es: "Según el Artículo 20 del RGPD (derecho a la portabilidad de los datos) puede obtener una copia completa y legible por máquina de todo lo que tenemos sobre usted en cualquier momento. La descarga es un único archivo JSON que puede conservar o llevar a otro proveedor.",
+  },
+  privacy_included_title: { en: "What's included", es: "Qué se incluye" },
+  privacy_included_intro: {
+    en: "Your export contains every record linked to your account, including:",
+    es: "Su exportación contiene todos los registros vinculados a su cuenta, incluyendo:",
+  },
+  privacy_inc_profile: { en: "Profile & contact details", es: "Perfil y datos de contacto" },
+  privacy_inc_intake: { en: "Intake forms & questionnaires", es: "Formularios de admisión y cuestionarios" },
+  privacy_inc_visits: { en: "Visits & clinical notes", es: "Visitas y notas clínicas" },
+  privacy_inc_labs: { en: "Lab results & scans", es: "Resultados de laboratorio y escaneos" },
+  privacy_inc_body: { en: "Body composition & findings", es: "Composición corporal y hallazgos" },
+  privacy_inc_plans: { en: "Care plans, tasks & progress logs", es: "Planes de cuidado, tareas y registros de progreso" },
+  privacy_inc_appts: { en: "Appointments", es: "Citas" },
+  privacy_inc_billing: { en: "Invoices, payments & orders", es: "Facturas, pagos y pedidos" },
+  privacy_inc_messages: { en: "Messages with your care team", es: "Mensajes con su equipo de atención" },
+  privacy_inc_agreements: { en: "Signed agreements & insurance", es: "Acuerdos firmados y seguros" },
+  privacy_inc_files: { en: "Uploaded files & imported health data", es: "Archivos subidos y datos de salud importados" },
 
   // ---- messages (patient ↔ care team) ----
   messages_title: { en: "Messages", es: "Mensajes" },

@@ -67,6 +67,7 @@ export default async function PatientRecord({
         <Link className="btn ghost" href={`/agreements/${patient.id}`} style={{ textDecoration: "none" }}>Agreements</Link>
         <Link className="btn ghost" href={`/payments/${patient.id}`} style={{ textDecoration: "none" }}>Payments</Link>
         <Link className="btn ghost" href={`/invoices/${patient.id}`} style={{ textDecoration: "none" }}>Invoices &amp; billing</Link>
+        <a className="btn ghost" href={`/api/patient-data/export?patientId=${patient.id}`} download style={{ textDecoration: "none" }}>Export data</a>
         {/* Module-gated links — only shown for modules this practice has enabled */}
         {mods.has("labs") && <Link className="btn ghost" href={`/biomarker/${patient.id}`} style={{ textDecoration: "none" }}>Biomarkers</Link>}
         {mods.has("longevity") && <Link className="btn ghost" href={`/longevity/${patient.id}`} style={{ textDecoration: "none" }}>Longevity</Link>}

@@ -1,45 +1,62 @@
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
-import { REPORTS, runReport, toCSV, type ReportKey } from "@/lib/reports/queries";
-import { NextResponse } from "next/server";
+import {
+  isReportKey,
+  runReport,
+  reportToCSV,
+  normalizeMonth,
+  csvFilename,
+} from "@/lib/reports/queries";
 
-const KEYS = REPORTS.map((r) => r.key) as string[];
+export const dynamic = "force-dynamic";
 
-function defaultRange() {
-  const to = new Date();
-  const from = new Date(to.getTime() - 30 * 86400_000);
-  return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
-}
-
-/** GET /api/reports/[report]?from=&to= — returns the report as a CSV download. */
+/**
+ * GET /api/reports/[report]?month=YYYY-MM
+ * Returns the report as a CSV download. Tenant-scoped via RLS (createClient),
+ * staff-gated, and module-gated on "reports".
+ *   report ∈ { daily-transactions, invoices, outstanding }
+ */
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ report: string }> },
 ) {
+  // staff gate
   const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
+  if (!practitioner) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // module gate (Layer B) — API routes can't redirect cleanly, so 403.
+  if (!(await hasModule("reports"))) {
+    return NextResponse.json({ error: "module_not_enabled" }, { status: 403 });
+  }
 
   const { report } = await params;
-  if (!KEYS.includes(report))
-    return NextResponse.json({ error: "unknown report" }, { status: 404 });
+  if (!isReportKey(report)) {
+    return NextResponse.json({ error: "unknown_report" }, { status: 404 });
+  }
 
-  const def = defaultRange();
   const { searchParams } = new URL(request.url);
-  const from = searchParams.get("from") || def.from;
-  const to = searchParams.get("to") || def.to;
+  const month = normalizeMonth(searchParams.get("month"));
 
   const supabase = await createClient();
-  const data = await runReport(supabase, report as ReportKey, from, to);
+  const data = await runReport(supabase, report, month);
 
-  await logAudit({ action: "export", resource: `report:${report}`, resourceId: null });
+  await logAudit({
+    action: "export",
+    resource: `report:${report}`,
+    resourceId: null,
+  });
 
-  const csv = toCSV(data);
+  const csv = reportToCSV(data);
   return new NextResponse(csv, {
     headers: {
       "content-type": "text/csv; charset=utf-8",
-      "content-disposition": `attachment; filename="${report}_${from}_${to}.csv"`,
+      "content-disposition": `attachment; filename="${csvFilename(report, month)}"`,
+      "cache-control": "no-store",
     },
   });
 }
