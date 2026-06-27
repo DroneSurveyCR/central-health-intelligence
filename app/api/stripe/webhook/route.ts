@@ -59,16 +59,26 @@ async function handleInvoicePayment(admin: AnySupabaseClient, session: Stripe.Ch
 export async function POST(request: Request) {
   if (!stripeEnabled) return NextResponse.json({ error: "stripe disabled" }, { status: 503 });
   const sig = request.headers.get("stripe-signature");
-  const whsec = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!sig || !whsec) return NextResponse.json({ error: "missing signature/secret" }, { status: 400 });
+  if (!sig) return NextResponse.json({ error: "missing signature" }, { status: 400 });
+  // Platform events (subscriptions) sign with STRIPE_WEBHOOK_SECRET; connected-account
+  // events (patient invoice payments) sign with the Connect endpoint secret. Try both.
+  const secrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_CONNECT_WEBHOOK_SECRET].filter(
+    Boolean,
+  ) as string[];
+  if (!secrets.length) return NextResponse.json({ error: "no webhook secret" }, { status: 400 });
 
   const raw = await request.text();
-  let event: Stripe.Event;
-  try {
-    event = getStripe().webhooks.constructEvent(raw, sig, whsec);
-  } catch {
-    return NextResponse.json({ error: "invalid signature" }, { status: 400 });
+  const stripe = getStripe();
+  let event: Stripe.Event | null = null;
+  for (const s of secrets) {
+    try {
+      event = stripe.webhooks.constructEvent(raw, sig, s);
+      break;
+    } catch {
+      /* try the next secret */
+    }
   }
+  if (!event) return NextResponse.json({ error: "invalid signature" }, { status: 400 });
 
   const admin = createAdminClient();
 

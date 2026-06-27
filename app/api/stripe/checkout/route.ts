@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentPatient } from "@/lib/auth/roles";
 import { getStripe, stripeEnabled } from "@/lib/stripe";
+import { applicationFeeBps } from "@/lib/billing/connect";
 
 export const dynamic = "force-dynamic";
 
@@ -30,25 +32,44 @@ export async function POST(request: Request) {
   const amount = Math.round(Number(inv.total ?? 0) * 100);
   if (amount <= 0) return NextResponse.json({ error: "Nothing to pay on this invoice." }, { status: 400 });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://healthsync-app-eight.vercel.app";
+  // Route the charge to the CLINIC's own connected Stripe account (per-tenant) — the
+  // money belongs to the clinic, not the platform. Block if they haven't connected.
+  const { data: pt } = await supabase.from("patients").select("practice_id").eq("id", inv.patient_id).maybeSingle();
+  const admin = createAdminClient();
+  const { data: pr } = await admin
+    .from("practices")
+    .select("stripe_connect_account_id")
+    .eq("id", (pt?.practice_id as string | undefined) ?? "")
+    .maybeSingle();
+  const connectedAccount = (pr?.stripe_connect_account_id as string | null) ?? null;
+  if (!connectedAccount)
+    return NextResponse.json({ error: "This clinic hasn't connected card payments yet." }, { status: 503 });
+
+  const appUrl = new URL(request.url).origin;
+  const feeBps = applicationFeeBps();
+  const fee = feeBps > 0 ? Math.round((amount * feeBps) / 10000) : 0;
   const stripe = getStripe();
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: patient.email ?? undefined,
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: (inv.currency || "USD").toLowerCase(),
-          unit_amount: amount,
-          product_data: { name: `Invoice ${inv.number ?? ""}`.trim() },
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      customer_email: patient.email ?? undefined,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: (inv.currency || "USD").toLowerCase(),
+            unit_amount: amount,
+            product_data: { name: `Invoice ${inv.number ?? ""}`.trim() },
+          },
         },
-      },
-    ],
-    metadata: { invoiceId: inv.id, patientId: inv.patient_id, number: inv.number ?? "" },
-    success_url: `${appUrl}/billing/${inv.id}?paid=1`,
-    cancel_url: `${appUrl}/billing/${inv.id}`,
-  });
+      ],
+      metadata: { invoiceId: inv.id, patientId: inv.patient_id, number: inv.number ?? "" },
+      ...(fee > 0 ? { payment_intent_data: { application_fee_amount: fee } } : {}),
+      success_url: `${appUrl}/billing/${inv.id}?paid=1`,
+      cancel_url: `${appUrl}/billing/${inv.id}`,
+    },
+    { stripeAccount: connectedAccount },
+  );
 
   return NextResponse.json({ url: session.url });
 }

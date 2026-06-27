@@ -6,6 +6,8 @@ export type CurrentPractice = {
   plan: string;
   modules: string[];
   stripe_customer_id: string | null;
+  stripe_connect_account_id: string | null;
+  stripe_connect_status: string;
   role: string | null;
 };
 
@@ -26,7 +28,7 @@ export async function getCurrentPractice(): Promise<CurrentPractice | null> {
 
   const { data: pr } = await supabase
     .from("practices")
-    .select("id, name, plan, modules, stripe_customer_id")
+    .select("id, name, plan, modules, stripe_customer_id, stripe_connect_account_id, stripe_connect_status")
     .eq("id", prac.practice_id)
     .maybeSingle();
   if (!pr) return null;
@@ -37,6 +39,8 @@ export async function getCurrentPractice(): Promise<CurrentPractice | null> {
     plan: (pr.plan as string) ?? "starter",
     modules: (pr.modules as string[]) ?? [],
     stripe_customer_id: (pr.stripe_customer_id as string | null) ?? null,
+    stripe_connect_account_id: (pr.stripe_connect_account_id as string | null) ?? null,
+    stripe_connect_status: (pr.stripe_connect_status as string) ?? "disconnected",
     role: (prac.role as string | null) ?? null,
   };
 }
