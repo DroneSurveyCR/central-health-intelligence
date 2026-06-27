@@ -35,16 +35,16 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  // API routes self-authenticate and must return JSON errors (or run with their own
+  // secret/signed-state auth: cron, OAuth callbacks, webhooks) — never redirect them
+  // to an HTML login. The middleware only bounces unauthenticated PAGE navigations.
   const isPublic =
     path === "/" ||
+    path.startsWith("/api/") ||
     path.startsWith("/login") ||
     path.startsWith("/onboarding") ||
-    path.startsWith("/api/onboarding") ||
     path.startsWith("/auth") ||
-    path.startsWith("/legal") ||
-    path.startsWith("/api/ical") ||
-    path.startsWith("/api/reminders") ||
-    path.startsWith("/api/stripe/webhook");
+    path.startsWith("/legal");
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
