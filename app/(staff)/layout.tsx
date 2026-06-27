@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireStaff } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
+import { getEnabledModules } from "@/lib/modules/requireModule";
 
 const S = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 const ICONS: Record<string, React.ReactNode> = {
@@ -14,6 +15,10 @@ const ICONS: Record<string, React.ReactNode> = {
   analytics: (<svg {...S}><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>),
   import: (<svg {...S}><path d="M12 3v11M8 10l4 4 4-4M4 20h16" /></svg>),
   security: (<svg {...S}><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" /></svg>),
+  triage: (<svg {...S}><path d="M12 3l9 16H3l9-16z" /><path d="M12 10v4M12 17h.01" /></svg>),
+  desk: (<svg {...S}><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 3v3h6V3M9 11h6M9 15h4" /></svg>),
+  approvals: (<svg {...S}><path d="M4 12l5 5L20 6" /></svg>),
+  modalities: (<svg {...S}><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3z" /></svg>),
 };
 
 export default async function StaffLayout({
@@ -23,6 +28,7 @@ export default async function StaffLayout({
 }) {
   const me = await requireStaff();
   const isAdmin = me.role === "doctor" || me.role === "admin";
+  const mods = await getEnabledModules();
   const supabase = await createClient();
   const { count: unread } = await supabase
     .from("messages")
@@ -44,6 +50,10 @@ export default async function StaffLayout({
           <span>Messages</span>
           {unread ? <span className="badge unread" style={{ marginLeft: "auto" }}>{unread}</span> : null}
         </Link>
+        <Link href="/triage">{ICONS.triage}<span>Triage</span></Link>
+        <Link href="/desk">{ICONS.desk}<span>Front desk</span></Link>
+        <Link href="/approvals">{ICONS.approvals}<span>Approvals</span></Link>
+        {mods.has("marketplace") && <Link href="/modalities">{ICONS.modalities}<span>Modalities</span></Link>}
         {isAdmin && <Link href="/settings">{ICONS.settings}<span>Settings</span></Link>}
         {isAdmin && <Link href="/settings/modules">{ICONS.settings}<span>Modules</span></Link>}
         {isAdmin && <Link href="/products">{ICONS.products}<span>Products</span></Link>}

@@ -1,16 +1,9 @@
 import { requireStaff } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
-import { KIND_LABELS, type DraftKind } from "@/lib/ai/drafts";
+import { logAudit } from "@/lib/auth/audit";
+import { KIND_LABELS, listPendingDrafts, type DraftKind } from "@/lib/ai/drafts";
+import { approveDraft, rejectDraft } from "./actions";
 import DraftActions from "./DraftActions";
-
-type DraftStatus = "pending" | "approved" | "rejected" | "edited";
-
-const STATUS_LABEL: Record<DraftStatus, string> = {
-  pending: "Pending",
-  approved: "Approved",
-  rejected: "Rejected",
-  edited: "Edited",
-};
 
 function fmtDate(s: string | null): string {
   if (!s) return "";
@@ -22,22 +15,11 @@ export default async function ApprovalsPage() {
   await requireStaff();
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("ai_drafts")
-    .select(
-      "id, kind, status, draft_content, edited_content, model, created_at, reviewed_at, patients(first_name,last_name)",
-    )
-    .order("created_at", { ascending: false })
-    .limit(50);
-
-  const rows = data ?? [];
-  // Pending first, then everything else (both already date-desc within group).
-  const sorted = [...rows].sort((a, b) => {
-    const ap = a.status === "pending" ? 0 : 1;
-    const bp = b.status === "pending" ? 0 : 1;
-    return ap - bp;
-  });
-  const pendingCount = rows.filter((r) => r.status === "pending").length;
+  // The approval queue is the pending AI drafts for the caller's practice (RLS
+  // scopes via can_access_patient). Approval is the only thing that finalizes
+  // clinical AI output, so this page is the single review gate.
+  const rows = await listPendingDrafts(supabase);
+  await logAudit({ action: "view", resource: "approvals" });
 
   return (
     <div style={{ maxWidth: 820 }}>
@@ -53,15 +35,15 @@ export default async function ApprovalsPage() {
           AI Drafts
         </h1>
         <span className="muted" style={{ fontSize: 13 }}>
-          {pendingCount} pending
+          {rows.length} pending
         </span>
       </div>
 
-      {sorted.length === 0 ? (
+      {rows.length === 0 ? (
         <div className="card" style={{ marginTop: 18 }}>
           <p className="muted" style={{ margin: 0 }}>
-            No AI drafts yet. Drafts appear here when a module enqueues one for
-            review.
+            Nothing waiting for approval. AI drafts appear here when a module
+            enqueues one for review.
           </p>
         </div>
       ) : (
@@ -74,22 +56,14 @@ export default async function ApprovalsPage() {
             gap: 12,
           }}
         >
-          {sorted.map((r) => {
-            const pt = r.patients as
-              | { first_name?: string; last_name?: string }
-              | null;
-            const status = r.status as DraftStatus;
-            const kindLabel =
-              KIND_LABELS[r.kind as DraftKind] ?? (r.kind as string);
-            const content =
-              (r.edited_content as string | null) ??
-              (r.draft_content as string | null) ??
-              "";
+          {rows.map((r) => {
+            const kindLabel = KIND_LABELS[r.kind as DraftKind] ?? r.kind;
+            const content = r.edited_content ?? r.draft_content ?? "";
             const name =
-              `${pt?.first_name ?? ""} ${pt?.last_name ?? ""}`.trim() ||
+              `${r.patients?.first_name ?? ""} ${r.patients?.last_name ?? ""}`.trim() ||
               "Unknown patient";
             return (
-              <li key={r.id as string} className="card">
+              <li key={r.id} className="card">
                 <div
                   style={{
                     display: "flex",
@@ -107,17 +81,14 @@ export default async function ApprovalsPage() {
                       {kindLabel}
                     </span>
                   </div>
-                  <span
-                    className={`badge ${status === "pending" ? "new" : "existing"}`}
-                    style={{ fontSize: 11 }}
-                  >
-                    {STATUS_LABEL[status]}
+                  <span className="badge new" style={{ fontSize: 11 }}>
+                    Pending
                   </span>
                 </div>
 
                 <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  {r.model ? `${r.model as string} · ` : ""}
-                  {fmtDate(r.created_at as string | null)}
+                  {r.model ? `${r.model} · ` : ""}
+                  {fmtDate(r.created_at)}
                 </div>
 
                 <pre
@@ -132,24 +103,42 @@ export default async function ApprovalsPage() {
                   {content}
                 </pre>
 
-                {status === "pending" ? (
-                  <div style={{ marginTop: 12 }}>
-                    <DraftActions
-                      draftId={r.id as string}
-                      initialContent={content}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="muted"
-                    style={{ fontSize: 12, marginTop: 12 }}
-                  >
-                    {STATUS_LABEL[status]}
-                    {r.reviewed_at
-                      ? ` · ${fmtDate(r.reviewed_at as string | null)}`
-                      : ""}
-                  </div>
-                )}
+                {/* Primary review path: server-action Approve / Reject. The
+                    inline editor (DraftActions) handles Save & approve edits. */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    marginTop: 12,
+                  }}
+                >
+                  <form action={approveDraft}>
+                    <input type="hidden" name="id" value={r.id} />
+                    <button className="btn" type="submit" style={{ fontSize: 12 }}>
+                      Approve
+                    </button>
+                  </form>
+                  <form action={rejectDraft}>
+                    <input type="hidden" name="id" value={r.id} />
+                    <button
+                      className="btn ghost"
+                      type="submit"
+                      style={{ fontSize: 12 }}
+                    >
+                      Reject
+                    </button>
+                  </form>
+                  <span className="muted" style={{ fontSize: 11 }}>
+                    or
+                  </span>
+                  <DraftActions
+                    draftId={r.id}
+                    initialContent={content}
+                    editOnly
+                  />
+                </div>
               </li>
             );
           })}

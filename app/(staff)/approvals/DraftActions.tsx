@@ -6,9 +6,13 @@ import { useRouter } from "next/navigation";
 export default function DraftActions({
   draftId,
   initialContent,
+  editOnly = false,
 }: {
   draftId: string;
   initialContent: string;
+  /** When true, render only the Edit entry point (Approve/Reject live in the
+   *  parent server-action forms) to avoid duplicate buttons. */
+  editOnly?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -101,6 +105,20 @@ export default function DraftActions({
           </button>
         </div>
       </div>
+    );
+  }
+
+  if (editOnly) {
+    return (
+      <button
+        type="button"
+        className="btn ghost"
+        disabled={busy}
+        onClick={() => setEditing(true)}
+        style={{ fontSize: 12 }}
+      >
+        Edit
+      </button>
     );
   }
 

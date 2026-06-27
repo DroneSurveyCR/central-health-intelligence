@@ -74,6 +74,7 @@ export default async function PatientRecord({
         {mods.has("psychedelic") && <Link className="btn ghost" href={`/psychedelic/${patient.id}`} style={{ textDecoration: "none" }}>Plant medicine</Link>}
         {mods.has("nutrition") && <Link className="btn ghost" href={`/nutrition/${patient.id}`} style={{ textDecoration: "none" }}>Nutrition</Link>}
         {mods.has("wearables") && <Link className="btn ghost" href={`/wearables/${patient.id}`} style={{ textDecoration: "none" }}>Wearables</Link>}
+        {mods.has("marketplace") && <Link className="btn ghost" href={`/modalities/${patient.id}`} style={{ textDecoration: "none" }}>Modalities</Link>}
       </div>
 
       <div style={{ marginTop: 16 }}>
