@@ -26,6 +26,33 @@ export const TITRATION_TEMPLATES: Record<string, TitrationStep[]> = {
   ],
 };
 
+/**
+ * Per-compound maximum single-dose ceiling (mg). [CLINICAL-REVIEW P1/P2]
+ * GLP-1 ceilings are the FDA-labeled maxima. Research-peptide ceilings are
+ * conservative fat-finger / mg-vs-mcg guards, NOT clinical maxima — a clinician
+ * must confirm these before live prescribing.
+ */
+export const MAX_DOSE_MG: Record<string, number> = {
+  semaglutide: 2.4,
+  tirzepatide: 15,
+  "bpc-157": 1,
+  "nad+": 1000,
+  "cjc-1295": 2,
+  ipamorelin: 2,
+  "tb-500": 10,
+};
+
+/** Ceiling for a compound (case-insensitive); conservative fallback for unknowns. */
+export function maxDoseFor(compound: string | null | undefined): number {
+  const key = String(compound ?? "").trim().toLowerCase();
+  return MAX_DOSE_MG[key] ?? 100;
+}
+
+/** True when `dose` is a finite, positive mg value at or below the compound ceiling. */
+export function isDoseSafe(dose: number, compound: string | null | undefined): boolean {
+  return Number.isFinite(dose) && dose > 0 && dose <= maxDoseFor(compound);
+}
+
 export type PeptideCompound = { name: string; category: string };
 
 export const PEPTIDE_COMPOUNDS: PeptideCompound[] = [

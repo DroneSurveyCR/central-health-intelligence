@@ -42,6 +42,23 @@ const CANONICAL_KEYS = [
 type CanonicalKey = (typeof CANONICAL_KEYS)[number];
 
 /**
+ * Plausible SI-unit ranges per marker (the units the formula expects). Used as a
+ * fail-safe: values outside these bounds are almost always conventional/US units
+ * entered without conversion, so we refuse to score rather than mislead.
+ */
+const SI_BOUNDS: Record<CanonicalKey, [number, number]> = {
+  albumin: [20, 60], // g/L       (US g/dL ~4.7 would be < 20 -> refuse)
+  creatinine: [20, 1500], // umol/L    (US mg/dL ~0.8 would be < 20 -> refuse)
+  glucose: [2, 40], // mmol/L    (US mg/dL ~90 would be > 40 -> refuse)
+  crp: [0, 300], // mg/L
+  lymphocyte_pct: [1, 90], // %
+  mcv: [60, 130], // fL
+  rdw: [9, 30], // %
+  alk_phos: [10, 1000], // U/L
+  wbc: [1, 100], // 1000/uL
+};
+
+/**
  * Map common lab synonyms / spellings onto our canonical keys. Names are first
  * normalized (lowercase, spaces & hyphens -> underscore) before lookup here.
  */
@@ -153,20 +170,26 @@ export function phenoAge(
   const alkPhos = pick(markers, "alk_phos"); // U/L
   const wbc = pick(markers, "wbc"); // 1000/uL
 
-  const present = [
-    albumin,
-    creatinine,
-    glucose,
-    crp,
-    lymphocytePct,
-    mcv,
-    rdw,
-    alkPhos,
-    wbc,
-  ].filter((v): v is number => v != null);
-
-  if (present.length < 4) return null;
+  // PhenoAge is only defined with ALL 9 biomarkers + age. A reduced-marker score
+  // keeps the full-model intercept and is meaningless (its value depends on WHICH
+  // markers are missing, not the patient), so refuse partial panels. [CLINICAL-REVIEW L2]
+  const required: Array<[CanonicalKey, number | null]> = [
+    ["albumin", albumin], ["creatinine", creatinine], ["glucose", glucose],
+    ["crp", crp], ["lymphocyte_pct", lymphocytePct], ["mcv", mcv],
+    ["rdw", rdw], ["alk_phos", alkPhos], ["wbc", wbc],
+  ];
+  if (required.some(([, v]) => v == null)) return null;
   if (!Number.isFinite(chronoAge) || chronoAge <= 0) return null;
+
+  // The formula REQUIRES SI units. We cannot safely convert without a trusted unit
+  // on each marker, so we FAIL-SAFE: if any value is outside its plausible SI range
+  // (the classic symptom of US-conventional units entered raw — e.g. glucose
+  // 90 mg/dL read as 90 mmol/L), refuse rather than emit a wild age. Full fix =
+  // unit-aware conversion threaded from the panel. [CLINICAL-REVIEW L1]
+  for (const [key, v] of required) {
+    const b = SI_BOUNDS[key];
+    if (v == null || v < b[0] || v > b[1]) return null;
+  }
 
   // Published Levine PhenoAge coefficients (per the original Aging 2018 paper).
   // These weights assume specific clinical units; where this module's expected
@@ -213,7 +236,7 @@ export function phenoAge(
   const m = Math.min(Math.max(mortality, 1e-9), 1 - 1e-9);
 
   const phenoAgeYears =
-    141.50225 + Math.log(-0.00553 * Math.log(1 - m)) / 0.090165;
+    141.50225 + Math.log(-0.00553 * Math.log(1 - m)) / 0.09165; // [CLINICAL-REVIEW L3] was 0.090165 (typo)
 
   if (!Number.isFinite(phenoAgeYears)) return null;
 

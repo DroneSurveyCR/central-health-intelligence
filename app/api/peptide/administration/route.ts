@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentPractitioner } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
+import { isDoseSafe, maxDoseFor } from "@/lib/peptide/templates";
 import { NextResponse } from "next/server";
 
 const VALID_BY = ["clinic", "self", "home_nurse"];
@@ -29,6 +30,21 @@ export async function POST(request: Request) {
   if (body.dose_mg == null || !Number.isFinite(doseMg))
     return NextResponse.json({ error: "invalid dose_mg" }, { status: 400 });
 
+  const supabase = await createClient();
+
+  // [CLINICAL-REVIEW P1/P2] validate the administered dose against the protocol's
+  // compound ceiling (positive, ≤ labeled max) before recording it.
+  const { data: proto } = await supabase
+    .from("peptide_protocols")
+    .select("compound")
+    .eq("id", protocolId)
+    .maybeSingle();
+  if (!isDoseSafe(doseMg, proto?.compound))
+    return NextResponse.json(
+      { error: `dose_mg must be > 0 and ≤ ${maxDoseFor(proto?.compound)} mg` },
+      { status: 400 },
+    );
+
   const route =
     typeof body.route === "string" && body.route.trim()
       ? body.route.trim()
@@ -46,15 +62,17 @@ export async function POST(request: Request) {
     VALID_BY.includes(body.administered_by)
       ? body.administered_by
       : null;
-  const weightKg = parseOptionalNumber(body.weight_kg);
-  const severity = parseOptionalNumber(body.side_effect_severity);
+  // [CLINICAL-REVIEW P9/P10] reject implausible weight / out-of-range severity.
+  const weightRaw = parseOptionalNumber(body.weight_kg);
+  const weightKg = weightRaw != null && weightRaw > 0 && weightRaw < 500 ? weightRaw : null;
+  const sevRaw = parseOptionalNumber(body.side_effect_severity);
+  const severity = sevRaw != null && sevRaw >= 1 && sevRaw <= 5 ? Math.round(sevRaw) : null;
   const sideEffects = Array.isArray(body.side_effects)
     ? (body.side_effects as unknown[])
         .map((s) => String(s).trim())
         .filter((s) => s.length > 0)
     : null;
 
-  const supabase = await createClient();
   const { data, error } = await supabase
     .from("peptide_administrations")
     .insert({

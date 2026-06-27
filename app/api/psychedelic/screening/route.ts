@@ -62,18 +62,30 @@ export async function POST(request: Request) {
       ? body.notes.trim()
       : null;
 
-  // Compute screening_result server-side (authoritative).
+  // Compute screening_result server-side (authoritative). [CLINICAL-REVIEW K2/K3]
+  // NOTE: the exact QTc threshold and the FULL contraindication/interaction lists
+  // still require clinician confirmation (CLINICAL-REVIEW K1, K4–K6).
+  // Fail-safe: ibogaine without a valid ECG QT on file cannot be cleared.
+  const ibogaineEcgMissing =
+    substance === "ibogaine" && (ecgQtMs == null || !Number.isFinite(ecgQtMs));
   const absolute =
     flags.psych_schizophrenia ||
     flags.psych_active_psychosis ||
     flags.psych_suicidal_ideation ||
+    ibogaineEcgMissing ||
     (substance === "ibogaine" && ecgQtMs != null && ecgQtMs > 450) ||
     (flags.sub_lithium && substance === "ibogaine");
+
+  const anyFlag = Object.values(flags).some((f) => f === true);
+  // Fail-safe: "cleared" is emitted ONLY on an explicit clinician completeness
+  // attestation with zero flags. Any missing/incomplete data reads as "conditional"
+  // (needs review), never "cleared".
+  const attested = asBool(body.assessment_complete);
 
   let screeningResult: "cleared" | "conditional" | "contraindicated";
   if (absolute) {
     screeningResult = "contraindicated";
-  } else if (Object.values(flags).some((f) => f === true)) {
+  } else if (anyFlag || !attested) {
     screeningResult = "conditional";
   } else {
     screeningResult = "cleared";

@@ -40,6 +40,41 @@ export async function POST(request: Request) {
     );
 
   const supabase = await createClient();
+
+  // [CLINICAL-REVIEW K7] A "journey" (dosing) session must be backed by a current,
+  // non-contraindicated screening for that substance. Fail-safe: block when the
+  // screening is missing or contraindicated, unless the clinician supplies an
+  // explicit override_reason (which is recorded in the notes).
+  let overrideNote: string | null = null;
+  if (sessionType === "journey") {
+    const substanceVal = asOptionalText(body.substance)?.toLowerCase() ?? null;
+    const overrideReason = asOptionalText(body.override_reason);
+    let screen: { screening_result?: string } | null = null;
+    if (substanceVal) {
+      const { data: s } = await supabase
+        .from("psychedelic_screenings")
+        .select("screening_result, substance, screening_date")
+        .eq("patient_id", patientId)
+        .eq("substance", substanceVal)
+        .order("screening_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      screen = s;
+    }
+    const cleared = !!screen && screen.screening_result !== "contraindicated";
+    if (!cleared && !overrideReason)
+      return NextResponse.json(
+        {
+          error:
+            "A current, non-contraindicated screening for this substance is required before logging a journey session. Supply override_reason to proceed.",
+          requiresOverride: true,
+        },
+        { status: 409 },
+      );
+    if (!cleared && overrideReason)
+      overrideNote = `[CLINICAL OVERRIDE — no cleared screening] ${overrideReason}`;
+  }
+
   const { data, error } = await supabase
     .from("psychedelic_sessions")
     .insert({
@@ -55,7 +90,8 @@ export async function POST(request: Request) {
       patient_weight_kg: parseOptionalNumber(body.patient_weight_kg),
       intention_statement: asOptionalText(body.intention_statement),
       setting_location: asOptionalText(body.setting_location),
-      practitioner_notes: asOptionalText(body.practitioner_notes),
+      practitioner_notes:
+        [asOptionalText(body.practitioner_notes), overrideNote].filter(Boolean).join("\n\n") || null,
     })
     .select("id")
     .maybeSingle();
