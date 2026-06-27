@@ -26,7 +26,7 @@ export async function markRead(fd: FormData) {
     .eq("id", notifId)
     .eq("recipient_patient_id", me.id)
     .is("read_at", null);
-  revalidatePath("/notifications");
+  revalidatePath("/updates");
 }
 
 /** Mark every unread notification addressed to me read. */
@@ -41,5 +41,5 @@ export async function markAllRead() {
     .update({ read_at: new Date().toISOString() })
     .eq("recipient_patient_id", me.id)
     .is("read_at", null);
-  revalidatePath("/notifications");
+  revalidatePath("/updates");
 }

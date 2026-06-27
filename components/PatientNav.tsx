@@ -107,7 +107,7 @@ export default function PatientNav({ wearables = false, engagement = false }: Pa
           </Link>
         ))}
       </span>
-      <Link href="/notifications" style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 4 }}>
+      <Link href="/updates" style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 4 }}>
         {t("notifications")}
         {unread > 0 && (
           <span
