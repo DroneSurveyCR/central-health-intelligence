@@ -26,8 +26,20 @@ import {
   SYSTEM_PROMPT,
 } from "@/lib/assistant/safety";
 import { buildGrounding, answerFromFacts } from "@/lib/assistant/grounding";
+import { captureError } from "@/lib/observability/logger";
 
 export async function POST(request: Request) {
+  try {
+    return await handlePost(request);
+  } catch (err) {
+    // Unexpected failure (the model path already degrades gracefully on its own).
+    // Report it, then rethrow so behavior is unchanged.
+    await captureError(err, { route: "assistant" });
+    throw err;
+  }
+}
+
+async function handlePost(request: Request) {
   // 1. Auth — patient scope.
   const me = await getCurrentPatient();
   if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });

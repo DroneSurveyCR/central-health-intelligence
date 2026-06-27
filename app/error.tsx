@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { captureError } from "@/lib/observability/logger";
+
 export default function Error({
   error,
   reset,
@@ -7,6 +10,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    void captureError(error, { boundary: "root", digest: error.digest });
+  }, [error]);
+
   return (
     <div className="auth-shell">
       <div className="card" style={{ maxWidth: 420, textAlign: "center" }}>

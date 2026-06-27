@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { refreshExpiringTokens, scheduleDueTokens, runDueJobs } from "@/lib/connectors/sync/engine";
+import { captureError } from "@/lib/observability/logger";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -16,11 +17,17 @@ function authorized(request: Request): boolean {
 }
 
 async function run() {
-  const admin = createAdminClient();
-  const refreshed = await refreshExpiringTokens(admin);
-  const scheduled = await scheduleDueTokens(admin);
-  const drained = await runDueJobs(admin, 50);
-  return { refreshed, scheduled, ...drained };
+  try {
+    const admin = createAdminClient();
+    const refreshed = await refreshExpiringTokens(admin);
+    const scheduled = await scheduleDueTokens(admin);
+    const drained = await runDueJobs(admin, 50);
+    return { refreshed, scheduled, ...drained };
+  } catch (err) {
+    // Surface the failure to observability, then rethrow unchanged.
+    await captureError(err, { route: "cron/sync" });
+    throw err;
+  }
 }
 
 export async function GET(request: Request) {

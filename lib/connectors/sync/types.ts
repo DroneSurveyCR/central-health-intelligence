@@ -45,4 +45,10 @@ export interface SyncProvider {
   refresh?(refreshToken: string): Promise<TokenSet>;
   /** Pull normalized daily summaries from `since` (inclusive) to now. */
   pull(token: TokenSet, since: Date): Promise<DailySummary[]>;
+  /**
+   * Optional webhook authenticity check (e.g. HMAC of the raw body with the provider
+   * secret). When present, the webhook route MUST call it and reject (401) on failure
+   * before enqueuing. Providers without it keep the accept-stub behavior.
+   */
+  webhookVerify?(req: Request, rawBody: string): boolean | Promise<boolean>;
 }

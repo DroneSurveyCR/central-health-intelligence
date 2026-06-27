@@ -2,6 +2,7 @@ import type { AnySupabaseClient } from "../types";
 import type { DailySummary, TokenSet } from "./types";
 import { getSyncProvider } from "./registry";
 import { encryptToken, decryptToken } from "./crypto";
+import { acquire } from "./ratelimit";
 
 // The sync worker. Runs with the ADMIN (service-role) client — it bypasses RLS, so
 // every write MUST carry an explicit practice_id taken from the job/token row.
@@ -145,6 +146,9 @@ export async function runDueJobs(
         refresh_token: token.refresh_token ? decryptToken(token.refresh_token) : token.refresh_token,
         expires_at: token.token_expires_at,
       };
+      // Per-connector token bucket: wait for a slot so we stay under the provider's
+      // rate ceiling (Dexcom/Oura throttle hard). In-memory only — see ratelimit.ts.
+      await acquire(job.connector_slug);
       const summaries = await provider.pull(tokenSet, since);
 
       if (summaries.length) {

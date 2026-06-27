@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { captureError } from "@/lib/observability/logger";
+
 export default function PatientError({
   error,
   reset,
@@ -7,6 +10,10 @@ export default function PatientError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    void captureError(error, { boundary: "patient", digest: error.digest });
+  }, [error]);
+
   return (
     <div className="card" style={{ maxWidth: 480 }}>
       <h1 className="serif" style={{ fontSize: 24, margin: "0 0 8px" }}>

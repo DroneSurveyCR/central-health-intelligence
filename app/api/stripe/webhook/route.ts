@@ -4,6 +4,7 @@ import { getStripe, stripeEnabled } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AnySupabaseClient } from "@/lib/connectors/types";
 import { entitlementsForPlan, planForPrice, isPlanId, type PlanId } from "@/lib/billing/plans";
+import { captureError } from "@/lib/observability/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,16 @@ async function handleInvoicePayment(admin: AnySupabaseClient, session: Stripe.Ch
 }
 
 export async function POST(request: Request) {
+  try {
+    return await handlePost(request);
+  } catch (err) {
+    // Log + report without altering behavior: rethrow so the platform still 500s.
+    await captureError(err, { route: "stripe/webhook" });
+    throw err;
+  }
+}
+
+async function handlePost(request: Request) {
   if (!stripeEnabled) return NextResponse.json({ error: "stripe disabled" }, { status: 503 });
   const sig = request.headers.get("stripe-signature");
   if (!sig) return NextResponse.json({ error: "missing signature" }, { status: 400 });
