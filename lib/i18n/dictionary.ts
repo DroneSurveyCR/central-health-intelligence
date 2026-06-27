@@ -38,6 +38,7 @@ export const DICT: Dict = {
   messages: { en: "Messages", es: "Mensajes" },
   connections: { en: "Connections", es: "Conexiones" },
   assistant: { en: "Assistant", es: "Asistente" },
+  notifications: { en: "Notifications", es: "Notificaciones" },
 
   // ---- common UI ----
   welcome: { en: "Welcome", es: "Bienvenido" },

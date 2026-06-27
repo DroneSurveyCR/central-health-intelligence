@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { entitlementsForPlan, planForPrice, isPlanId } from "@/lib/billing/plans";
+import { DEFAULT_ON } from "@/lib/modules/manifest";
 
 describe("entitlementsForPlan", () => {
   const ALWAYS_AND_DEFAULT = ["core", "scheduling", "billing", "portal", "engagement"];
@@ -35,6 +36,26 @@ describe("entitlementsForPlan", () => {
   it("entitlements contain no duplicates", () => {
     const ents = entitlementsForPlan("network");
     expect(new Set(ents).size).toBe(ents.length);
+  });
+
+  it("every plan always includes the full DEFAULT_ON module spine", () => {
+    for (const plan of ["starter", "growth", "network", "enterprise"] as const) {
+      const ents = entitlementsForPlan(plan);
+      for (const m of DEFAULT_ON) expect(ents).toContain(m);
+    }
+  });
+
+  it("module sets are nested: network ⊇ growth ⊇ starter", () => {
+    const starter = new Set(entitlementsForPlan("starter"));
+    const growth = new Set(entitlementsForPlan("growth"));
+    const network = new Set(entitlementsForPlan("network"));
+
+    for (const m of starter) expect(growth.has(m)).toBe(true);
+    for (const m of growth) expect(network.has(m)).toBe(true);
+
+    // and strictly growing (not equal sets)
+    expect(growth.size).toBeGreaterThan(starter.size);
+    expect(network.size).toBeGreaterThan(growth.size);
   });
 });
 

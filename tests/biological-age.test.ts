@@ -100,6 +100,22 @@ describe("extractMarkerMap", () => {
     expect(map.glucose).toBeCloseTo(5, 5);
   });
 
+  it("converts an explicit mg/dL glucose to mmol/L (÷18)", () => {
+    const map = extractMarkerMap([{ name: "glucose", value: 180, unit: "mg/dL" }]);
+    expect(map.glucose).toBeCloseTo(10, 5); // 180 / 18 = 10 mmol/L
+  });
+
+  it("converts an explicit g/dL albumin to g/L (×10)", () => {
+    const map = extractMarkerMap([{ name: "Albumin", value: 4, unit: "g/dL" }]);
+    expect(map.albumin).toBeCloseTo(40, 5); // 4 × 10 = 40 g/L
+  });
+
+  it("trusts an explicit SI unit even when the value also looks conventional", () => {
+    // albumin 4.7 g/L is implausibly low for SI, but the explicit unit is trusted.
+    const map = extractMarkerMap([{ name: "albumin", value: 4.7, unit: "g/L" }]);
+    expect(map.albumin).toBeCloseTo(4.7, 5); // not multiplied
+  });
+
   it("leaves already-SI values untouched", () => {
     const map = extractMarkerMap([
       { name: "glucose", value: 5, unit: "mmol/L" },

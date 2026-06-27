@@ -47,7 +47,32 @@ export type PatientNavProps = {
 export default function PatientNav({ wearables = false, engagement = false }: PatientNavProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Lightweight unread badge: poll the patient unread-count endpoint. Best-effort
+  // — any failure leaves the badge hidden and the plain link still works.
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/patient/notifications/unread-count", {
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { count?: number };
+        if (!cancelled) setUnread(typeof data.count === "number" ? data.count : 0);
+      } catch {
+        /* ignore — badge simply stays hidden */
+      }
+    }
+    load();
+    const interval = setInterval(load, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   // Build the "More" menu: core items + module-gated extras (Connections when
   // wearables is enabled, Assistant when engagement is enabled).
@@ -82,6 +107,28 @@ export default function PatientNav({ wearables = false, engagement = false }: Pa
           </Link>
         ))}
       </span>
+      <Link href="/notifications" style={{ position: "relative", display: "inline-flex", alignItems: "center", gap: 4 }}>
+        {t("notifications")}
+        {unread > 0 && (
+          <span
+            aria-label={`${unread} unread`}
+            style={{
+              minWidth: 18,
+              height: 18,
+              padding: "0 5px",
+              borderRadius: 9,
+              background: "var(--berry, #b91c1c)",
+              color: "#fff",
+              fontSize: 11,
+              fontWeight: 700,
+              lineHeight: "18px",
+              textAlign: "center",
+            }}
+          >
+            {unread > 99 ? "99+" : unread}
+          </span>
+        )}
+      </Link>
       <div
         ref={wrapRef}
         style={{ position: "relative" }}

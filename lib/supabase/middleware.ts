@@ -43,6 +43,7 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/api/") ||
     path.startsWith("/login") ||
     path.startsWith("/onboarding") ||
+    path.startsWith("/p/") ||
     path.startsWith("/auth") ||
     path.startsWith("/legal");
 

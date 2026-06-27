@@ -13,8 +13,45 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentPatient } from "@/lib/auth/roles";
 import { getEnabledModules } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
-import { checkMilestones } from "@/lib/engagement/streaks";
+import { checkMilestones, type MilestoneRow } from "@/lib/engagement/streaks";
+import { notify } from "@/lib/notifications/create";
 import { revalidatePath } from "next/cache";
+
+type SupabaseServer = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * Deliver a patient notification for each NEWLY-earned milestone. Best-effort:
+ * a delivery hiccup must never break the log that earned the milestone.
+ *
+ * Idempotency: `notify` is called with a stable dedupKey per (patient, milestone)
+ * — `milestone:<patientId>:<kind>:<label>` — so even if `checkMilestones` were to
+ * re-report a badge, the unique dedup index makes the duplicate insert a silent
+ * no-op. Patients therefore get exactly one notification per milestone, ever.
+ *
+ * Runs on the patient's RLS session client, so practice_id auto-fills via the
+ * column default and recipient_patient_id is the patient themselves.
+ */
+async function deliverMilestoneNotifications(
+  client: SupabaseServer,
+  patientId: string,
+  earned: MilestoneRow[],
+): Promise<void> {
+  for (const m of earned) {
+    try {
+      await notify(client, {
+        patientId,
+        kind: "milestone",
+        title: "Milestone unlocked!",
+        body: m.label,
+        link: "/today",
+        severity: "info",
+        dedupKey: `milestone:${patientId}:${m.kind}:${m.label}`,
+      });
+    } catch {
+      // Never fail the log because a notification insert hiccuped.
+    }
+  }
+}
 
 const FEELING_TAGS = [
   "energized",
@@ -114,6 +151,8 @@ export async function logProtocolDose(input: {
   try {
     const earned = await checkMilestones(supabase, me.id);
     newMilestones = earned.map((m) => m.label);
+    // Deliver an in-app notification for each newly-earned milestone (idempotent).
+    await deliverMilestoneNotifications(supabase, me.id, earned);
   } catch {
     // Never fail the log because the milestone pass hiccuped.
   }
@@ -163,6 +202,8 @@ export async function logFeelingTags(input: {
   try {
     const earned = await checkMilestones(supabase, me.id);
     newMilestones = earned.map((m) => m.label);
+    // Deliver an in-app notification for each newly-earned milestone (idempotent).
+    await deliverMilestoneNotifications(supabase, me.id, earned);
   } catch {
     /* swallow — milestone failure must not break the log */
   }

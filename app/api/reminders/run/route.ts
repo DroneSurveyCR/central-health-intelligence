@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReminderEmail } from "@/lib/email/resend";
 import { reminderEmail } from "@/lib/email/templates";
 import { dueReminders } from "@/lib/reminders/window";
+import { notify } from "@/lib/notifications/create";
 import { NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 
@@ -39,7 +40,7 @@ async function run(request: Request) {
 
   const { data: appts } = await admin
     .from("appointments")
-    .select("id, start_time, modality, reminders_sent_json, patient_id, patients(email)")
+    .select("id, start_time, modality, reminders_sent_json, patient_id, practice_id, patients(email)")
     .eq("status", "scheduled")
     .gte("start_time", new Date(now).toISOString())
     .lte("start_time", horizon);
@@ -70,6 +71,24 @@ async function run(request: Request) {
           resend_id: r.id,
           status: r.skipped ? "skipped" : "sent",
         });
+
+        // In-app delivery alongside the email. Admin (service-role) client => no
+        // auth.uid(), so practice_id MUST be passed explicitly. Idempotent via a
+        // dedupKey scoped to (appointment, reminder window) so re-runs of the cron
+        // never double-notify the patient for the same appointment+window.
+        if (a.practice_id) {
+          await notify(admin, {
+            practiceId: a.practice_id as string,
+            patientId: a.patient_id as string,
+            kind: "reminder",
+            title: "Upcoming appointment",
+            body: `${practiceName} · ${new Date(a.start_time).toLocaleString()}`,
+            link: "/appointments",
+            severity: "info",
+            dedupKey: `reminder:${a.id}:${key}`,
+          });
+        }
+
         sent++;
       } catch {
         await admin.from("email_log").insert({

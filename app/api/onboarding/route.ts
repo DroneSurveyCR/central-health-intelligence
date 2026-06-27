@@ -1,8 +1,28 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { MODULES, DEFAULT_ON } from "@/lib/modules/manifest";
+import type { ModuleId } from "@/lib/modules/types";
 import { NextResponse } from "next/server";
 
-// Modules a brand-new practice gets switched on by default (minus always-on "core").
-const DEFAULT_ON = ["scheduling", "billing", "portal", "reports", "engagement"];
+const VALID_MODULE_IDS = new Set(Object.keys(MODULES));
+const VALID_VERTICALS = new Set([
+  "integrative", "longevity", "peptide", "psychedelic", "functional", "womens",
+]);
+
+/**
+ * Resolve the final module set for a new practice:
+ *   - always include DEFAULT_ON (and always-on core, which is in DEFAULT_ON)
+ *   - add any client-requested modules that are valid manifest ids
+ * Dedupes; ignores anything not in the manifest.
+ */
+function resolveModules(requested: unknown): ModuleId[] {
+  const set = new Set<string>(DEFAULT_ON as string[]);
+  if (Array.isArray(requested)) {
+    for (const id of requested) {
+      if (typeof id === "string" && VALID_MODULE_IDS.has(id)) set.add(id);
+    }
+  }
+  return Array.from(set) as ModuleId[];
+}
 
 /**
  * Public new-practice onboarding. Creates a tenant end-to-end with the
@@ -20,6 +40,10 @@ export async function POST(request: Request) {
   const ownerName = String(body.ownerName ?? "").trim();
   const ownerEmail = String(body.ownerEmail ?? "").trim();
   const password = String(body.password ?? "");
+
+  const verticalRaw = String(body.vertical ?? "").trim();
+  const vertical = VALID_VERTICALS.has(verticalRaw) ? verticalRaw : null;
+  const modules = resolveModules(body.modules);
 
   if (!practiceName || !slug || !ownerName || !ownerEmail || !password) {
     return NextResponse.json(
@@ -57,7 +81,8 @@ export async function POST(request: Request) {
       name: practiceName,
       plan: "starter",
       region: "us",
-      modules: [...DEFAULT_ON],
+      vertical,
+      modules,
     })
     .select("id")
     .single();
