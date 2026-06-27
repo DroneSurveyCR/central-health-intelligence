@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/auth/audit";
 import WearableImport from "./WearableImport";
 import Connections from "./Connections";
+import DraftWithAiButton from "@/lib/ai/DraftWithAiButton";
+import { aiEnabled } from "@/lib/ai";
 
 type DailySummary = {
   id: string;
@@ -96,6 +98,15 @@ export default async function StaffWearablesPage({
         </Link>
       </div>
       <p className="muted">Wearables &amp; CGM</p>
+
+      <div style={{ margin: "8px 0 4px" }}>
+        <DraftWithAiButton
+          endpoint="/api/ai/narrative"
+          body={{ patientId }}
+          label="Draft narrative with AI"
+          aiEnabled={aiEnabled}
+        />
+      </div>
 
       <Connections patientId={patientId} />
 

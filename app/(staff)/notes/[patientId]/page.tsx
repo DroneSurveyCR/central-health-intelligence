@@ -2,6 +2,8 @@ import { requireStaff } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/auth/audit";
 import NoteEditor from "./NoteEditor";
+import DraftWithAiButton from "@/lib/ai/DraftWithAiButton";
+import { aiEnabled } from "@/lib/ai";
 
 const TYPE_LABELS: Record<string, string> = {
   consult: "Consult",
@@ -67,6 +69,15 @@ export default async function NotesPage({
         {patient.first_name} {patient.last_name}
       </h1>
       <p className="muted">Visit notes</p>
+
+      <div style={{ margin: "10px 0 4px" }}>
+        <DraftWithAiButton
+          endpoint="/api/ai/soap"
+          body={{ patientId }}
+          label="Draft SOAP with AI"
+          aiEnabled={aiEnabled}
+        />
+      </div>
 
       <NoteEditor patientId={patientId} />
 

@@ -20,6 +20,7 @@ const ICONS: Record<string, React.ReactNode> = {
   approvals: (<svg {...S}><path d="M4 12l5 5L20 6" /></svg>),
   modalities: (<svg {...S}><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3z" /></svg>),
   reports: (<svg {...S}><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5M8 13h8M8 17h8M8 9h3" /></svg>),
+  bell: (<svg {...S}><path d="M6 9a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6" /><path d="M10 20a2 2 0 004 0" /></svg>),
 };
 
 export default async function StaffLayout({
@@ -36,6 +37,10 @@ export default async function StaffLayout({
     .select("id", { count: "exact", head: true })
     .eq("sender", "patient")
     .is("read_at", null);
+  const { count: notifs } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null);
 
   const initials = me.name?.split(/\s+/).map((p: string) => p[0]).slice(0, 2).join("").toUpperCase() || "DR";
 
@@ -50,6 +55,11 @@ export default async function StaffLayout({
           {ICONS.messages}
           <span>Messages</span>
           {unread ? <span className="badge unread" style={{ marginLeft: "auto" }}>{unread}</span> : null}
+        </Link>
+        <Link href="/notifications">
+          {ICONS.bell}
+          <span>Notifications</span>
+          {notifs ? <span className="badge unread" style={{ marginLeft: "auto" }}>{notifs}</span> : null}
         </Link>
         <Link href="/triage">{ICONS.triage}<span>Triage</span></Link>
         <Link href="/desk">{ICONS.desk}<span>Front desk</span></Link>

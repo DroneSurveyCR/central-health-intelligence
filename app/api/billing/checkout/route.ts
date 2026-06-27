@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe, stripeEnabled } from "@/lib/stripe";
-import { getCurrentPractice } from "@/lib/billing/practice";
+import { getCurrentPractice, countProviderSeats } from "@/lib/billing/practice";
 import { PLANS, isPlanId } from "@/lib/billing/plans";
 
 export const dynamic = "force-dynamic";
@@ -27,13 +27,20 @@ export async function POST(request: Request) {
       { status: 503 },
     );
 
+  // Per-provider seats: one quantity per active practitioner (min 1). The plan price
+  // stays a single recurring price; total = price * seats.
+  const seats = await countProviderSeats(practice.id);
+
   const origin = new URL(request.url).origin;
   const session = await getStripe().checkout.sessions.create({
     mode: "subscription",
     customer: practice.stripe_customer_id ?? undefined,
-    line_items: [{ price: priceId, quantity: 1 }],
-    metadata: { practiceId: practice.id, plan },
+    line_items: [{ price: priceId, quantity: seats }],
+    metadata: { practiceId: practice.id, plan, seats: String(seats) },
     subscription_data: { metadata: { practiceId: practice.id, plan } },
+    // Stripe Tax: Stripe collects the billing address and computes tax automatically.
+    // NOTE: Stripe Tax must be enabled in the Stripe Dashboard (Settings → Tax) for live.
+    automatic_tax: { enabled: true },
     success_url: `${origin}/settings/billing?upgraded=${plan}`,
     cancel_url: `${origin}/settings/billing`,
   });

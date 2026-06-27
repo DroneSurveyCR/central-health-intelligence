@@ -1,12 +1,54 @@
 import type { AnySupabaseClient } from "../connectors/types";
+import { notify } from "../notifications/create";
 
 // Continuous-data alerting engine. Runs with the ADMIN (service-role) client from
 // the cron route — it bypasses RLS, so every write MUST carry an explicit
 // practice_id taken from the rule/patient row. Idempotent: the unique index
 // uq_alerts_dedup (patient_id, dedup_key) makes duplicate inserts a no-op.
+//
+// DELIVERY: every genuinely-new alert row also spawns an in-app notification
+// (kind 'alert', link '/triage') for the practice's care team. The notification
+// reuses the alert's dedup_key, so the SAME rule+patient cannot notify more than
+// once per 24h (uq_notifications_dedup gives daily idempotency, matching alerts).
 
 type Comparator = "gt" | "lt" | "gte" | "lte";
 type Severity = "info" | "warn" | "urgent";
+
+// ---------------------------------------------------------------------------
+// Alert-fatigue tuning knobs.
+// ---------------------------------------------------------------------------
+// HYSTERESIS_BAND (default OFF / 0): when > 0, a value that is only MARGINALLY
+// over the threshold is treated as noise and skipped. "Marginally" = within this
+// FRACTION of the threshold. e.g. 0.05 = a value within 5% of the threshold on
+// the breach side does NOT fire. Raise it per-practice if a rule is too chatty.
+// Set via env so ops can tune without a deploy; 0 keeps today's behavior exactly.
+const HYSTERESIS_BAND = (() => {
+  const raw = Number(process.env.ALERT_HYSTERESIS_BAND ?? "0");
+  return Number.isFinite(raw) && raw > 0 ? raw : 0;
+})();
+
+/**
+ * True when a breaching `value` is only marginally past `threshold` and should
+ * be suppressed under the configured hysteresis band. No-op when band is 0.
+ * The required margin scales with the threshold magnitude so it works across
+ * very different metric ranges (HR ~90 vs HRV ~25 vs glucose ~180).
+ */
+function withinHysteresis(value: number, threshold: number, comparator: Comparator): boolean {
+  if (HYSTERESIS_BAND <= 0) return false;
+  const margin = Math.abs(threshold) * HYSTERESIS_BAND;
+  switch (comparator) {
+    case "gt":
+    case "gte":
+      // Over-threshold breach: suppress if it has not cleared threshold+margin.
+      return value < threshold + margin;
+    case "lt":
+    case "lte":
+      // Under-threshold breach: suppress if it has not cleared threshold-margin.
+      return value > threshold - margin;
+    default:
+      return false;
+  }
+}
 
 type RuleRow = {
   id: string;
@@ -135,6 +177,11 @@ export async function evaluateAlerts(admin: AnySupabaseClient): Promise<number> 
         if (!Number.isFinite(value)) continue;
         if (!compare(value, rule.comparator, rule.threshold)) continue;
 
+        // Tuning: skip values that only marginally breach the threshold when a
+        // hysteresis band is configured (default off — no behavior change).
+        if (withinHysteresis(value, rule.threshold, rule.comparator)) continue;
+
+        const dedupKey = `${rule.id}:${today}`;
         const message = `${rule.name}: ${rule.metric} ${value} ${COMPARATOR_SYMBOL[rule.comparator]} ${rule.threshold}`;
         const { error } = await admin.from("alerts").insert({
           practice_id: practiceId,
@@ -145,13 +192,34 @@ export async function evaluateAlerts(admin: AnySupabaseClient): Promise<number> 
           severity: rule.severity,
           message,
           status: "open",
-          dedup_key: `${rule.id}:${today}`,
+          dedup_key: dedupKey,
         });
 
         // Duplicate-key (23505) means the alert for this rule+day already exists —
         // expected and ignored. Any other error is also swallowed so one bad row
         // doesn't abort the whole sweep.
-        if (!error) created += 1;
+        if (!error) {
+          created += 1;
+
+          // DELIVERY + fatigue tuning. One notification per NEW alert, addressed
+          // practice-wide (recipient_* null -> the whole care team sees it).
+          // - Reuses the alert dedup_key so the SAME rule+patient can't notify
+          //   more than once per 24h (uq_notifications_dedup), staying in lockstep
+          //   with the alert dedup. Belt-and-suspenders: we only get here when the
+          //   alert insert itself was NOT a duplicate, so this is doubly idempotent.
+          // - Only `urgent` interrupts (notify() derives interrupt from severity),
+          //   so warn/info alerts ride quietly in the feed and don't add to the
+          //   "interrupting" badge — the core anti-fatigue lever.
+          await notify(admin, {
+            practiceId,
+            kind: "alert",
+            title: rule.name,
+            body: message,
+            link: "/triage",
+            severity: rule.severity,
+            dedupKey: `alert:${dedupKey}`,
+          });
+        }
       }
     }
   }

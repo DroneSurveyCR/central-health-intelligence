@@ -84,8 +84,14 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    // One-time HIPAA setup fee
+    if (session.metadata?.kind === "setup_fee" && session.metadata?.practiceId && session.payment_status === "paid") {
+      const patch: Record<string, unknown> = { setup_fee_paid_at: new Date().toISOString() };
+      if (typeof session.customer === "string") patch.stripe_customer_id = session.customer;
+      await admin.from("practices").update(patch).eq("id", session.metadata.practiceId);
+    }
     // SaaS plan subscription
-    if (session.mode === "subscription" && session.metadata?.practiceId && isPlanId(session.metadata?.plan)) {
+    else if (session.mode === "subscription" && session.metadata?.practiceId && isPlanId(session.metadata?.plan)) {
       await applyPlan(admin, session.metadata.practiceId, session.metadata.plan, {
         customerId: typeof session.customer === "string" ? session.customer : null,
         subscriptionId: typeof session.subscription === "string" ? session.subscription : null,

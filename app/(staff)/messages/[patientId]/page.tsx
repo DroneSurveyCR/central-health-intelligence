@@ -3,6 +3,8 @@ import { requireStaff } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/auth/audit";
 import StaffComposer from "./StaffComposer";
+import DraftWithAiButton from "@/lib/ai/DraftWithAiButton";
+import { aiEnabled } from "@/lib/ai";
 
 type MessageRow = {
   id: string;
@@ -145,6 +147,17 @@ export default async function StaffMessagesPage({
           })
         )}
       </div>
+
+      {messages.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <DraftWithAiButton
+            endpoint="/api/ai/message-reply"
+            body={{ patientId }}
+            label="Draft reply with AI"
+            aiEnabled={aiEnabled}
+          />
+        </div>
+      )}
 
       <StaffComposer patientId={patientId} />
     </div>
