@@ -14,19 +14,20 @@ live keys, dev-app approvals, legal) are tracked separately in ACTIVATION.md and
 | 4 | Intelligence layer (Part 9) | **8** | Briefing/alerts/triage/desk/approvals + **AI draft producers (SOAP/reply/narrative, verified)** + **notification delivery** + alert-fatigue tuning. |
 | 5 | Marketplace (Part 10) | 7 | Layer-1 (clinic menu + recommend + outcomes + course) built. |
 | 6 | Patient experience | 8 | Connections/today/assistant/privacy built. Nudge *delivery* missing. |
-| 7 | Connectors / sync engine | **5** | Engine + queue + sandbox proven; **tokens now AES-256-GCM encrypted**. Real providers, webhook verify, rate limits missing. |
+| 7 | Connectors / sync engine | **7** | Engine + queue + encrypted tokens; **Withings/Dexcom/Garmin providers + webhook HMAC verify + per-connector rate limiting**. Activation needs provider dev-app creds (Garmin=OAuth1 caveat). |
 | 8 | SaaS billing | **8** | Plan checkout + entitlement + **per-provider seats + Stripe customer portal + one-time HIPAA setup fee + Stripe Tax**. Proration/cancel via portal. |
 | 9 | Patient billing (Connect) | 7 | Per-tenant routing wired; activation-pending. |
 | 10 | AI features | **9** | Assistant + **doctor-side draft producers (SOAP/message-reply/narrative)** all live + verified end-to-end. |
-| 11 | Security & compliance | **7** | RLS proven; **tokens encrypted**; tests lock guardrails. MFA enrollment, audit WORM/retention, CSP-for-egress pending. |
-| 12 | Automated testing | **5** | 59 unit tests (dose guards, PhenoAge, billing, modules, state, safety) + runtime isolation script. No route/e2e/CI yet. |
-| 13 | Observability / ops | 1 | No monitoring, logging, CI/CD. |
+| 11 | Security & compliance | **9** | RLS proven; tokens encrypted; **MFA (TOTP) enrollment + /mfa step-up**; **audit-log WORM (append-only, verified)** + 6yr-retention doc. Pen-test/full-CSP-audit pending. |
+| 12 | Automated testing | **6** | 65 unit tests (guardrails, PhenoAge, billing, modules, state, safety, observability) + runtime isolation script. Route/e2e still light. |
+| 13 | Observability / ops | **5** | Structured logger + `captureError` (Sentry-DSN-gated) + `/api/health` (verified) + error-boundary capture + GitHub Actions CI. Real Sentry/uptime account = external. |
 | 14 | Onboarding / GTM surfaces | 5 | Basic onboarding; no subdomain routing, wizard depth, or marketing pages. |
 
-**Buildable production-readiness: 78 → 90 → 96/140** (target 130+; ~10 reserved for external-only items).
+**Buildable production-readiness: 78 → 90 → 96 → 104/140** (target 130+; ~10 reserved for external-only items).
 
 ## Wave log
 - **Waves 1–4 + AI:** intelligence layer, marketplace, patient experience, reports, export, session middleware, all modules, AI assistant activated. (Baseline 78.)
 - **Wave 5 ✅ (Tier 1 hardening):** AES-256-GCM token encryption (sync regression-tested), runtime tenant-isolation test (0 leaks/18 tables), vitest suite (59 tests), QTc-from-HR + PhenoAge unit conversion. Score 78→90. Areas 1/3/7/11/12 up.
 - **Wave 6 ✅ (Tier 2a):** billing depth (seats + Stripe portal + HIPAA setup fee + Stripe Tax), AI draft producers (SOAP/reply/narrative — verified end-to-end), notifications + alert delivery + fatigue tuning. Migrations 010/011. Score 90→96. Areas 4/8/10 up.
-- **Wave 7 (next, Tier 2b/3):** real connector providers (Withings/Dexcom/Garmin) + webhook verify + rate limiting; observability (Sentry-gated, logger, health, error boundaries, CI workflow); MFA enrollment + audit WORM/retention. Targets 7/11/13.
+- **Wave 7 ✅ (Tier 2b/3):** Withings/Dexcom/Garmin providers + webhook HMAC + rate limiting; observability (logger/captureError/health/CI); MFA enrollment + /mfa; audit WORM (migration 012, verified). Score 96→104. Areas 7/11/13 up.
+- **Wave 8 (next):** subdomain/custom-domain routing + onboarding wizard depth + per-clinic public pages (→14); patient notification/nudge delivery (→6); broader route/integration tests (→12). Then re-score toward the 130 target.
