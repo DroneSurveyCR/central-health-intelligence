@@ -4,6 +4,7 @@ import { requireModule } from "@/lib/modules/requireModule";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/auth/audit";
 import WearableImport from "./WearableImport";
+import Connections from "./Connections";
 
 type DailySummary = {
   id: string;
@@ -95,6 +96,8 @@ export default async function StaffWearablesPage({
         </Link>
       </div>
       <p className="muted">Wearables &amp; CGM</p>
+
+      <Connections patientId={patientId} />
 
       <WearableImport patientId={patientId} />
 

@@ -41,6 +41,13 @@ export default async function SettingsPage() {
       </h1>
       <p className="muted">Customize your practice — patients see this branding everywhere.</p>
 
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
+        <a className="btn ghost" href="/settings/modules">Modules</a>
+        <a className="btn ghost" href="/settings/billing">Plan &amp; billing</a>
+        <a className="btn ghost" href="/settings/payments">Patient payments</a>
+        <a className="btn ghost" href="/settings/connectors">Connectors</a>
+      </div>
+
       {/* Practice info */}
       <section style={sectionStyle}>
         <h2 className="serif" style={{ fontSize: 19 }}>About your practice</h2>
