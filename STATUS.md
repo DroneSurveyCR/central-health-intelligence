@@ -15,7 +15,22 @@ management, and MRR are the next increment (plan Part 1.7).
 set NEXT_PUBLIC_APP_URL; subdomain routing for public marketing pages.
 **Blockers:** none for the working app. Clinical review = needs human.
 
-### Three greenfield blocks (this push)
+### BUILD-OUT COMPLETE (Waves 1–4) — see ACTIVATION.md for what's left (all external)
+Full product per the PRD/plan is built, deployed, and smoke-tested (every route gates; all engines run):
+- **Part 9 intelligence layer** — `/focus` morning briefing (buildDelta + nightly cron), alerts engine + `/triage`,
+  generalized `ai_drafts` + `/approvals`, `/desk` front-desk + `care_team` + `tasks`. Migration 007.
+- **Part 10 marketplace** — modalities catalog (13 global seeded) + recommend + outcomes + course tracking, gated.
+- **Patient experience** — `/connections` (self-serve device OAuth + consent grid), engagement (`/today` streaks/
+  milestones/nudges), `/assistant` (grounded + safety-gated, AI-activation-ready), module-driven PatientNav.
+- **Reports v1** (`/reports` + CSV) and **GDPR Art.20 export** (full bundle, all module tables).
+- **All modules** now have surfaces: hrt (dose-guarded), rx (printable script v1), telehealth (Jitsi room),
+  weight, dispensary (+ migration 009), plus the earlier labs/wearables/nutrition/peptide/psychedelic/longevity.
+- **Session-refresh middleware** re-enabled (edge-safe; APIs exempt so crons/callbacks survive).
+- **Sync engine PROVEN** end-to-end (sandbox: 90-day backfill → tenant-scoped rows); **billing PROVEN** (test-mode
+  webhook flips plan→modules); **Connect** per-tenant patient billing wired (activation-ready).
+- Infra fix: `eslint.ignoreDuringBuilds` (tsc is the gate). Migrations 005–009 applied.
+
+### Three greenfield blocks (earlier push)
 - **Clinical-logic safety audit** → `CLINICAL-REVIEW.md`. 3 parallel auditors found go-live-blocking defects.
   Applied STRICTLY-SAFER guardrails (block more, never approve more; exact thresholds still need a clinician):
   peptide dose ceiling+positivity (`MAX_DOSE_MG`), KAP fail-safe screening (no "cleared" on missing data,
