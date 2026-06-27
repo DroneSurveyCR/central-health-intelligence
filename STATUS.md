@@ -15,6 +15,22 @@ management, and MRR are the next increment (plan Part 1.7).
 set NEXT_PUBLIC_APP_URL; subdomain routing for public marketing pages.
 **Blockers:** none for the working app. Clinical review = needs human.
 
+### Three greenfield blocks (this push)
+- **Clinical-logic safety audit** → `CLINICAL-REVIEW.md`. 3 parallel auditors found go-live-blocking defects.
+  Applied STRICTLY-SAFER guardrails (block more, never approve more; exact thresholds still need a clinician):
+  peptide dose ceiling+positivity (`MAX_DOSE_MG`), KAP fail-safe screening (no "cleared" on missing data,
+  ibogaine needs ECG) + journey-session gated on a non-contraindicated screening, PhenoAge require-9-markers
+  + SI plausibility refusal + divisor typo fix. ⛔ verticals NOT cleared for live patients until clinician signs `CLINICAL-REVIEW.md`.
+- **Connector sync engine (the moat)** — `lib/connectors/sync/*` + `app/api/connectors/[slug]/{authorize,callback,webhook}`
+  + `app/api/cron/sync` + migration 005 (claim-with-SKIP-LOCKED job queue, scheduling cols, idempotency
+  constraint). Providers: **sandbox** (no creds, proves the loop) + **Oura** (real OAuth, activates when
+  `OURA_CLIENT_ID/SECRET` set). **PROVEN end-to-end on prod**: cron claimed 2 jobs, upserted 15 tenant-correct
+  daily summaries (practice_id = Casa Elev8 only). Cron = daily Vercel cron, auth via `CRON_SECRET`.
+- **SaaS billing** — `lib/billing/{plans,practice}.ts` + `app/api/billing/checkout` + extended Stripe webhook
+  (subscription events → `practices.plan` + `practices.modules` via `entitlementsForPlan`) + `/settings/billing` UI.
+  Plans starter/growth/network/enterprise → module entitlements. Activation-ready: needs `STRIPE_SECRET_KEY`,
+  `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*`. Degrades cleanly today (checkout 503, UI shows reference).
+
 ### Deploy notes (what it took)
 - Vercel project under personalhealthintelligence (token-based CLI deploy). Supabase auth redirect
   allow-list set via Management API. Vercel Deployment Protection disabled (public SaaS access).
