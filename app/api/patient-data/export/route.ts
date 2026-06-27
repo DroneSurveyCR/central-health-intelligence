@@ -25,7 +25,7 @@ const SCHEMA_VERSION = "1.0";
 
 /** Run a query, returning [] on any failure / missing table rather than throwing. */
 async function safe<T>(
-  fn: () => Promise<{ data: T | null; error: unknown } | { data: T | null }>,
+  fn: () => PromiseLike<{ data: T | null; error: unknown } | { data: T | null }>,
 ): Promise<T | []> {
   try {
     const res = await fn();
