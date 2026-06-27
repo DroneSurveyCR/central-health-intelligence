@@ -55,6 +55,7 @@ export default async function StaffLayout({
         <Link href="/desk">{ICONS.desk}<span>Front desk</span></Link>
         <Link href="/approvals">{ICONS.approvals}<span>Approvals</span></Link>
         {mods.has("marketplace") && <Link href="/modalities">{ICONS.modalities}<span>Modalities</span></Link>}
+        {mods.has("dispensary") && <Link href="/dispensary">{ICONS.products}<span>Dispensary</span></Link>}
         {isAdmin && mods.has("reports") && <Link href="/reports">{ICONS.reports}<span>Reports</span></Link>}
         {isAdmin && <Link href="/settings">{ICONS.settings}<span>Settings</span></Link>}
         {isAdmin && <Link href="/settings/modules">{ICONS.settings}<span>Modules</span></Link>}
