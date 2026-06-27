@@ -7,6 +7,10 @@
 links on the patient record. `npm run build` PASS, `tsc` PASS, tenant-isolation PASS. Commit `a8db3a5`.
 **DEPLOYED & LIVE:** https://healthsync-cloud-mu.vercel.app (personalhealthintelligence Vercel team).
 Public pages 200; protected routes 307→/login (auth enforced by layouts); onboarding API validates.
+**Platform super-admin LIVE:** `/superadmin` cross-tenant dashboard (lists every practice + patient/staff
+counts). Gated by email allowlist (`SUPERADMIN_EMAILS` env), bypasses RLS via the service-role admin client.
+Login `personalhealthintelligence@gmail.com`. Read-only v1 — per-tenant detail, impersonation, plan/module
+management, and MRR are the next increment (plan Part 1.7).
 **Next action:** clinical-logic review (human); re-add a proper edge-safe middleware (session refresh);
 set NEXT_PUBLIC_APP_URL; subdomain routing for public marketing pages.
 **Blockers:** none for the working app. Clinical review = needs human.
