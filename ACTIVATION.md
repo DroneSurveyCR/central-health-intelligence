@@ -32,10 +32,12 @@ Live: **https://healthsync-cloud-mu.vercel.app** · super-admin: `personalhealth
   `OURA_CLIENT_SECRET` to activate Oura. The sync engine + job queue + cron are built and **proven end-to-end via
   the sandbox provider** (90-day backfill → normalized tenant-scoped rows). Patients self-connect at `/connections`.
 
-## 6. AI features (assistant + AI drafts)
-- Set `ANTHROPIC_API_KEY` (a **BAA / zero-retention** endpoint for the PRODUCT — distinct from any personal Max plan).
-  Patient `/assistant` (grounded + safety-gated) and the `ai_drafts`→`/approvals` loop activate; both degrade to
-  non-AI grounded/empty states without it.
+## 6. AI features (assistant + AI drafts) — ✅ ACTIVATED
+- `ANTHROPIC_API_KEY` is set (Vercel prod + .env.local); model `claude-haiku-4-5-20251001`. Patient `/assistant`
+  verified live end-to-end (grounded on the patient's own data + clinic library, safety/crisis gating, defers to
+  clinic — `aiEnabled: true`). The `ai_drafts`→`/approvals` synthesis loop uses the same key.
+- **HIPAA note:** for US PHI, confirm this key is on a **BAA / zero-retention** Anthropic account before go-live
+  (the assistant sends grounded patient context to the model). Optional: set `ANTHROPIC_MODEL` to upgrade quality.
 
 ## 7. Comms
 - **Email:** verify a Resend domain → set `RESEND_FROM` (patient reminders, invites). **SMS:** Twilio 10DLC/A2P registration.
