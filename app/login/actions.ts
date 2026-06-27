@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { isSuperAdminEmail } from "@/lib/auth/superadmin";
 
 const TOO_MANY = "Too+many+attempts.+Please+try+again+in+a+few+minutes.";
 
@@ -46,6 +47,9 @@ export async function signInStaff(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error)
     redirect(`/login?tab=staff&error=${encodeURIComponent(error.message)}`);
+
+  // Platform super-admins have no practice — send them to the cross-tenant dashboard.
+  if (isSuperAdminEmail(email)) redirect("/superadmin");
 
   // Step up to MFA if a factor is enrolled (no factor yet → straight in).
   let needsMfa = false;
