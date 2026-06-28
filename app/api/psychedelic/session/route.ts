@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   if (sessionType === "journey") {
     const substanceVal = asOptionalText(body.substance)?.toLowerCase() ?? null;
     const overrideReason = asOptionalText(body.override_reason);
-    let screen: { screening_result?: string } | null = null;
+    let screen: { screening_result?: string; screening_date?: string } | null = null;
     if (substanceVal) {
       const { data: s } = await supabase
         .from("psychedelic_screenings")
@@ -61,7 +61,16 @@ export async function POST(request: Request) {
         .maybeSingle();
       screen = s;
     }
-    const cleared = !!screen && screen.screening_result !== "contraindicated";
+    // [CLINICAL-REVIEW K7] Only an explicitly CLEARED screening (zero flags + clinician
+    // completeness attestation) green-lights a journey without an override. A 'conditional'
+    // screening (flagged, or not yet attested) and a 'contraindicated' one BOTH require an
+    // explicit override_reason — treating 'conditional' as cleared was a fail-open.
+    // The screening must also be recent; a stale screen no longer reflects the patient.
+    const SCREENING_MAX_AGE_DAYS = 90; // clinician-confirmable recency window
+    const screeningFresh =
+      !!screen?.screening_date &&
+      (Date.now() - new Date(screen.screening_date).getTime()) / 86_400_000 <= SCREENING_MAX_AGE_DAYS;
+    const cleared = !!screen && screen.screening_result === "cleared" && screeningFresh;
     if (!cleared && !overrideReason)
       return NextResponse.json(
         {

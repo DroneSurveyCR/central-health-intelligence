@@ -23,12 +23,12 @@ async function run(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const admin = createAdminClient();
-  const { data: settings } = await admin
-    .from("practice_settings")
-    .select("name")
-    .limit(1)
-    .maybeSingle();
-  const practiceName = settings?.name ?? "Your clinic";
+  // Multi-tenant: resolve each appointment's clinic name by ITS practice_id. A single
+  // unscoped settings row would email every tenant's patients the wrong clinic name.
+  const { data: settingsRows } = await admin.from("practice_settings").select("practice_id, name");
+  const nameByPractice = new Map<string, string>(
+    (settingsRows ?? []).map((s) => [s.practice_id as string, (s.name as string) ?? "Your clinic"]),
+  );
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
 
   const now = Date.now();
@@ -54,6 +54,7 @@ async function run(request: Request) {
       | null;
     if (!patient?.email) continue;
 
+    const practiceName = nameByPractice.get(a.practice_id as string) ?? "Your clinic";
     for (const key of dueReminders(minutesUntil, flags, windows)) {
       const { subject, text } = reminderEmail({
         practiceName,

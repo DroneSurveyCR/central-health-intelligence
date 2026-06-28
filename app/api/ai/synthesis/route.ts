@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const [intakeRes, scanRes, labRes, visitRes] = await Promise.all([
     admin.from("intake_forms").select("form_data").eq("patient_id", patientId)
       .order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    admin.from("scans").select("scan_date, parsed_findings, ai_synthesis")
+    admin.from("scans").select("id, scan_date, parsed_findings, ai_synthesis")
       .eq("patient_id", patientId).order("scan_date", { ascending: false }).limit(1).maybeSingle(),
     admin.from("lab_results").select("marker, value, unit, optimal_low, optimal_high, category, collected_on")
       .eq("patient_id", patientId).order("collected_on", { ascending: false }).limit(20),
@@ -90,10 +90,11 @@ Write a concise clinical session briefing (2–3 paragraphs) for the practitione
     maxTokens: 600,
   });
 
-  // Persist to scans table if there's an existing scan row.
-  if (scan) {
-    await admin.from("scans").update({ ai_synthesis: synthesis })
-      .eq("patient_id", patientId).order("scan_date", { ascending: false }).limit(1);
+  // Persist to the LATEST scan row by its id. PostgREST ignores .order()/.limit() on an
+  // UPDATE, so filtering by id is the only way to avoid overwriting ai_synthesis on every
+  // one of the patient's historical scans.
+  if (scan?.id) {
+    await admin.from("scans").update({ ai_synthesis: synthesis }).eq("id", scan.id);
   }
 
   await logAudit({ action: "ai_synthesis", resource: "patients", resourceId: patientId, patientId });

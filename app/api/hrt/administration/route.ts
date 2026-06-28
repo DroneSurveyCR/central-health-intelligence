@@ -42,6 +42,10 @@ export async function POST(request: Request) {
     .select("hormone")
     .eq("id", protocolId)
     .maybeSingle();
+  // Fail-safe: an unresolvable protocol (wrong/foreign id, RLS-denied) must NOT fall through to
+  // the generic dose ceiling — reject so the dose is always checked against a real hormone.
+  if (!proto)
+    return NextResponse.json({ error: "protocol not found" }, { status: 404 });
   if (!isDoseSafe(dose, proto?.hormone))
     return NextResponse.json(
       { error: `dose must be > 0 and ≤ ${maxDoseFor(proto?.hormone)}` },

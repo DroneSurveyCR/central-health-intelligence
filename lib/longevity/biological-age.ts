@@ -168,6 +168,13 @@ function toSiValue(
     return toSi ? toSi(value) : value;
   }
 
+  // CRP is genuinely ambiguous without a unit (mg/L and mg/dL overlap at low values), and
+  // guessing mg/L silently understates inflammation ~10x for an mg/dL input — biasing biological
+  // age YOUNGER (over-reassuring). Per this module's own "refuse rather than mislead" doctrine,
+  // require an explicit unit for CRP: signal "undeterminable" so the marker is dropped and the
+  // whole score refuses (all 9 markers required) rather than emitting a falsely-young age.
+  if (key === "crp") return NaN;
+
   // No usable explicit unit: infer from the value's range.
   const si = SI_BOUNDS[key];
   const conv = CONVENTIONAL_BOUNDS[key];
@@ -175,7 +182,7 @@ function toSiValue(
   if (inSi) return value; // plausibly already SI — leave it.
   const inConv = conv && value >= conv[0] && value <= conv[1];
   if (inConv) {
-    if (key === "crp") return value * 10; // mg/dL -> mg/L
+    // CRP returned early above (requires an explicit unit), so it never reaches here.
     return toSi ? toSi(value) : value;
   }
   // Ambiguous / unknown — leave as-is; phenoAge() SI-bounds will refuse it.
@@ -249,6 +256,9 @@ export function extractMarkerMap(
     const value = Number(m.value);
     if (!Number.isFinite(value)) continue;
     const converted = toSiValue(key, value, m.unit ?? null);
+    // Drop markers we couldn't convert with confidence (e.g. CRP with no explicit unit →
+    // NaN). A dropped required marker makes phenoAge() refuse rather than emit a misleading score.
+    if (!Number.isFinite(converted)) continue;
     // First occurrence wins (panels are typically ordered most-relevant first).
     if (!(key in out)) out[key] = converted;
   }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildDelta } from "@/lib/briefing/buildDelta";
+import { authorizeCron } from "@/lib/auth/cron";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -9,13 +10,7 @@ export const maxDuration = 60;
 // with an appointment in the next 48h and caches a rule-based "what changed
 // since last visit" briefing into patient_briefings. Protected by CRON_SECRET.
 // Idempotent: upserts on (patient_id, briefing_date), so safe to over-run.
-function authorized(request: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  const auth = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const qs = new URL(request.url).searchParams.get("secret");
-  return auth === secret || qs === secret;
-}
+const authorized = authorizeCron;
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);

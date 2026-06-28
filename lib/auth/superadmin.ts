@@ -18,7 +18,11 @@ export function isSuperAdminEmail(email?: string | null): boolean {
 
 /** Guard for /superadmin routes. Redirects non-super-admins to /login. */
 export async function requireSuperAdmin() {
-  const { user } = await getSessionUser();
+  const { supabase, user } = await getSessionUser();
   if (!user || !isSuperAdminEmail(user.email)) redirect("/login");
+  // This is the most privileged view in the system (all tenants, RLS bypassed). If the operator
+  // has an MFA factor enrolled, require the AAL2 step-up before any cross-tenant read.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") redirect("/mfa");
   return user;
 }

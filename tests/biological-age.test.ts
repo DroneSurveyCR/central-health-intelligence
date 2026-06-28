@@ -58,7 +58,7 @@ describe("extractMarkerMap", () => {
   it("maps synonyms/spellings onto canonical keys and drops unknowns", () => {
     const map = extractMarkerMap([
       { name: "Albumin", value: 45 },
-      { name: "hs-CRP", value: 1 },
+      { name: "hs-CRP", value: 1, unit: "mg/L" }, // explicit unit required for CRP
       { name: "Fasting Glucose", value: 5 },
       { name: "WBC", value: 6 },
       { name: "totally unknown marker", value: 123 },
@@ -68,6 +68,16 @@ describe("extractMarkerMap", () => {
     expect(map.glucose).toBe(5);
     expect(map.wbc).toBe(6);
     expect(Object.keys(map)).not.toContain("totally_unknown_marker");
+  });
+
+  it("DROPS CRP when no explicit unit is given (ambiguous mg/L vs mg/dL → fail-safe)", () => {
+    // Without a unit, CRP is genuinely ambiguous; assuming mg/L can understate inflammation
+    // ~10x and bias biological age younger. The module refuses rather than guess.
+    const noUnit = extractMarkerMap([{ name: "hs-CRP", value: 1 }]);
+    expect(noUnit.crp).toBeUndefined();
+    // Explicit mg/dL is converted to the module's mg/L SI input (×10).
+    const mgdl = extractMarkerMap([{ name: "hs-CRP", value: 0.5, unit: "mg/dL" }]);
+    expect(mgdl.crp).toBeCloseTo(5, 6);
   });
 
   it("skips non-finite values and keeps first occurrence", () => {

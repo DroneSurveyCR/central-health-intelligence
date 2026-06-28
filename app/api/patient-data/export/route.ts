@@ -1,4 +1,4 @@
-import { getCurrentPatient, getCurrentPractitioner } from "@/lib/auth/roles";
+import { getCurrentPatient, requireStaffApi } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/auth/audit";
 import { NextRequest, NextResponse } from "next/server";
@@ -44,11 +44,14 @@ function byPatient(supabase: SupabaseClient, table: string, patientId: string) {
 }
 
 export async function GET(req: NextRequest) {
+  // Patient exports their own data; otherwise require staff WITH the MFA step-up (this is a
+  // full-PHI bundle, so a passwords-only API call must not bypass the org's MFA policy).
   const patientRow = await getCurrentPatient();
-  const staff = patientRow ? null : await getCurrentPractitioner();
-
-  if (!patientRow && !staff) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  let staff: { id: string } | null = null;
+  if (!patientRow) {
+    const gate = await requireStaffApi();
+    if (!gate.ok) return gate.response;
+    staff = gate.practitioner;
   }
 
   const supabase = await createClient();

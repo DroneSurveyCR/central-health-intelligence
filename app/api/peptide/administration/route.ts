@@ -39,6 +39,10 @@ export async function POST(request: Request) {
     .select("compound")
     .eq("id", protocolId)
     .maybeSingle();
+  // Fail-safe: a protocol that can't be resolved (wrong/foreign id, RLS-denied) must NOT fall
+  // through to the generic 100 mg ceiling — reject so the dose is always checked against a real compound.
+  if (!proto)
+    return NextResponse.json({ error: "protocol not found" }, { status: 404 });
   if (!isDoseSafe(doseMg, proto?.compound))
     return NextResponse.json(
       { error: `dose_mg must be > 0 and ≤ ${maxDoseFor(proto?.compound)} mg` },

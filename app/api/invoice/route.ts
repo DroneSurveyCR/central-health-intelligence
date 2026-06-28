@@ -171,7 +171,7 @@ export async function POST(request: Request) {
 
     const { data: existing } = await supabase
       .from("invoices")
-      .select("id, patient_id, discount, issued_at, status, total, number, payment_method, receipt_issued")
+      .select("id, patient_id, practice_id, discount, issued_at, status, total, number, payment_method, receipt_issued")
       .eq("id", id)
       .maybeSingle();
     if (!existing) return bad("invoice not found");
@@ -317,12 +317,13 @@ export async function POST(request: Request) {
     if (finalStatus === "sent" && existing.status !== "sent") {
       try {
         const admin = createAdminClient();
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL;
         const [{ data: pt }, { data: ps }] = await Promise.all([
           admin.from("patients").select("email").eq("id", existing.patient_id).maybeSingle(),
-          admin.from("practice_settings").select("name, legal_name").limit(1).maybeSingle(),
+          // Scope to THIS invoice's practice — an unscoped row would email the wrong clinic name.
+          admin.from("practice_settings").select("name, legal_name").eq("practice_id", existing.practice_id).maybeSingle(),
         ]);
-        if (pt?.email) {
-          const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://healthsync-app-eight.vercel.app";
+        if (pt?.email && appUrl) {
           const { subject, text } = invoiceEmail({
             practiceName: ps?.legal_name || ps?.name || "your clinic",
             appUrl,
