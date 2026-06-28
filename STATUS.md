@@ -1,113 +1,66 @@
-# HealthSync Cloud — STATUS
+# Central Health Intelligence (CHI) — STATUS
 
-**Updated:** this session
-**Phase:** Phases 1–3 DONE (app stood up, modules ported + gated, onboarding) — not deployed.
-**Last action:** Seeded the Cloud Next.js app from Randi's minimal core; ported the 7 modules from
-`../healthsync-app@modules-for-cloud` with `requireModule` gating; built onboarding; gated module
-links on the patient record. `npm run build` PASS, `tsc` PASS, tenant-isolation PASS. Commit `a8db3a5`.
-**DEPLOYED & LIVE:** https://healthsync-cloud-mu.vercel.app (personalhealthintelligence Vercel team).
-Public pages 200; protected routes 307→/login (auth enforced by layouts); onboarding API validates.
-**Platform super-admin LIVE:** `/superadmin` cross-tenant dashboard (lists every practice + patient/staff
-counts). Gated by email allowlist (`SUPERADMIN_EMAILS` env), bypasses RLS via the service-role admin client.
-Login `personalhealthintelligence@gmail.com`. Read-only v1 — per-tenant detail, impersonation, plan/module
-management, and MRR are the next increment (plan Part 1.7).
-**Next action:** clinical-logic review (human); re-add a proper edge-safe middleware (session refresh);
-set NEXT_PUBLIC_APP_URL; subdomain routing for public marketing pages.
-**Blockers:** none for the working app. Clinical review = needs human.
+**Company:** Health Intelligency · **Product:** Central Health Intelligence (multi-tenant SaaS EHR)
+**Patient layer concept:** Personal Health Intelligence (what patients own inside CHI)
+**Updated:** 2026-06-28
 
-### BUILD-OUT COMPLETE (Waves 1–4) — see ACTIVATION.md for what's left (all external)
-Full product per the PRD/plan is built, deployed, and smoke-tested (every route gates; all engines run):
-- **Part 9 intelligence layer** — `/focus` morning briefing (buildDelta + nightly cron), alerts engine + `/triage`,
-  generalized `ai_drafts` + `/approvals`, `/desk` front-desk + `care_team` + `tasks`. Migration 007.
-- **Part 10 marketplace** — modalities catalog (13 global seeded) + recommend + outcomes + course tracking, gated.
+> Single source of truth. Score detail → `SCORECARD.md`. What's left to go live → `ACTIVATION.md`.
+> Older wave-by-wave narrative is in `SCORECARD.md`'s Wave log. This file is the current snapshot only.
+
+## Where it stands: BUILT · DEPLOYED · GREEN
+
+The sellable multi-tenant app is complete and live. Not a scaffold — the full product.
+
+- **Live:** https://healthsync-cloud-mu.vercel.app (Vercel, personalhealthintelligence team)
+- **Repo:** `DroneSurveyCR/central-health-intelligence`, branch `main`
+- **Build/test health (verified 2026-06-28):** `tsc` clean · **79/79** unit tests · Playwright e2e 21/21 ·
+  smoke gate 45/45 · runtime tenant-isolation **0 leaks across 18 tables**
+- **Score:** **116/140** — the buildable production ceiling. The remaining ~24 points are
+  external-gated (clinician sign-off, BAAs, live keys, dev-app approvals, legal) — see `ACTIVATION.md`.
+- **`middleware.ts` is ACTIVE** (edge-safe session refresh + tenant rewrite; APIs exempt so crons/callbacks survive).
+
+## What's built (all gated, all deployed)
+
+- **Tenancy** — `practice_id NOT NULL` on every tenant table, RLS + tenant policies, `current_practice_id()`,
+  `requireModule()` gating. Tenant #1 = Casa Elev8 (Randi), 168 patients ETL'd. Cloud DB `aezudceznxclvexfpdvr`,
+  migrations 001–003 (tenancy) + module/feature migrations through 013.
+- **Platform super-admin** — `/superadmin` cross-tenant dashboard (email-allowlist gated, `SUPERADMIN_EMAILS`).
+- **All vertical modules** with working surfaces: peptide, psychedelic/KAP, longevity, hrt, labs, wearables,
+  nutrition, weight, rx (printable script v1), telehealth (Jitsi), dispensary.
+- **Intelligence layer (Part 9)** — `/focus` morning briefing (buildDelta + nightly cron), alerts engine + `/triage`,
+  `ai_drafts` → `/approvals`, `/desk` + `care_team` + `tasks`.
+- **Marketplace (Part 10)** — modalities catalog (13 seeded) + recommend + outcomes + course tracking.
 - **Patient experience** — `/connections` (self-serve device OAuth + consent grid), engagement (`/today` streaks/
-  milestones/nudges), `/assistant` (grounded + safety-gated, AI-activation-ready), module-driven PatientNav.
+  milestones/nudges), `/assistant` (grounded + safety-gated, **AI ACTIVATED**), module-driven PatientNav, `/updates`.
+- **Connector sync engine (the moat)** — job queue (SKIP-LOCKED claim, idempotent), encrypted OAuth tokens,
+  Withings/Dexcom/Garmin providers + webhook HMAC + per-connector rate limiting. Proven end-to-end via sandbox
+  (90-day backfill → tenant-scoped rows). Activates per provider when dev-app creds are set.
+- **Billing — two layers (do not conflate):**
+  - *Platform SaaS billing* (clinic → CHI): one Stripe account. Plan checkout + entitlements + per-provider seats +
+    customer portal + one-time HIPAA setup fee + Stripe Tax. Proven in test mode (webhook flips plan→modules).
+  - *Patient billing* (patient → clinic): per-tenant via **Stripe Connect (Standard)**, 0% platform fee. Wired;
+    activation needs Connect enabled + `STRIPE_CONNECT_*`.
+- **Security/compliance** — RLS proven, tokens encrypted, MFA (TOTP), audit-log WORM + `/audit` viewer,
+  rate limiting on all 12 API routes, CSP/HSTS/XFO headers, X-Request-ID correlation, 13 perf indexes.
 - **Reports v1** (`/reports` + CSV) and **GDPR Art.20 export** (full bundle, all module tables).
-- **All modules** now have surfaces: hrt (dose-guarded), rx (printable script v1), telehealth (Jitsi room),
-  weight, dispensary (+ migration 009), plus the earlier labs/wearables/nutrition/peptide/psychedelic/longevity.
-- **Session-refresh middleware** re-enabled (edge-safe; APIs exempt so crons/callbacks survive).
-- **Sync engine PROVEN** end-to-end (sandbox: 90-day backfill → tenant-scoped rows); **billing PROVEN** (test-mode
-  webhook flips plan→modules); **Connect** per-tenant patient billing wired (activation-ready).
-- Infra fix: `eslint.ignoreDuringBuilds` (tsc is the gate). Migrations 005–009 applied.
 
-### Three greenfield blocks (earlier push)
-- **Clinical-logic safety audit** → `CLINICAL-REVIEW.md`. 3 parallel auditors found go-live-blocking defects.
-  Applied STRICTLY-SAFER guardrails (block more, never approve more; exact thresholds still need a clinician):
-  peptide dose ceiling+positivity (`MAX_DOSE_MG`), KAP fail-safe screening (no "cleared" on missing data,
-  ibogaine needs ECG) + journey-session gated on a non-contraindicated screening, PhenoAge require-9-markers
-  + SI plausibility refusal + divisor typo fix. ⛔ verticals NOT cleared for live patients until clinician signs `CLINICAL-REVIEW.md`.
-- **Connector sync engine (the moat)** — `lib/connectors/sync/*` + `app/api/connectors/[slug]/{authorize,callback,webhook}`
-  + `app/api/cron/sync` + migration 005 (claim-with-SKIP-LOCKED job queue, scheduling cols, idempotency
-  constraint). Providers: **sandbox** (no creds, proves the loop) + **Oura** (real OAuth, activates when
-  `OURA_CLIENT_ID/SECRET` set). **PROVEN end-to-end on prod**: cron claimed 2 jobs, upserted 15 tenant-correct
-  daily summaries (practice_id = Casa Elev8 only). Cron = daily Vercel cron, auth via `CRON_SECRET`.
-- **SaaS billing** — `lib/billing/{plans,practice}.ts` + `app/api/billing/checkout` + extended Stripe webhook
-  (subscription events → `practices.plan` + `practices.modules` via `entitlementsForPlan`) + `/settings/billing` UI.
-  Plans starter/growth/network/enterprise → module entitlements. Activation-ready: needs `STRIPE_SECRET_KEY`,
-  `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*`. Degrades cleanly today (checkout 503, UI shows reference).
+## Open software (non-blocking, no external dependency) — the "finish it off" list
 
-### Billing is TWO layers (do not conflate)
-- **Platform / SaaS billing** (clinic → HealthSync subscription): the platform's **single** Stripe account.
-  Built + proven (test mode): products/prices/webhook, `entitlementsForPlan`, webhook flips `practices.plan`+`modules`.
-- **Patient billing** (patient → their clinic): each clinic's **OWN** Stripe via **Stripe Connect (Standard)**.
-  Built: `/api/connect/{authorize,callback,disconnect}` OAuth, `/settings/payments` UI, and the patient-invoice
-  checkout now charges on the clinic's connected account (`stripeAccount`) — it no longer (incorrectly) used the
-  platform key. **0% application fee** (configurable via `STRIPE_APPLICATION_FEE_BPS`). Webhook verifies platform
-  AND connect secrets. **Activation (one-time):** enable Connect in the platform Stripe dashboard → set
-  `STRIPE_CONNECT_CLIENT_ID` (ca_…) → register a Connect webhook → set `STRIPE_CONNECT_WEBHOOK_SECRET`.
-  Until then `/settings/payments` shows "not configured" and patient card checkout 503s gracefully.
+1. `requireStaffApi()` — enforce MFA (AAL2) step-up on staff API routes (today: `getCurrentPractitioner()` only).
+2. Final hardening code-review pass across tenant-isolation + billing + connector surface.
+3. Housekeeping: gitignore `test-results/`; confirm `NEXT_PUBLIC_APP_URL` set in Vercel prod.
 
-### Deploy notes (what it took)
-- Vercel project under personalhealthintelligence (token-based CLI deploy). Supabase auth redirect
-  allow-list set via Management API. Vercel Deployment Protection disabled (public SaaS access).
-- **Root cause of all the 500s/404s:** the bare `vercel project add` left `framework: null`, so Vercel
-  ran `next build` but never wired Next's routing → static-only → 404 on every SSR route. Fix: set
-  project `framework: "nextjs"`. The earlier `__dirname` 500 was the edge middleware in that broken build.
-- **Middleware currently DISABLED** (`middleware.ts.disabled`) — auth is enforced by the (staff)/(patient)
-  layouts, so the app is functional + secure without it. Re-add a proper edge-safe middleware later
-  (session refresh + early bounce). The seeded Supabase-SSR middleware is rejected by Vercel's Edge bundler.
-- Webpack prod build required extracting page-exported helpers into `lib/{labs,report}/components.tsx`.
+## Deferred (needs a real customer to justify) — `BACKLOG.md`
 
-## Added since Phase 3 (this push)
-- **Connector/import gating** — import routes check `moduleForConnector` + enabled modules (closes the RLS-bypass gap).
-- **Admin Modules UI** — `/settings/modules` toggles a practice's modules on/off (admin-only).
-- **Positive login checkpoint PASS** — a practice-#1 user logs in and sees exactly their 168 patients.
-- **Audit logging fixed** — `logAudit` now sets `practice_id` (was silently failing on NOT NULL).
-- **Migration 004: `practice_id` default = `current_practice_id()`** — fixes ALL app inserts (writes
-  auto-fill the caller's own practice; isolation still holds). Verified with a real insert.
+- Subdomain / custom-domain routing for per-tenant public pages (needs Vercel wildcard config).
+- Full multisite per-location data scoping.
+- Enterprise dedicated/self-hosted HIPAA tier (build on demand when a HIPAA client signs).
 
-## Done this phase (verified)
-- Multi-tenant Next.js app (349 files) builds clean against the Cloud DB.
-- 7 vertical modules ported + **gated** (`requireModule` → `/upgrade` if practice lacks it).
-- Module links on the patient record show only enabled modules.
-- Onboarding flow: new practice → creates practice + owner practitioner + auth user (default modules).
-- Tenant-isolation gate still PASS.
+## To go live — NOT code, see `ACTIVATION.md`
 
----
-
-## What exists now (verified)
-- **Cloud DB** `aezudceznxclvexfpdvr` — full multi-tenant schema, tenancy migrations 001–003 +
-  module migrations 021–028, `practice_id NOT NULL` across all tenant tables.
-- **Tenant-isolation gate: PASS** (practice #2 sees 0 rows of practice #1).
-- **Tenant #1** = Casa Elev8 (Randi) — 168 patients + her data ETL'd in.
-- **Toolchain** (`scripts/`) — provision/clone/grants/etl/migrate/isolation, all working via Management API.
-- **No Cloud app yet** — this repo is DB + scaffold (module manifest, lib/modules) + scripts. The
-  actual sellable Next.js app does not exist yet.
-- **Module code** parked on `healthsync-app@modules-for-cloud` (psychedelic, peptide, biomarker,
-  nutrition, longevity, wearables, AI drafts) — to be ported leanly, per phase, with gating.
-
-## What is intentionally NOT here
-- Randi's Casa Elev8 app/DB — separate, minimal, near-launch. Don't build product modules into it.
-
-## Lean Phase plan (draft — confirm before executing)
-- **Phase 1 — Cloud app core.** Seed the multi-tenant Next.js app (core only: auth w/ practice_id,
-  patients, notes, scheduling, billing). Checkpoint: one tenant logs in, sees only their patients;
-  isolation still passes. NO vertical modules.
-- **Phase 2 — Onboarding + module gating.** New-practice signup; `requireModule` wired so a tenant
-  sees only enabled modules. Checkpoint: create a 2nd tenant via UI; gating verified.
-- **Phase 3 — First vertical module (the wedge).** Port ONE module from the branch, gated. Checkpoint:
-  enable it for one tenant, it's hidden for another.
-- Everything else (more modules, marketplace, patient app depth, Stripe, OAuth) → `BACKLOG.md`.
+Clinician signs `CLINICAL-REVIEW.md` · Stripe LIVE keys · Stripe Connect enable · wearable OAuth dev-apps ·
+BAAs (US PHI only) · Resend domain · legal stack. Each is wired and degrades gracefully until you supply the input.
 
 ## Conventions
-- Update this file after every task. Don't skip checkpoints. Don't deploy/push without go-ahead.
+
+Update this file after every task. Don't deploy/push without go-ahead. Keep it a snapshot — history goes in SCORECARD's Wave log.

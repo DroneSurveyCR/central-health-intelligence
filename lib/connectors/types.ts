@@ -58,6 +58,9 @@ export interface ConnectorModule {
     importId: string,
     patientId: string,
     adminClient: AnySupabaseClient,
+    // The caller's practice. Connectors that insert tenant-root rows (e.g. patients) MUST scope
+    // dedup + writes by this. Per-patient connectors key off the already-scoped patientId and may ignore it.
+    practiceId?: string,
   ): Promise<string[]>;
   pull?: (
     patientId: string,

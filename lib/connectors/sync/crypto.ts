@@ -45,10 +45,23 @@ function warnOnce(): void {
   }
 }
 
-/** Encrypt a plaintext token into the `v1:` envelope. Identity if no key configured. */
+/** True in a deployed production environment (Vercel prod or NODE_ENV=production). */
+function isProduction(): boolean {
+  return process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+}
+
+/**
+ * Encrypt a plaintext token into the `v1:` envelope.
+ * Identity fallback ONLY in non-production (dev/sandbox). In production a missing key is a hard
+ * error — silently storing real OAuth tokens in cleartext at rest is never acceptable.
+ */
 export function encryptToken(plain: string): string {
   const key = getKey();
   if (!key) {
+    if (isProduction())
+      throw new Error(
+        "[connectors/crypto] CONNECTOR_ENC_KEY is required in production — refusing to store OAuth tokens in plaintext.",
+      );
     warnOnce();
     return plain;
   }

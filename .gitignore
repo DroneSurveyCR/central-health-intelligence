@@ -10,3 +10,4 @@ baseline.sql
 next-env.d.ts
 
 .vercel
+test-results/

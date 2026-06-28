@@ -14,7 +14,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ co
   if (body.enabled !== undefined) update.enabled = body.enabled;
   if (body.config_json !== undefined) update.config_json = body.config_json;
 
-  const { error } = await admin.from("practice_connectors").upsert({ connector_id: connectorId, ...update }, { onConflict: "connector_id" });
+  // Practice-scoped write — resolve the row by (practice_id, connector_id) so one tenant can't overwrite another's.
+  const { data: existing } = await admin
+    .from("practice_connectors")
+    .select("id")
+    .eq("practice_id", me.practice_id)
+    .eq("connector_id", connectorId)
+    .maybeSingle();
+  const { error } = existing
+    ? await admin.from("practice_connectors").update(update).eq("id", existing.id)
+    : await admin.from("practice_connectors").insert({ practice_id: me.practice_id, connector_id: connectorId, ...update });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });
 }

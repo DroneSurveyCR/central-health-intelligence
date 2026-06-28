@@ -24,31 +24,34 @@ export const noterrocsv: ConnectorModule = {
     };
   },
 
-  async confirm(rows, importId, _patientId, admin: AnySupabaseClient): Promise<string[]> {
+  async confirm(rows, importId, _patientId, admin: AnySupabaseClient, practiceId?: string): Promise<string[]> {
+    // This connector inserts patients (the tenant root) via the admin client, which bypasses RLS.
+    // Without scoping dedup + writes by practiceId, it can UPDATE another tenant's patient and misfile rows.
+    if (!practiceId) throw new Error("noterro_csv.confirm requires practiceId for tenant scoping");
     const ids: string[] = [];
     for (const row of rows) {
       const { _visits, ...patientData } = row as Record<string, unknown>;
       const email      = patientData.email as string | undefined;
       const noterroId  = patientData.noterro_id as string;
 
-      // Deduplicate: try noterro_id first (most reliable), fall back to email.
+      // Deduplicate WITHIN this practice: try noterro_id first (most reliable), fall back to email.
       let existing: { id: string } | null = null;
-      const { data: byNotId } = await admin.from("patients").select("id").eq("noterro_id", noterroId).maybeSingle();
+      const { data: byNotId } = await admin.from("patients").select("id").eq("practice_id", practiceId).eq("noterro_id", noterroId).maybeSingle();
       if (byNotId) {
         existing = byNotId;
       } else if (email) {
-        const { data: byEmail } = await admin.from("patients").select("id").eq("email", email).maybeSingle();
+        const { data: byEmail } = await admin.from("patients").select("id").eq("practice_id", practiceId).eq("email", email).maybeSingle();
         if (byEmail) existing = byEmail;
       }
 
       let pid: string;
       if (existing) {
         pid = existing.id;
-        // Update with any new fields from the export.
-        await admin.from("patients").update({ ...patientData, import_id: importId }).eq("id", pid);
+        // Update with any new fields from the export (scoped to this practice's row).
+        await admin.from("patients").update({ ...patientData, import_id: importId }).eq("id", pid).eq("practice_id", practiceId);
       } else {
         const { data, error } = await admin.from("patients")
-          .insert({ ...patientData, import_id: importId })
+          .insert({ ...patientData, practice_id: practiceId, import_id: importId })
           .select("id").single();
         if (error) throw new Error(`Patient insert failed (${noterroId} ${email ?? "no-email"}): ${error.message}`);
         pid = data.id;
@@ -57,7 +60,7 @@ export const noterrocsv: ConnectorModule = {
 
       if (Array.isArray(_visits)) {
         for (const v of _visits as Record<string, unknown>[]) {
-          const { error: visitErr } = await admin.from("visits").insert({ ...v, patient_id: pid, import_id: importId });
+          const { error: visitErr } = await admin.from("visits").insert({ ...v, patient_id: pid, practice_id: practiceId, import_id: importId });
           if (visitErr) throw new Error(`Visit insert failed for ${noterroId}: ${visitErr.message}`);
         }
       }

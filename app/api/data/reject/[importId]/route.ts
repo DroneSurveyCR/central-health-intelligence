@@ -11,7 +11,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ imp
   const { reason } = await request.json().catch(() => ({})) as { reason?: string };
   const admin = createAdminClient();
 
-  const { data: job } = await admin.from("health_data_imports").select("status").eq("id", importId).maybeSingle();
+  // Admin client bypasses RLS — scope to the caller's practice or a foreign importId is a cross-tenant write/DoS.
+  const { data: job } = await admin.from("health_data_imports").select("status").eq("id", importId).eq("practice_id", me.practice_id).maybeSingle();
   if (!job) return NextResponse.json({ error: "Import not found" }, { status: 404 });
   if (job.status === "confirmed") return NextResponse.json({ error: "Cannot reject a confirmed import" }, { status: 409 });
 
@@ -20,7 +21,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ imp
     reviewer_notes: reason ?? null,
     confirmed_by: user.id,
     confirmed_at: new Date().toISOString(),
-  }).eq("id", importId);
+  }).eq("id", importId).eq("practice_id", me.practice_id);
 
   return NextResponse.json({ importId, status: "rejected" });
 }

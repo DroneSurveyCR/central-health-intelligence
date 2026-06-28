@@ -17,7 +17,7 @@ export async function getCurrentPractitioner() {
   if (!user) return null;
   const { data } = await supabase
     .from("practitioners")
-    .select("id, name, email, role, active")
+    .select("id, name, email, role, active, practice_id")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   return data && data.active ? data : null;

@@ -57,3 +57,22 @@ describe("encryptToken / decryptToken round-trip", () => {
     expect(() => decryptToken("v1:onlyonepart")).toThrow();
   });
 });
+
+describe("encryptToken missing-key behavior", () => {
+  it("falls back to identity (plaintext) in non-production with no key", async () => {
+    vi.stubEnv("CONNECTOR_ENC_KEY", "");
+    vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("NODE_ENV", "test");
+    const { encryptToken } = await import("@/lib/connectors/sync/crypto");
+    expect(encryptToken("dev-token")).toBe("dev-token");
+    vi.unstubAllEnvs();
+  });
+
+  it("HARD-FAILS in production when CONNECTOR_ENC_KEY is unset (never stores plaintext tokens)", async () => {
+    vi.stubEnv("CONNECTOR_ENC_KEY", "");
+    vi.stubEnv("VERCEL_ENV", "production");
+    const { encryptToken } = await import("@/lib/connectors/sync/crypto");
+    expect(() => encryptToken("real-oauth-token")).toThrow(/required in production/);
+    vi.unstubAllEnvs();
+  });
+});

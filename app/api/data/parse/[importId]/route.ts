@@ -12,7 +12,13 @@ export async function POST(_req: Request, { params }: { params: Promise<{ import
   const { importId } = await params;
   const admin = createAdminClient();
 
-  const { data: job } = await admin.from("health_data_imports").select("*").eq("id", importId).maybeSingle();
+  // Admin client bypasses RLS — scope to the caller's practice or a foreign importId leaks PHI.
+  const { data: job } = await admin
+    .from("health_data_imports")
+    .select("*")
+    .eq("id", importId)
+    .eq("practice_id", me.practice_id)
+    .maybeSingle();
   if (!job) return NextResponse.json({ error: "Import not found" }, { status: 404 });
   if (job.status === "confirmed") return NextResponse.json({ error: "Already confirmed" }, { status: 409 });
 
@@ -26,13 +32,13 @@ export async function POST(_req: Request, { params }: { params: Promise<{ import
   if (dlErr || !fileData) return NextResponse.json({ error: `Could not download file: ${dlErr?.message}` }, { status: 500 });
 
   const fileBuffer = Buffer.from(await fileData.arrayBuffer());
-  const { data: patient } = await admin.from("patients").select("id, first_name, last_name, dob, sex").eq("id", job.patient_id).single();
+  const { data: patient } = await admin.from("patients").select("id, first_name, last_name, dob, sex").eq("id", job.patient_id).eq("practice_id", me.practice_id).single();
   if (!patient) return NextResponse.json({ error: "Patient not found" }, { status: 404 });
 
   await admin.from("health_data_imports").update({ status: "parsing", parse_error: null }).eq("id", importId);
 
   try {
-    const { data: pc } = await admin.from("practice_connectors").select("config_json").eq("connector_id", job.connector_id).maybeSingle();
+    const { data: pc } = await admin.from("practice_connectors").select("config_json").eq("connector_id", job.connector_id).eq("practice_id", me.practice_id).maybeSingle();
     const connector = getConnector(job.connector_id);
     const result = await connector.parse({
       fileBuffer, mimeType: job.raw_mime, originalFileName: job.raw_file_name ?? "",

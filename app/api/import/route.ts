@@ -67,10 +67,13 @@ export async function POST(request: Request) {
       continue;
     }
 
-    // Skip if a patient with this email already exists (case-insensitive, not soft-deleted).
+    // Skip if a patient with this email already exists IN THIS PRACTICE (case-insensitive, not
+    // soft-deleted). Admin client bypasses RLS — without the practice filter this both leaks
+    // cross-tenant patient existence and wrongly skips creating a patient another clinic happens to have.
     const { data: existing, error: lookupErr } = await admin
       .from("patients")
       .select("id")
+      .eq("practice_id", practitioner.practice_id)
       .ilike("email", email)
       .is("deleted_at", null)
       .maybeSingle();
@@ -85,6 +88,7 @@ export async function POST(request: Request) {
     }
 
     const { error: insertErr } = await admin.from("patients").insert({
+      practice_id: practitioner.practice_id,
       first_name,
       last_name,
       email,

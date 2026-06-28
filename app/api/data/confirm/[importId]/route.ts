@@ -17,15 +17,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ imp
 
   // Atomically transition from pending_review → parsing (reused as "locked").
   // Only one concurrent request can win this update; the loser gets 0 rows back.
+  // Admin client bypasses RLS — scope to the caller's practice or a foreign importId writes cross-tenant PHI.
   const { data: claimed } = await admin
     .from("health_data_imports")
     .update({ status: "parsing", parse_error: null })
     .eq("id", importId)
+    .eq("practice_id", me.practice_id)
     .eq("status", "pending_review")
     .select("patient_id, connector_id, parsed_data");
 
   if (!claimed?.length) {
-    const { data: job } = await admin.from("health_data_imports").select("status").eq("id", importId).maybeSingle();
+    const { data: job } = await admin.from("health_data_imports").select("status").eq("id", importId).eq("practice_id", me.practice_id).maybeSingle();
     if (!job) return NextResponse.json({ error: "Import not found" }, { status: 404 });
     return NextResponse.json({ error: `Cannot confirm: status is "${job.status}"` }, { status: 409 });
   }
@@ -46,7 +48,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ imp
 
   try {
     const connector = getConnector(job.connector_id);
-    const targetRowIds = await connector.confirm(rows, importId, job.patient_id, admin);
+    const targetRowIds = await connector.confirm(rows, importId, job.patient_id, admin, me.practice_id);
 
     const { error: updateErr } = await admin.from("health_data_imports").update({
       status: "confirmed",
