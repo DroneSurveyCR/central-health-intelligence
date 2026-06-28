@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
-import { randomUUID } from "crypto";
+// NOTE: middleware runs on the Edge runtime — do NOT import from Node's "crypto"
+// (it crashes with MIDDLEWARE_INVOCATION_FAILED). Use the global Web Crypto API.
 
 // Keeps the Supabase session fresh on every navigation (so users aren't logged out
 // at the access-token TTL) and bounces unauthenticated PAGE requests to /login.
@@ -29,7 +30,7 @@ export async function middleware(request: NextRequest) {
     host.endsWith(".localhost");
 
   // Generate or propagate a correlation ID for every request.
-  const requestId = request.headers.get("x-request-id") ?? randomUUID();
+  const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
 
   if (!isAppDomain && path === "/") {
     // tenant label: left-most subdomain label, else the bare host (custom domain).
