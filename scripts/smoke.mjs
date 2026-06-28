@@ -39,8 +39,9 @@ for (const p of ["/home", "/today", "/connections", "/assistant", "/updates", "/
 // APIs self-auth (401/503, never an HTML redirect)
 for (const p of ["/api/billing/checkout", "/api/billing/portal", "/api/billing/setup-fee", "/api/ai/soap", "/api/assistant", "/api/connect/disconnect"])
   await check("api self-auth", p, [401, 403, 503], { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
-// engines (need CRON secret)
-if (CRON) for (const c of ["sync", "alerts", "briefing"]) await check("cron engine", `/api/cron/${c}?secret=${encodeURIComponent(CRON)}`, 200);
+// engines (need CRON secret) — crons are HEADER-ONLY (Authorization: Bearer); the query-string
+// secret was removed (it leaked into access logs). GET is fine for the engine endpoints.
+if (CRON) for (const c of ["sync", "alerts", "briefing"]) await check("cron engine", `/api/cron/${c}`, 200, { headers: { authorization: `Bearer ${CRON}` } });
 await check("cron rejects no-secret", "/api/cron/sync", 401);
 
 console.log(results.join("\n"));
