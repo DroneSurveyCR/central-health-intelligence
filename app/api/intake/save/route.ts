@@ -13,6 +13,10 @@ export async function POST(request: Request) {
   const currentStep = Number(body.current_step ?? 0);
   const completed = Boolean(body.completed);
 
+  // Guard a patient-writable JSON field against unbounded storage growth.
+  if (JSON.stringify(formData).length > 100_000)
+    return NextResponse.json({ error: "intake form too large" }, { status: 413 });
+
   const supabase = await createClient();
 
   const { data: existing } = await supabase
@@ -40,8 +44,8 @@ export async function POST(request: Request) {
 
   // Keep the patient's name/sex in sync from their intake answers.
   const namePatch: Record<string, unknown> = {};
-  if (typeof formData.first_name === "string") namePatch.first_name = formData.first_name;
-  if (typeof formData.last_name === "string") namePatch.last_name = formData.last_name;
+  if (typeof formData.first_name === "string") namePatch.first_name = formData.first_name.slice(0, 100);
+  if (typeof formData.last_name === "string") namePatch.last_name = formData.last_name.slice(0, 100);
   if (typeof formData.sex === "string") namePatch.sex = normalizeSex(formData.sex);
   if (completed) namePatch.status_cached = "existing";
   if (Object.keys(namePatch).length)

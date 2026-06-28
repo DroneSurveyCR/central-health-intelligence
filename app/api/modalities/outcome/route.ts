@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
+import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -19,8 +20,11 @@ function parseOptionalNumber(v: unknown): number | null {
  * supplies the verdict; we just compute delta when baseline/after are numeric.
  */
 export async function POST(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
+  if (!(await hasModule("marketplace")))
+    return NextResponse.json({ error: "marketplace module not enabled" }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
 
@@ -68,6 +72,19 @@ export async function POST(request: Request) {
       : null;
 
   const supabase = await createClient();
+
+  // The outcome must belong to the SAME patient as the recommendation it references.
+  // RLS keeps the recommendation in-practice; this stops a mismatched patient_id from
+  // mis-filing one patient's outcome against another's recommendation.
+  const { data: rec } = await supabase
+    .from("modality_recommendations")
+    .select("id, patient_id")
+    .eq("id", recommendationId)
+    .maybeSingle();
+  if (!rec) return NextResponse.json({ error: "recommendation not found" }, { status: 404 });
+  if (rec.patient_id !== patientId)
+    return NextResponse.json({ error: "patient does not match recommendation" }, { status: 400 });
+
   const { data, error } = await supabase
     .from("modality_outcomes")
     .insert({

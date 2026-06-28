@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
+import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -17,8 +18,10 @@ function toStringArray(v: unknown): string[] {
  * global catalogue. Not a patient-scoped write, so no patientId in the audit.
  */
 export async function POST(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  if (!(await hasModule("marketplace")))
+    return NextResponse.json({ error: "marketplace module not enabled" }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
 

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
+import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -16,8 +17,12 @@ function toStringArray(v: unknown): string[] {
  * so we never set practice_id explicitly here.
  */
 export async function POST(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  // Same gates the page enforces: staff + MFA step-up + marketplace module.
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
+  if (!(await hasModule("marketplace")))
+    return NextResponse.json({ error: "marketplace module not enabled" }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
 
@@ -48,6 +53,16 @@ export async function POST(request: Request) {
       : null;
 
   const supabase = await createClient();
+
+  // Verify the patient and modality are visible to this practice (RLS) before referencing
+  // them — RLS checks the NEW row's practice_id on insert, not the FKs it points at, so an
+  // unscoped recommend could otherwise reference a foreign patient or another clinic's modality.
+  const [{ data: ptRow }, { data: modRow }] = await Promise.all([
+    supabase.from("patients").select("id").eq("id", patientId).is("deleted_at", null).maybeSingle(),
+    supabase.from("modalities").select("id").eq("id", modalityId).maybeSingle(),
+  ]);
+  if (!ptRow) return NextResponse.json({ error: "patient not found" }, { status: 404 });
+  if (!modRow) return NextResponse.json({ error: "modality not found" }, { status: 404 });
 
   const { data: rec, error } = await supabase
     .from("modality_recommendations")

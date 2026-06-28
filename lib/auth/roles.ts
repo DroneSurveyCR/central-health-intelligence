@@ -30,7 +30,7 @@ export async function getCurrentPatient() {
   if (!user) return null;
   const { data } = await supabase
     .from("patients")
-    .select("id, first_name, last_name, email, sex")
+    .select("id, first_name, last_name, email, sex, practice_id")
     .eq("auth_user_id", user.id)
     .is("deleted_at", null)
     .maybeSingle();
