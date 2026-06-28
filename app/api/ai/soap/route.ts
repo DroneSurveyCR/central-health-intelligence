@@ -14,8 +14,13 @@ import {
   labLines,
   PRODUCER_MODEL,
 } from "@/lib/ai/producers";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export async function POST(request: Request) {
+  const ip = clientIp(request.headers);
+  const allowed = await rateLimit(`soap:${ip}`, 30, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const { patientId, visitId, transcript } = (await request
     .json()
     .catch(() => ({}))) as {

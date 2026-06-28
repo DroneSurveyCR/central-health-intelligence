@@ -37,6 +37,14 @@ export const log = {
   info: (event: string, fields?: Fields): void => emit("info", event, fields),
   warn: (event: string, fields?: Fields): void => emit("warn", event, fields),
   error: (event: string, fields?: Fields): void => emit("error", event, fields),
+  /** Return a child logger with `requestId` bound to every call. */
+  withId(requestId: string) {
+    return {
+      info: (event: string, ctx?: Fields) => emit("info", event, { ...ctx, requestId }),
+      warn: (event: string, ctx?: Fields) => emit("warn", event, { ...ctx, requestId }),
+      error: (event: string, ctx?: Fields) => emit("error", event, { ...ctx, requestId }),
+    };
+  },
 };
 
 /** Normalize anything thrown into a plain { type, message, stack } shape. */

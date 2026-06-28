@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import { getStripe, stripeEnabled } from "@/lib/stripe";
 import { getCurrentPractice, countProviderSeats } from "@/lib/billing/practice";
 import { PLANS, isPlanId } from "@/lib/billing/plans";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 
 // Start a plan-subscription checkout for the caller's own practice (admin/doctor only).
 // On payment the webhook flips practices.plan + practices.modules (entitlements).
 export async function POST(request: Request) {
+  const ip = clientIp(request.headers);
+  const allowed = await rateLimit(`billing:${ip}`, 10, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   if (!stripeEnabled)
     return NextResponse.json({ error: "Billing is not enabled yet." }, { status: 503 });
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe, stripeEnabled } from "@/lib/stripe";
 import { getCurrentPractice } from "@/lib/billing/practice";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,10 @@ export const dynamic = "force-dynamic";
 // price_data charge for STRIPE_SETUP_FEE_CENTS (default 300000 = $3000). On payment the
 // webhook stamps practices.setup_fee_paid_at via the metadata.kind === "setup_fee" branch.
 export async function POST(request: Request) {
+  const ip = clientIp(request.headers);
+  const allowed = await rateLimit(`setupfee:${ip}`, 5, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   if (!stripeEnabled)
     return NextResponse.json({ error: "Billing is not enabled yet." }, { status: 503 });
 

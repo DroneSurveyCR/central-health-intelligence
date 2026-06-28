@@ -14,7 +14,10 @@
     "provision": "node --env-file=.env scripts/provision.mjs",
     "migrate": "node --env-file=.env scripts/migrate.mjs",
     "etl:apply": "node --env-file=.env scripts/etl-casa-elev8.mjs --apply",
-    "test:tenant-isolation": "node --env-file=.env scripts/test-tenant-isolation.mjs"
+    "test:tenant-isolation": "node --env-file=.env scripts/test-tenant-isolation.mjs",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -34,6 +37,7 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.3",
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",

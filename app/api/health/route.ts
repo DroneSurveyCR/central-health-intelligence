@@ -7,22 +7,26 @@ export const dynamic = "force-dynamic";
 // Public liveness/readiness probe. NO auth, NO PHI — only a trivial connectivity
 // check (head count on a small, non-PHI table) so uptime monitors and Vercel can
 // tell whether the app can reach the database. Fast and side-effect free.
-export async function GET() {
+export async function GET(request: Request) {
+  const requestId = request.headers.get("x-request-id") ?? "unknown";
   let db: "ok" | "degraded" = "degraded";
   try {
     const admin = createAdminClient();
     // `head: true` issues a COUNT with no row payload — cheapest possible probe.
     const { error } = await admin.from("practices").select("id", { head: true, count: "exact" });
     db = error ? "degraded" : "ok";
-    if (error) log.warn("health_db_degraded", { error_message: error.message });
+    if (error) log.warn("health_db_degraded", { error_message: error.message, requestId });
   } catch (e) {
     db = "degraded";
-    log.warn("health_db_unreachable", { error_message: e instanceof Error ? e.message : String(e) });
+    log.warn("health_db_unreachable", { error_message: e instanceof Error ? e.message : String(e), requestId });
   }
 
   const status = db === "ok" ? "ok" : "degraded";
   return NextResponse.json(
-    { status, db, time: new Date().toISOString() },
-    { status: status === "ok" ? 200 : 503 },
+    { status, db, time: new Date().toISOString(), requestId },
+    {
+      status: status === "ok" ? 200 : 503,
+      headers: { "x-request-id": requestId },
+    },
   );
 }

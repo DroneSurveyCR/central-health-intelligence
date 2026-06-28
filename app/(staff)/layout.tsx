@@ -15,6 +15,7 @@ const ICONS: Record<string, React.ReactNode> = {
   analytics: (<svg {...S}><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>),
   import: (<svg {...S}><path d="M12 3v11M8 10l4 4 4-4M4 20h16" /></svg>),
   security: (<svg {...S}><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" /></svg>),
+  audit: (<svg {...S}><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /><rect x="9" y="3" width="6" height="4" rx="1" /><path d="M9 12h6M9 16h4" /></svg>),
   triage: (<svg {...S}><path d="M12 3l9 16H3l9-16z" /><path d="M12 10v4M12 17h.01" /></svg>),
   desk: (<svg {...S}><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 3v3h6V3M9 11h6M9 15h4" /></svg>),
   approvals: (<svg {...S}><path d="M4 12l5 5L20 6" /></svg>),
@@ -74,6 +75,7 @@ export default async function StaffLayout({
         {isAdmin && <Link href="/analytics">{ICONS.analytics}<span>Analytics</span></Link>}
         {isAdmin && <Link href="/import">{ICONS.import}<span>Import</span></Link>}
         <Link href="/security">{ICONS.security}<span>Security</span></Link>
+        {isAdmin && <Link href="/audit">{ICONS.audit}<span>Audit</span></Link>}
         <div className="who">
           <span className="who-avatar">{initials}</span>
           <span>{me.name} · {me.role}</span>

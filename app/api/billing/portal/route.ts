@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe, stripeEnabled } from "@/lib/stripe";
 import { getCurrentPractice } from "@/lib/billing/practice";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,10 @@ export const dynamic = "force-dynamic";
 // Returns 503 when Stripe is off or the practice has no Stripe customer yet (i.e. it has
 // never started a subscription checkout, so there is nothing to manage).
 export async function POST(request: Request) {
+  const ip = clientIp(request.headers);
+  const allowed = await rateLimit(`portal:${ip}`, 10, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   if (!stripeEnabled)
     return NextResponse.json({ error: "Billing is not enabled yet." }, { status: 503 });
 

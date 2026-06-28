@@ -15,8 +15,13 @@ import {
   wearableLines,
   PRODUCER_MODEL,
 } from "@/lib/ai/producers";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export async function POST(request: Request) {
+  const ip = clientIp(request.headers);
+  const allowed = await rateLimit(`narrative:${ip}`, 20, 60);
+  if (!allowed) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const { patientId } = (await request.json().catch(() => ({}))) as {
     patientId?: string;
   };
