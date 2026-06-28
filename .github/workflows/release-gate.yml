@@ -1,0 +1,56 @@
+name: Release Gate
+
+# Manual / pre-release verification against a live deployment + the Cloud DB.
+# NOT on push: the full isolation test plants and deletes probe rows in the Cloud
+# database, so it must be run deliberately, not on every commit.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   PROVE_BASE_URL                  deployment URL to smoke (e.g. https://healthsync-cloud-mu.vercel.app)
+#   CRON_SECRET                     to exercise the cron/engine endpoints in the smoke gate
+#   DEST_URL                        Cloud Supabase URL (https://<ref>.supabase.co)
+#   DEST_SERVICE_KEY                Cloud service-role key (RLS-bypassing — CI secret only)
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY   Cloud anon key (for the probe user sign-in)
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Deployment URL to smoke (overrides PROVE_BASE_URL secret)"
+        required: false
+        default: ""
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Smoke gate (HTTP — every surface gates, engines run, health green)
+        run: node scripts/smoke.mjs
+        env:
+          PROVE_BASE_URL: ${{ github.event.inputs.base_url != '' && github.event.inputs.base_url || secrets.PROVE_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+      - name: Tenant-isolation gate (DB-level — practice #2 reads 0 rows of practice #1)
+        run: node scripts/test-isolation-full.mjs
+        env:
+          DEST_URL: ${{ secrets.DEST_URL }}
+          DEST_SERVICE_KEY: ${{ secrets.DEST_SERVICE_KEY }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      # FOLLOW-UP (not yet wired): admin-client API-route isolation — the round-1 leak class
+      # (routes that bypass RLS via the service-role client and fetched by id without a practice
+      # filter). The DB-level gate above does NOT exercise those routes. Cover it with an
+      # AUTHENTICATED Playwright spec (cookie-based Supabase auth) that, as a practice-#2 user,
+      # POSTs practice-#1 ids to /api/data/{parse,confirm,reject} and GETs /api/settings/connectors
+      # and asserts 404 / no practice-#1 data. Requires the hardened build deployed + a 2nd tenant.
