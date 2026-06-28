@@ -1,14 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
 const VALID_TYPES = ["consult", "follow_up", "scan_review", "other"];
 
 export async function POST(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
   const patientId = String(body.patientId || "");

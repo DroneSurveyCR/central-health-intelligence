@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
@@ -13,9 +13,9 @@ function parseOptionalNumber(v: unknown): number | null {
 
 export async function POST(request: Request) {
   // requireStaff equivalent for an API route.
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   // Module gate (the real gate; RLS is defense-in-depth).
   if (!(await hasModule("weight")))

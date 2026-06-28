@@ -1,13 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { NextResponse } from "next/server";
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export async function POST(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
   if (practitioner.role !== "doctor" && practitioner.role !== "admin")
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
 

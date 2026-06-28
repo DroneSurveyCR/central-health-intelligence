@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPatient, getCurrentPractitioner } from "@/lib/auth/roles";
+import { getCurrentPatient, getCurrentPractitioner, staffMfaGate } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -48,6 +48,8 @@ export async function POST(request: Request) {
   // Staff path: reply into a specific patient's thread as 'staff'.
   const practitioner = await getCurrentPractitioner();
   if (practitioner) {
+    const mfa = await staffMfaGate();
+    if (mfa) return mfa;
     const patientId = String(payload?.patientId ?? "");
     if (!patientId)
       return NextResponse.json({ error: "missing patientId" }, { status: 400 });

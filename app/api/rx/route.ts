@@ -1,12 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
   if (!(await hasModule("rx")))
     return NextResponse.json({ error: "module not enabled" }, { status: 403 });
 
@@ -67,8 +68,9 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
   if (!(await hasModule("rx")))
     return NextResponse.json({ error: "module not enabled" }, { status: 403 });
 

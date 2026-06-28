@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { requireModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import { isDoseSafe, maxDoseFor, doseUnitFor } from "@/lib/hrt/templates";
@@ -9,8 +9,9 @@ const VALID_STATUS = ["active", "paused", "completed", "discontinued"];
 
 export async function POST(request: Request) {
   await requireModule("hrt");
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
 
@@ -86,8 +87,9 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   await requireModule("hrt");
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
   const id = String(body.id || "");

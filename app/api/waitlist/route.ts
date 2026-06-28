@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -7,9 +7,9 @@ const STATUSES = ["waiting", "offered", "booked", "removed"] as const;
 
 /** POST — add a patient to the waitlist. Body: { patientId, notes?, priority? }. */
 export async function POST(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
   const patientId = String(body.patientId || "");
@@ -34,9 +34,9 @@ export async function POST(request: Request) {
 
 /** PATCH — change a waitlist entry's status. Body: { id, status }. */
 export async function PATCH(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
   const id = String(body.id || "");

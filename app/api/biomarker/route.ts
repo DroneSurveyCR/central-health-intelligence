@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -46,9 +46,9 @@ function normalizeMarker(raw: RawMarker) {
 }
 
 export async function POST(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
 
@@ -116,9 +116,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id") || "";

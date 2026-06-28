@@ -1,4 +1,4 @@
-import { getCurrentPractitioner, getSessionUser } from "@/lib/auth/roles";
+import { requireStaffApi, getSessionUser } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getConnector } from "@/lib/connectors/registry";
 import { moduleForConnector } from "@/lib/modules";
@@ -8,8 +8,10 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request, { params }: { params: Promise<{ importId: string }> }) {
   const { user } = await getSessionUser();
-  const me = await getCurrentPractitioner();
-  if (!me || !user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { importId } = await params;
   const body = await request.json().catch(() => ({})) as { edits?: Record<string, unknown>[]; reviewerNotes?: string };

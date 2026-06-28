@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { sendReminderEmail } from "@/lib/email/resend";
 import { invoiceEmail } from "@/lib/email/templates";
@@ -67,9 +67,9 @@ function cleanDiscount(raw: unknown): number {
 
 export async function POST(request: Request) {
   // Staff only — patients cannot manage invoices.
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const action = String(body.action ?? "");

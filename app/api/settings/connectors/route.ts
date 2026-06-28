@@ -1,10 +1,11 @@
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const me = await getCurrentPractitioner();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
 
   const admin = createAdminClient();
   const { data: registry } = await admin.from("connector_registry").select("*").order("phase").order("label");
@@ -22,8 +23,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const me = await getCurrentPractitioner();
-  if (!me || !["doctor", "admin"].includes(me.role)) return NextResponse.json({ error: "admin only" }, { status: 403 });
+  const gate = await requireStaffApi(["doctor", "admin"]);
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
 
   const { connectorId } = await request.json().catch(() => ({})) as { connectorId?: string };
   if (!connectorId) return NextResponse.json({ error: "missing connectorId" }, { status: 400 });

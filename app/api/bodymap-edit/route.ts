@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 import { ALL_PART_IDS, PART_ALIASES } from "@/lib/bodymap/schema";
@@ -16,8 +16,9 @@ function cleanPoint(raw: unknown): { st: string; v: string; score: number } {
 
 export async function POST(request: Request) {
   // Staff only.
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   const patientId = String(body.patientId ?? "").trim();

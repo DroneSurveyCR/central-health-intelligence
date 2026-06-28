@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { isDoseSafe, maxDoseFor } from "@/lib/peptide/templates";
 import { NextResponse } from "next/server";
@@ -7,8 +7,9 @@ import { NextResponse } from "next/server";
 const VALID_STATUS = ["active", "paused", "completed", "discontinued"];
 
 export async function POST(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
 
@@ -80,8 +81,9 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const p = await getCurrentPractitioner();
-  if (!p) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const p = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
   const id = String(body.id || "");

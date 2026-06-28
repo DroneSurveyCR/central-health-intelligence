@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 import type { PlanLevel } from "@/lib/plan/helpers";
@@ -9,8 +9,9 @@ const STATUSES = ["draft", "active", "completed"] as const;
 
 export async function POST(request: Request) {
   // Only staff may write plans.
-  const me = await getCurrentPractitioner();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
 
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object")

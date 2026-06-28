@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 
@@ -8,9 +8,9 @@ const str = (v: unknown) =>
 
 /** POST — add an insurance policy. Body: { patientId, insurer, policy_number?, ... }. */
 export async function POST(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const body = await request.json().catch(() => ({}));
   const patientId = String(body.patientId || "");
@@ -43,9 +43,9 @@ export async function POST(request: Request) {
 
 /** DELETE — remove an insurance policy. Query: ?id=... */
 export async function DELETE(request: Request) {
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner)
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
 
   const { searchParams } = new URL(request.url);
   const id = String(searchParams.get("id") || "");

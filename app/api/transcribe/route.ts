@@ -1,11 +1,12 @@
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { rateLimit } from "@/lib/ratelimit";
 import { transcribeAudio, transcribeEnabled } from "@/lib/ai";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const me = await getCurrentPractitioner();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
 
   if (!transcribeEnabled)
     return NextResponse.json({ error: "Transcription is not configured on this server." }, { status: 503 });

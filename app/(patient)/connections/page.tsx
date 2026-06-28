@@ -169,8 +169,8 @@ export default async function PatientConnectionsPage() {
       <section className="card" style={{ marginTop: 18 }}>
         <h2 className="serif" style={{ fontSize: 19, marginTop: 0 }}>What you share with your care team</h2>
         <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
-          You decide what your clinicians can see. Private data stays with you and is
-          never shown to staff.
+          Tell your care team which data you&apos;d prefer to keep private. Your treating
+          clinicians may still access records needed for your care.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {DOMAINS.map((d) => {

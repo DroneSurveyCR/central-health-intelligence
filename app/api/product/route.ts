@@ -1,13 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { NextResponse } from "next/server";
 
 // Admin-only roles for managing the product catalog.
 const ADMIN_ROLES = ["doctor", "admin"];
 
 export async function POST(request: Request) {
-  const me = await getCurrentPractitioner();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
   if (!ADMIN_ROLES.includes(String(me.role)))
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
 

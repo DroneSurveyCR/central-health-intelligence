@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { getCurrentPractitioner, staffMfaGate } from "@/lib/auth/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const me = await getCurrentPractitioner();
   if (!me) return NextResponse.json({ count: 0 });
+  if (await staffMfaGate()) return NextResponse.json({ count: 0 });
 
   const supabase = await createClient();
   const { count } = await supabase

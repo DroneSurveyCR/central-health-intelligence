@@ -1,12 +1,13 @@
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
 import { MODULES, ALWAYS_ON } from "@/lib/modules/manifest";
 import type { ModuleId } from "@/lib/modules/types";
 import { NextResponse } from "next/server";
 
 export async function PATCH(request: Request) {
-  const me = await getCurrentPractitioner();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
   if (!["doctor", "admin"].includes(me.role))
     return NextResponse.json({ error: "admin only" }, { status: 403 });
 

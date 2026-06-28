@@ -1,4 +1,4 @@
-import { getCurrentPractitioner, getSessionUser } from "@/lib/auth/roles";
+import { requireStaffApi, getSessionUser } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getConnector } from "@/lib/connectors/registry";
@@ -12,8 +12,10 @@ const INLINE_THRESHOLD = 500 * 1024; // parse inline if < 500 KB
 
 export async function POST(request: Request) {
   const { user } = await getSessionUser();
-  const me = await getCurrentPractitioner();
-  if (!me || !user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   if (!(await rateLimit(`data-upload:${me.id}`, 60, 3600)))
     return NextResponse.json({ error: "Too many uploads. Try again later." }, { status: 429 });

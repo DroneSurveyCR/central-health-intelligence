@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getCurrentPractitioner,
   getCurrentPatient,
+  staffMfaGate,
 } from "@/lib/auth/roles";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
@@ -12,6 +13,10 @@ export async function POST(request: Request) {
   const patient = practitioner ? null : await getCurrentPatient();
   if (!practitioner && !patient)
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (practitioner) {
+    const mfa = await staffMfaGate();
+    if (mfa) return mfa;
+  }
 
   const body = await request.json().catch(() => ({}));
 

@@ -73,13 +73,24 @@ export async function requireStaffApi(roles?: StaffRole[]) {
   if (!p)
     return { ok: false as const, response: NextResponse.json({ error: "unauthorized" }, { status: 401 }) };
 
-  const supabase = await createClient();
-  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2")
-    return { ok: false as const, response: NextResponse.json({ error: "mfa_required" }, { status: 403 }) };
+  const mfa = await staffMfaGate();
+  if (mfa) return { ok: false as const, response: mfa };
 
   if (roles && !roles.includes(p.role as StaffRole))
     return { ok: false as const, response: NextResponse.json({ error: "forbidden" }, { status: 403 }) };
 
   return { ok: true as const, practitioner: p };
+}
+
+/**
+ * AAL2 MFA step-up check for an already-authenticated staff caller. For dual patient/staff API
+ * routes that can't use the full requireStaffApi (the patient branch must survive): call this on
+ * the staff branch only. Returns a 403 response when a step-up is required, else null.
+ */
+export async function staffMfaGate(): Promise<NextResponse | null> {
+  const supabase = await createClient();
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2")
+    return NextResponse.json({ error: "mfa_required" }, { status: 403 });
+  return null;
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { hasModule } from "@/lib/modules/requireModule";
 import { logAudit } from "@/lib/auth/audit";
 import {
@@ -23,11 +23,9 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ report: string }> },
 ) {
-  // staff gate
-  const practitioner = await getCurrentPractitioner();
-  if (!practitioner) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  // staff gate (+ MFA step-up)
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
 
   // module gate (Layer B) — API routes can't redirect cleanly, so 403.
   if (!(await hasModule("reports"))) {

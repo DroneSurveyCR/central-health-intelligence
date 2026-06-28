@@ -1,10 +1,11 @@
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ connectorId: string }> }) {
-  const me = await getCurrentPractitioner();
-  if (!me || !["doctor", "admin"].includes(me.role)) return NextResponse.json({ error: "admin only" }, { status: 403 });
+  const gate = await requireStaffApi(["doctor", "admin"]);
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
 
   const { connectorId } = await params;
   const body = await request.json().catch(() => ({})) as { enabled?: boolean; config_json?: Record<string, unknown> };

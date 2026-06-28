@@ -1,4 +1,4 @@
-import { getCurrentPractitioner } from "@/lib/auth/roles";
+import { requireStaffApi } from "@/lib/auth/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getConnector } from "@/lib/connectors/registry";
 import { moduleForConnector } from "@/lib/modules";
@@ -6,8 +6,9 @@ import { getEnabledModules } from "@/lib/modules/requireModule";
 import { NextResponse } from "next/server";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ importId: string }> }) {
-  const me = await getCurrentPractitioner();
-  if (!me) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const me = gate.practitioner;
 
   const { importId } = await params;
   const admin = createAdminClient();
