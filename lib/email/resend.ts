@@ -16,7 +16,7 @@ export async function sendReminderEmail(
 ): Promise<{ id: string | null; skipped: boolean }> {
   const resend = getResend();
   if (!resend) return { id: null, skipped: true };
-  const from = process.env.RESEND_FROM || "Personal Health Intelligence <onboarding@resend.dev>";
+  const from = process.env.RESEND_FROM || "Central Health Intelligence <onboarding@resend.dev>";
   const { data, error } = await resend.emails.send({ from, to, subject, text });
   if (error) throw new Error(error.message);
   return { id: data?.id ?? null, skipped: false };
