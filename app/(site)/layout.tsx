@@ -1,7 +1,5 @@
-import "./site.css";
 import type { Metadata } from "next";
-import SiteNav from "@/components/site/SiteNav";
-import SiteFooter from "@/components/site/SiteFooter";
+import SiteShell from "@/components/site/SiteShell";
 
 export const metadata: Metadata = {
   title: {
@@ -13,11 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mkt">
-      <SiteNav />
-      <main>{children}</main>
-      <SiteFooter />
-    </div>
-  );
+  return <SiteShell>{children}</SiteShell>;
 }
