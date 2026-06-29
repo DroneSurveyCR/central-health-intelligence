@@ -20,7 +20,12 @@
   --gold-bg: #fceed4;       /* amber tint */
   --line: #ece1ce;          /* warm hairline (demo --line) */
   --lime: #f4a63c;          /* accent now warm amber, not lime */
-  --maxw: 1080px;
+  --maxw: 1100px;
+
+  /* Marketing uses ONE clean, bold sans everywhere (Apple-style hierarchy
+     by weight, not by mixing a serif). Override the global serif alias here
+     so the app's own typography is untouched. */
+  --serif: var(--font-sans), "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
 
   color: var(--ink);
   background: var(--bg);
@@ -48,27 +53,27 @@
 .mkt-section.sand { background: var(--sand); }
 .mkt-section.ink { background: var(--ink-deep); color: #f4ede0; }
 .mkt-section.ink .mkt-muted { color: #b7ccbd; }
-.mkt-section.ink .mkt-btn:not(.ghost) { background: var(--gold); color: #2a1a06; }
-.mkt-section.ink .mkt-btn:not(.ghost):hover { background: var(--gold-d); }
+.mkt-section.ink .mkt-btn:not(.ghost) { background: var(--gold); color: #2a1a06; box-shadow: 0 14px 30px -12px rgba(244, 166, 60, 0.7); }
+.mkt-section.ink .mkt-btn:not(.ghost):hover { background: var(--gold-d); box-shadow: 0 18px 36px -12px rgba(244, 166, 60, 0.75); }
 
 /* ---- type ---- */
 .mkt-display {
   font-family: var(--serif);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
   margin: 0;
-  font-size: clamp(40px, 6vw, 68px);
+  font-size: clamp(40px, 6vw, 66px);
 }
 .mkt-h2 {
   font-family: var(--serif);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1.12;
-  margin: 0 0 14px;
-  font-size: clamp(28px, 3.6vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+  margin: 0 0 16px;
+  font-size: clamp(28px, 3.4vw, 40px);
 }
-.mkt-h3 { font-weight: 600; font-size: 20px; margin: 0 0 8px; letter-spacing: -0.005em; }
+.mkt-h3 { font-weight: 700; font-size: 20px; margin: 0 0 8px; letter-spacing: -0.012em; }
 .mkt-lead { font-size: clamp(17px, 1.7vw, 20px); color: var(--ink-2); max-width: 60ch; margin: 0; }
 .mkt-muted { color: var(--muted); }
 .mkt-kicker { font-weight: 600; font-size: 14px; color: var(--green); margin: 0 0 14px; }
@@ -77,15 +82,20 @@
 
 /* ---- buttons (solid green; ghost = hairline) ---- */
 .mkt-btn {
-  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
-  background: var(--green); color: #fff; font-weight: 600; font-size: 15px;
-  padding: 12px 22px; border-radius: 12px; border: 0; cursor: pointer;
-  transition: background .18s ease, transform .18s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+  background: var(--green); color: #fff; font-weight: 700; font-size: 15px;
+  padding: 13px 22px; border-radius: 12px; border: 0; cursor: pointer;
+  box-shadow: 0 10px 22px -10px rgba(20, 131, 78, 0.55);
+  transition: background .18s ease, transform .16s ease, box-shadow .18s ease;
 }
-.mkt-btn:hover { background: var(--green-d); }
-.mkt-btn.ghost { background: transparent; color: var(--green); border: 1px solid var(--line); }
-.mkt-btn.ghost:hover { background: var(--mint); }
-.mkt-btn.lg { padding: 14px 26px; font-size: 16px; }
+.mkt-btn:hover { background: var(--green-d); transform: translateY(-2px); box-shadow: 0 16px 30px -12px rgba(20, 131, 78, 0.6); }
+.mkt-btn:active { transform: translateY(0); }
+.mkt-btn.ghost {
+  background: transparent; color: var(--ink); border: 1.5px solid var(--line);
+  box-shadow: none;
+}
+.mkt-btn.ghost:hover { background: #fff; border-color: var(--green); color: var(--green); transform: translateY(-2px); }
+.mkt-btn.lg { padding: 15px 28px; font-size: 16px; }
 
 /* ---- top nav + submenus ---- */
 .mkt-nav {
@@ -96,13 +106,13 @@
   border-bottom: 1px solid var(--line);
 }
 .mkt-nav-row { display: flex; align-items: center; gap: 28px; height: 64px; }
-.mkt-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.mkt-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; }
 .mkt-brand .mark {
-  width: 30px; height: 30px; border-radius: 9px; background: var(--green);
-  color: #fff; font-family: var(--serif); font-weight: 600; font-size: 17px;
-  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 7px; background: var(--green);
+  color: #fff; font-weight: 800; font-size: 15px; letter-spacing: -0.02em;
+  display: grid; place-items: center; flex-shrink: 0;
 }
-.mkt-brand b { font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+.mkt-brand b { font-weight: 700; font-size: 16px; letter-spacing: -0.022em; color: var(--ink); }
 .mkt-nav-links { display: flex; align-items: center; gap: 4px; margin-left: 8px; }
 .mkt-nav-spacer { flex: 1; }
 .mkt-navitem { position: relative; }
@@ -143,11 +153,14 @@
 .mkt-hero .mkt-kicker { color: var(--gold); }
 .mkt-hero-cta { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
 /* primary CTA in the hero goes warm amber, like the demo */
-.mkt-hero .mkt-btn:not(.ghost) { background: var(--gold); color: #2a1a06; }
-.mkt-hero .mkt-btn:not(.ghost):hover { background: var(--gold-d); }
+.mkt-hero .mkt-btn:not(.ghost) {
+  background: var(--gold); color: #2a1a06;
+  box-shadow: 0 14px 30px -12px rgba(244, 166, 60, 0.7);
+}
+.mkt-hero .mkt-btn:not(.ghost):hover { background: var(--gold-d); box-shadow: 0 18px 36px -12px rgba(244, 166, 60, 0.75); }
 /* ghost CTA inverts for the dark ground */
 .mkt-hero .mkt-btn.ghost { color: #f6efe2; border-color: rgba(246, 239, 226, 0.34); }
-.mkt-hero .mkt-btn.ghost:hover { background: rgba(246, 239, 226, 0.08); }
+.mkt-hero .mkt-btn.ghost:hover { background: rgba(246, 239, 226, 0.08); border-color: rgba(246, 239, 226, 0.6); color: #fffaf0; }
 
 /* ---- device frame (floating screenshot) ---- */
 .mkt-device {
@@ -156,32 +169,72 @@
 }
 .mkt-device.tilt { transform: rotate(-1.2deg); }
 
-/* ---- phone mockup (iOS-style) ---- */
+/* ---- iPhone (hover-to-scroll): a fixed window, the tall screenshot
+   glides up on hover so you can read the whole screen. Modeled on the
+   Randi demo. ---- */
 .mkt-phone {
-  position: relative;
-  width: 260px;
+  display: block;
+  width: 248px;
+  max-width: 100%;
   flex-shrink: 0;
-  border-radius: 42px;
-  border: 10px solid #141414;
-  background: #141414;
-  box-shadow: 0 36px 80px rgba(0,0,0,.24), inset 0 0 0 1px rgba(255,255,255,.07);
-  overflow: hidden;
+  border-radius: 40px;
+  background: #0f0f10;
+  padding: 9px;
+  box-shadow: 0 34px 70px -28px rgba(17, 36, 27, 0.5), inset 0 0 0 1px rgba(255,255,255,.06);
 }
-.mkt-phone::before {
+.mkt-phone .mkt-screen-window {
+  position: relative;
+  height: 440px;
+  overflow: hidden;
+  border-radius: 31px;
+  background: #0f0f10;
+}
+.mkt-phone .mkt-screen-window::after {
+  /* gentle "scroll on hover" affordance — a fade at the bottom edge */
   content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 88px;
-  height: 26px;
-  background: #141414;
-  border-radius: 0 0 18px 18px;
-  z-index: 2;
+  position: absolute; inset: auto 0 0 0; height: 40px;
+  background: linear-gradient(transparent, rgba(15,15,16,.0));
   pointer-events: none;
 }
-.mkt-phone img { width: 100%; display: block; }
+.mkt-phone img {
+  width: 100%; display: block;
+  transition: transform 6.5s cubic-bezier(.33, 0, .2, 1);
+}
+.mkt-phone:hover img,
+.mkt-phone:focus-within img {
+  transform: translateY(calc(-100% + 440px));
+}
 .mkt-phone.tilt { transform: rotate(1.5deg); }
+
+/* ---- MacBook frame (clean, Apple-style) for desktop screenshots ---- */
+.mkt-laptop { width: 100%; max-width: 680px; margin: 0 auto; }
+.mkt-laptop .lid {
+  background: #141618;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 44px 90px -42px rgba(17, 36, 27, 0.55), inset 0 0 0 1px rgba(255,255,255,.05);
+}
+.mkt-laptop .lid-screen {
+  border-radius: 6px; overflow: hidden; background: #fff;
+}
+.mkt-laptop .lid-screen img { width: 100%; display: block; }
+.mkt-laptop .base {
+  width: 112%; margin-left: -6%;
+  height: 13px;
+  background: linear-gradient(#dfe1e4, #b9bcc1);
+  border-radius: 0 0 11px 11px;
+  position: relative;
+}
+.mkt-laptop .base::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 96px; height: 6px; background: #a7abb0; border-radius: 0 0 7px 7px;
+}
+.mkt-laptop.tilt { transform: rotate(-1deg); }
+/* on the dark hero, lift the lid off the ground with a brighter edge */
+.mkt-hero .mkt-laptop .lid { box-shadow: 0 50px 100px -36px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,.1); }
+
+/* small caption under a device ("hover to scroll") */
+.mkt-device-hint { font-size: 13px; color: var(--muted); margin-top: 18px; font-weight: 500; }
 
 /* ---- browser / laptop screen mockup ---- */
 .mkt-screen {
@@ -214,12 +267,15 @@
 .mkt-screen img { width: 100%; display: block; }
 .mkt-screen.tilt { transform: rotate(-1deg); }
 
-/* ---- phone row (patient app screens side by side) ---- */
-.mkt-phone-row { display: flex; gap: 20px; align-items: flex-start; justify-content: center; }
-.mkt-phone-row .mkt-phone { width: 160px; border-radius: 32px; }
-.mkt-phone-row .mkt-phone::before { width: 66px; height: 20px; border-radius: 0 0 14px 14px; }
-@media (max-width: 880px) { .mkt-phone-row { gap: 12px; } .mkt-phone-row .mkt-phone { width: 130px; } }
-@media (max-width: 640px) { .mkt-phone-row { gap: 8px; } .mkt-phone-row .mkt-phone { width: 90px; border-radius: 20px; } }
+/* ---- two phones, gently overlapped (used sparingly) ---- */
+.mkt-phone-duo { display: flex; justify-content: center; align-items: flex-start; }
+.mkt-phone-duo .mkt-phone { width: 226px; }
+.mkt-phone-duo .mkt-phone:nth-child(2) { margin-left: -56px; margin-top: 36px; }
+.mkt-phone-duo .mkt-phone:hover { position: relative; z-index: 3; }
+@media (max-width: 640px) {
+  .mkt-phone-duo { flex-direction: column; align-items: center; gap: 24px; }
+  .mkt-phone-duo .mkt-phone:nth-child(2) { margin-left: 0; margin-top: 0; }
+}
 
 /* ---- credibility strip ---- */
 .mkt-strip { display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: center; color: var(--muted); font-size: 14px; }
@@ -232,9 +288,10 @@
 .mkt-hero-strip { border-top: 1px solid rgba(246, 239, 226, 0.14); padding-top: 28px; }
 
 /* ---- feature rows (alternating, not identical cards) ---- */
-.mkt-row { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
-.mkt-row.rev { grid-template-columns: 1fr 1.05fr; }
+.mkt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+.mkt-row.rev { grid-template-columns: 1fr 1fr; }
 .mkt-row.rev .mkt-row-media { order: -1; }
+.mkt-row .mkt-lead, .mkt-row .mkt-p { margin-bottom: 4px; }
 
 /* ---- a restrained list (no icon-tile cards) ---- */
 .mkt-points { display: grid; gap: 18px; margin: 18px 0 0; padding: 0; list-style: none; }

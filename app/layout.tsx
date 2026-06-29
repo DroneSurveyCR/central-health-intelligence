@@ -4,7 +4,7 @@ import "./globals.css";
 import PWARegister from "@/components/PWARegister";
 
 const serif = Fraunces({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-serif", display: "swap" });
-const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-sans", display: "swap" });
+const sans = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-sans", display: "swap" });
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ToastProvider } from "@/components/Toast";
 import { getServerLang } from "@/lib/i18n/getServerLang";
