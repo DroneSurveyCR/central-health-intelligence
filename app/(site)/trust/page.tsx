@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Security & compliance",
   description:
-    "How Central Health Intelligence protects patient data: HIPAA-ready BAAs, strict tenant isolation, MFA, append-only audit logs, AES-256-GCM encryption and modern security headers — across Cloud, HIPAA Cloud and Private Cloud editions.",
+    "How Central Health Intelligence protects client data: HIPAA-ready BAAs, strict tenant isolation, MFA, append-only audit logs, AES-256-GCM encryption and modern security headers — across Cloud, HIPAA Cloud and Private Cloud editions.",
 };
 
 export default function SecurityPage() {
@@ -16,7 +16,7 @@ export default function SecurityPage() {
           <div>
             <p className="mkt-kicker">Security &amp; compliance</p>
             <h1 className="mkt-display">
-              Built for patient data
+              Built for client data
               <br />
               from the first row.
             </h1>
@@ -65,7 +65,7 @@ export default function SecurityPage() {
               physically cannot return another tenant&apos;s rows.
             </p>
             <ul className="mkt-points">
-              <li>Row-level security on every patient-data table</li>
+              <li>Row-level security on every client-data table</li>
               <li>Verified: 0 cross-tenant rows returned across 18 tables</li>
               <li>Nightly isolation checks, re-run on every schema change</li>
             </ul>
@@ -178,7 +178,7 @@ export default function SecurityPage() {
               ["Are you HIPAA compliant?", "The HIPAA Cloud edition runs with signed BAAs and is US-PHI-ready, operating our controls to a documented compliance standard. Non-US clinics can start on Cloud, which uses the same technical isolation and security controls."],
               ["How do you guarantee tenant isolation?", "Every record carries a practice_id, and row-level security enforces that boundary in the database itself. We verify it continuously — the most recent check returned 0 cross-tenant rows across 18 tables."],
               ["How is staff access protected?", "Every staff account requires MFA via TOTP. All access is written to an append-only, WORM audit log that cannot be silently edited or deleted."],
-              ["How are connector credentials stored?", "Tokens for wearable, CGM and lab connectors are encrypted at rest with AES-256-GCM. They are never exposed to other tenants or written to logs in plaintext."],
+              ["How are uploads and credentials stored?", "Uploaded files and any connector credentials are encrypted at rest with AES-256-GCM. They are never exposed to other tenants or written to logs in plaintext."],
               ["What protects the application itself?", "Rate limiting on the API surface, plus CSP and HSTS headers on every response to defend against injection and downgrade attacks."],
               ["Can we run it on our own infrastructure?", "Yes — the Private Cloud edition is a dedicated, isolated instance on your own VPS, white-labeled to your clinic."],
             ].map(([q, a]) => (

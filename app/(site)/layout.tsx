@@ -3,11 +3,11 @@ import SiteShell from "@/components/site/SiteShell";
 
 export const metadata: Metadata = {
   title: {
-    default: "Central Health Intelligence — live health intelligence for clinics",
+    default: "Central Health Intelligence — a clear 90-day plan for every client",
     template: "%s · Central Health Intelligence",
   },
   description:
-    "Central Health Intelligence keeps patient data live — wearables, labs and CGM in one picture, with AI that drafts and the doctor approves. For longevity, functional-medicine and integrative clinics. By Health Intelligency.",
+    "Central Health Intelligence gives every client a clear 90-day plan — built with AI, approved by the doctor, and tracked on both sides. For longevity, functional-medicine and integrative practices. By Health Intelligency.",
 };
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {

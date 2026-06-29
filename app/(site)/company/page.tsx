@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Company",
   description:
-    "Health Intelligency builds Central Health Intelligence: real-time health intelligence — every data source, one patient picture, doctor-supervised AI. For the longevity, functional-medicine and integrative clinics mainstream EHRs overlook.",
+    "Health Intelligency builds Central Health Intelligence: a clear 90-day plan for every client — built with AI, approved by the doctor, and tracked on both sides. For the longevity, functional-medicine and integrative practices mainstream EHRs overlook.",
 };
 
 export default function CompanyPage() {
@@ -15,11 +15,12 @@ export default function CompanyPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">Health Intelligency</p>
           <h1 className="mkt-display mkt-display-narrow">
-            One patient <span className="mkt-lime-underline">picture</span>, kept live.
+            A plan every client <span className="mkt-lime-underline">follows</span>.
           </h1>
-          <p className="mkt-lead mkt-p-lead-md">
-            Real-time health intelligence — every data source, one patient picture, doctor-supervised
-            AI. That&apos;s our north star, and the whole reason the company exists.
+          <p className="mkt-lead mkt-hero-lead-wide">
+            A clear 90-day plan, built with AI and approved by the doctor, that the client actually
+            follows — with both sides tracking progress. That&apos;s our north star, and the whole reason
+            the company exists.
           </p>
         </div>
       </section>
@@ -28,31 +29,31 @@ export default function CompanyPage() {
       <section className="mkt-section mint">
         <div className="mkt-wrap">
           <p className="mkt-kicker">How we think about it</p>
-          <h2 className="mkt-h2">Doctor, AI, patient — in that order.</h2>
+          <h2 className="mkt-h2">Doctor, AI, client — in that order.</h2>
           <p className="mkt-lead mkt-p-lead-gap">
-            Good health intelligence isn&apos;t AI replacing the clinician. It&apos;s a triangle where each
-            corner does what it&apos;s best at.
+            Good care isn&apos;t AI replacing the doctor. It&apos;s a triangle where each corner does what
+            it&apos;s best at.
           </p>
           <div className="mkt-three">
             <div>
-              <h3>Doctors lead</h3>
+              <h3 className="mkt-h3">Doctors lead</h3>
               <p className="mkt-muted mkt-three-p">
-                The clinician decides. Every synthesis is a draft for them to approve — never an action
-                taken on its own.
+                The doctor decides. The plan and the notes are drafts to approve — never an action taken
+                on its own.
               </p>
             </div>
             <div>
-              <h3>AI synthesizes</h3>
+              <h3 className="mkt-h3">AI does the work</h3>
               <p className="mkt-muted mkt-three-p">
-                It reads across the live data, surfaces what changed, and drafts the notes and talking
-                points so the doctor walks in informed.
+                It reads the uploaded data, drafts the 90-day plan and the notes, and answers the
+                client&apos;s questions — so neither side is buried in admin.
               </p>
             </div>
             <div>
-              <h3>Patients own</h3>
+              <h3 className="mkt-h3">Clients follow</h3>
               <p className="mkt-muted mkt-three-p">
-                The record is theirs — connected from their own devices, and portable on request. They
-                hold their own copy.
+                A simple daily schedule they can actually keep — and their own copy of the record,
+                portable on request.
               </p>
             </div>
           </div>
@@ -64,25 +65,25 @@ export default function CompanyPage() {
         <div className="mkt-wrap mkt-row">
           <div>
             <p className="mkt-kicker">Who we build for</p>
-            <h2 className="mkt-h2">The clinics the big EHRs overlook.</h2>
+            <h2 className="mkt-h2">The practices the big EHRs overlook.</h2>
             <p className="mkt-p">
-              Mainstream EHRs were built for billing inside hospital systems. The clinics practicing
-              proactive, data-driven medicine were left to improvise on spreadsheets and tools that
+              Mainstream EHRs were built for billing inside hospital systems. The practices doing
+              proactive, plan-based medicine were left to improvise on spreadsheets and tools that
               don&apos;t talk to each other. We build for them.
             </p>
             <ul className="mkt-points">
               <li>Longevity and preventive medicine</li>
               <li>Functional and integrative medicine</li>
-              <li>Practices that live in wearables, labs and CGM data</li>
+              <li>Practices that run structured, plan-based care</li>
             </ul>
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
               <div className="mkt-mock-grid">
                 {[
-                  "Every data source, normalized",
-                  "One patient picture, kept live",
-                  "AI that drafts — the doctor approves",
+                  "Upload a scan, get a clear visual",
+                  "AI drafts the 90-day plan",
+                  "The doctor approves — always",
                 ].map((t) => (
                   <div key={t} className="mkt-item">{t}</div>
                 ))}
@@ -100,8 +101,8 @@ export default function CompanyPage() {
               <div className="mkt-mock-body">
                 {[
                   ["The doctor is never out of the loop", "by design"],
-                  ["Patients keep their own data", "portable"],
-                  ["A clinic's data stays its own", "isolated"],
+                  ["Clients follow a clear plan", "scheduled"],
+                  ["A practice's data stays its own", "isolated"],
                 ].map(([k, v]) => (
                   <div key={k} className="mkt-stat">
                     <span>{k}</span>
@@ -115,8 +116,8 @@ export default function CompanyPage() {
             <p className="mkt-kicker">What we hold to</p>
             <h2 className="mkt-h2">A few things we won&apos;t trade away.</h2>
             <p className="mkt-p">
-              We&apos;re a small team building for clinicians we listen to closely. These hold whether
-              you&apos;re our first clinic or our hundredth.
+              We&apos;re a small team building for the doctors we listen to closely. These hold whether
+              you&apos;re our first practice or our hundredth.
             </p>
           </div>
         </div>
@@ -125,7 +126,7 @@ export default function CompanyPage() {
       {/* ---- CTA ---- */}
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2">Building a clinic like this?</h2>
+          <h2 className="mkt-h2">Building a practice like this?</h2>
           <p className="mkt-lead mkt-cta-lead">
             We&apos;d like to hear how you practice. Let&apos;s talk.
           </p>
