@@ -12,16 +12,14 @@ export const metadata: Metadata = {
     "Central Health Intelligence keeps patient data live — wearables, labs and CGM in one picture, with AI that drafts and the doctor approves. For longevity, functional-medicine and integrative clinics. By Health Intelligency.",
 };
 
-/** A clean MacBook frame around a desktop screenshot. */
-function Laptop({ src, alt, tilt }: { src: string; alt: string; tilt?: boolean }) {
+/** A clean browser window around a desktop screenshot. */
+function Browser({ src, alt, label, tilt }: { src: string; alt: string; label?: string; tilt?: boolean }) {
   return (
-    <div className={`mkt-laptop${tilt ? " tilt" : ""}`}>
-      <div className="lid">
-        <div className="lid-screen">
-          <img src={`${SCREENS}/${src}`} alt={alt} width={1440} height={900} />
-        </div>
+    <div className={`mkt-screen${tilt ? " tilt" : ""}`}>
+      <div className="mkt-screen-bar">
+        {label ? <span className="mkt-screen-url">{label}</span> : null}
       </div>
-      <div className="base" />
+      <img src={`${SCREENS}/${src}`} alt={alt} width={1440} height={900} />
     </div>
   );
 }
@@ -65,7 +63,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="mkt-row-media">
-            <Laptop src="be-dashboard.png" alt="Central Health Intelligence — clinician morning briefing dashboard" tilt />
+            <Browser src="be-dashboard.png" alt="Central Health Intelligence — clinician morning briefing dashboard" label="app.healthintelligency.com" tilt />
           </div>
         </div>
         <div className="mkt-wrap mkt-hero-strip">
@@ -84,11 +82,8 @@ export default async function Home() {
       {/* ---- Personal Health Intelligence (patient app) ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap mkt-row rev">
-          <div className="mkt-row-media">
-            <div className="mkt-phone-duo">
-              <Phone src="fe-dashboard.png" alt="Personal Health Intelligence — the patient's health dashboard" />
-              <Phone src="fe-plan.png" alt="Personal Health Intelligence — the patient's care plan" />
-            </div>
+          <div className="mkt-row-media mkt-phone-center">
+            <Phone src="fe-dashboard.png" alt="Personal Health Intelligence — the patient's health dashboard" tilt />
           </div>
           <div>
             <p className="mkt-kicker">Personal Health Intelligence</p>
@@ -128,7 +123,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="mkt-row-media">
-            <Laptop src="be-records.png" alt="Clinician view — patient records with live data" />
+            <Browser src="be-records.png" alt="Clinician view — patient records with live data" label="app.healthintelligency.com/records" />
           </div>
         </div>
       </section>
@@ -137,7 +132,7 @@ export default async function Home() {
       <section className="mkt-section sand">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
-            <Laptop src="be-results-review.png" alt="Results review — lab and wearable data in one view" />
+            <Browser src="be-results-review.png" alt="Results review — lab and wearable data in one view" label="app.healthintelligency.com/results" />
           </div>
           <div>
             <p className="mkt-kicker">The connector moat</p>

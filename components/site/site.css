@@ -266,6 +266,16 @@
 }
 .mkt-screen img { width: 100%; display: block; }
 .mkt-screen.tilt { transform: rotate(-1deg); }
+/* a faux URL pill in the browser chrome (sits clear of the traffic lights) */
+.mkt-screen-url {
+  margin-left: 42px;
+  background: #fff; border: 1px solid rgba(0,0,0,.09); border-radius: 7px;
+  padding: 4px 14px; font-size: 12px; color: var(--muted); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px;
+}
+
+/* center a single device within its column */
+.mkt-phone-center { display: flex; justify-content: center; }
 
 /* ---- two phones, gently overlapped (used sparingly) ---- */
 .mkt-phone-duo { display: flex; justify-content: center; align-items: flex-start; }
