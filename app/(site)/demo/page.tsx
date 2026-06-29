@@ -11,20 +11,20 @@ export default function DemoPage() {
     <>
       {/* ---- Hero ---- */}
       <section className="mkt-section mkt-hero">
-        <div className="mkt-wrap" style={{ textAlign: "center", maxWidth: 680, margin: "0 auto" }}>
+        <div className="mkt-wrap mkt-demo-hero">
           <p className="mkt-kicker">No signup required</p>
-          <h1 className="mkt-display" style={{ fontSize: "clamp(2.2rem, 5vw, 3.2rem)" }}>
+          <h1 className="mkt-display mkt-demo-display">
             See CHI with real data.
           </h1>
           <p className="mkt-lead">
             A fully loaded demo clinic — 6 patients, 30 days of wearable data, morning briefings, AI drafts
             waiting for approval. Click in and explore.
           </p>
-          <div className="mkt-hero-cta" style={{ justifyContent: "center", marginTop: 28 }}>
+          <div className="mkt-hero-cta center">
             <a href="/api/demo" className="mkt-btn lg">Enter demo →</a>
             <Link href="/contact" className="mkt-btn ghost lg">Book a real demo</Link>
           </div>
-          <p style={{ marginTop: 16, fontSize: 13, color: "var(--muted)" }}>
+          <p className="mkt-demo-fine">
             Demo data resets daily · read-only wearable syncs · no real PHI
           </p>
         </div>
@@ -33,28 +33,25 @@ export default function DemoPage() {
       {/* ---- What you'll see ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 36 }}>What you&apos;ll find inside.</h2>
+          <h2 className="mkt-h2 mkt-demo-h2">What you&apos;ll find inside.</h2>
           <div className="mkt-three">
             <div>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>☀️</div>
               <h3>Morning briefing</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 6 patients pre-loaded with today&apos;s delta — what changed since their last visit,
                 what needs attention. Ken Patterson&apos;s sleep regression is already flagged.
               </p>
             </div>
             <div>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>🤖</div>
               <h3>AI drafts, doctor approves</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 SOAP notes and patient messages drafted and waiting in the approvals queue.
                 Approve, edit, or reject — nothing sends without your sign-off.
               </p>
             </div>
             <div>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>📊</div>
               <h3>Live wearable data</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Oura, Garmin, Dexcom CGM, Withings and Apple Health — 30 days of normalized
                 data in one view per patient.
               </p>
@@ -82,24 +79,24 @@ export default function DemoPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device tilt" role="img" aria-label="Ken Patterson morning briefing">
-              <div style={{ background: "var(--mint)", padding: "14px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
+              <div className="mkt-briefing-bar">
                 Morning briefing · today
               </div>
-              <div style={{ padding: 18 }}>
-                <div style={{ fontFamily: "var(--serif)", fontSize: 19, marginBottom: 2 }}>Ken Patterson</div>
-                <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>Since last visit · 11 days</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-briefing-name">Ken Patterson</div>
+                <div className="mkt-briefing-sub">Since last visit · 11 days</div>
                 {[
                   ["Resting HR", "+9 bpm", "up"],
                   ["Sleep", "−1.4 h / night", "down"],
                   ["Glucose, time in range", "−12%", "down"],
                 ].map(([k, v, dir]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+                  <div key={k} className="mkt-briefing-row">
                     <span>{k}</span>
-                    <strong style={{ color: dir === "down" ? "#bb5234" : "var(--ink)" }}>{v}</strong>
+                    <strong className={dir === "down" ? "mkt-val-down" : "mkt-val-up"}>{v}</strong>
                   </div>
                 ))}
-                <div style={{ marginTop: 14, padding: "11px 13px", background: "var(--mint-2)", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13.5, color: "var(--ink-2)" }}>
-                  <strong style={{ color: "var(--green)" }}>AI draft</strong> · Talking points ready — sleep regression and glucose trend.
+                <div className="mkt-briefing-draft">
+                  <strong className="mkt-draft-label">AI draft</strong> · Talking points ready — sleep regression and glucose trend.
                 </div>
               </div>
             </div>
@@ -111,7 +108,7 @@ export default function DemoPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Ready to see it?</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-demo-cta-lead">
             One click. No account needed.
           </p>
           <a href="/api/demo" className="mkt-btn lg">Enter demo →</a>

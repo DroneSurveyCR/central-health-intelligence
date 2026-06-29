@@ -249,6 +249,25 @@
 .mkt-faq-heading { text-align: center; margin-bottom: 32px; }
 .mkt-cta-lead { margin: 0 auto 26px; text-align: center; max-width: 56ch; }
 
+/* ---- demo page ---- */
+.mkt-demo-hero { text-align: center; max-width: 680px; margin: 0 auto; }
+.mkt-demo-display { font-size: clamp(2.2rem, 5vw, 3.2rem); }
+.mkt-hero-cta.center { justify-content: center; }
+.mkt-demo-fine { margin-top: 16px; font-size: 13px; color: var(--muted); }
+.mkt-demo-h2 { text-align: center; margin-bottom: 36px; }
+.mkt-demo-cta-lead { margin: 0 auto 26px; text-align: center; }
+
+/* briefing card (demo page mock) */
+.mkt-briefing-bar { background: var(--mint); padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.mkt-briefing-body { padding: 18px; }
+.mkt-briefing-name { font-family: var(--serif); font-size: 19px; margin-bottom: 2px; }
+.mkt-briefing-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.mkt-briefing-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.mkt-val-down { color: #bb5234; }
+.mkt-val-up { color: var(--ink); }
+.mkt-briefing-draft { margin-top: 14px; padding: 11px 13px; background: var(--mint-2); border: 1px solid var(--line); border-radius: 10px; font-size: 13.5px; color: var(--ink-2); }
+.mkt-draft-label { color: var(--green); }
+
 /* ---- two-device showcase ---- */
 .mkt-devices-duo {
   display: flex;
