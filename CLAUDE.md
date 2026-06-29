@@ -1,5 +1,11 @@
 # HealthSync Cloud — CLAUDE.md
 
+> 🛑 **STOP — SINGLE-OWNER REPO (Nick's directive, 2026-06-29).** Only ONE agent works in this
+> repo (Central Health Intelligence / Track B). If you are the **Casa Elev8 / Track A** agent
+> (`../healthsync-app`), **do NOT commit, push, or deploy here — stay on your own track.**
+> Two agents on this repo caused collisions and duplicate Vercel projects. If you're unsure
+> which track you are, STOP and ask Nick before touching this repo. See `COORDINATION.md`.
+
 > **Read `STATUS.md` first, every session.** It is the single source of truth.
 
 ## What this is
