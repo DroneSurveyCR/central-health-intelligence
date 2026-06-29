@@ -5,16 +5,21 @@
    radius, calm clinical voice. Lime is a whisper accent, never a button. */
 
 .mkt {
-  --bg: #ffffff;
-  --mint: #eef5ef;          /* soft mint section bg */
-  --mint-2: #f4f8f4;
-  --ink: #15352a;           /* forest-tinted near-black text */
+  --bg: #fffbf4;            /* warm paper base (demo --paper) */
+  --sand: #fff6ea;          /* sunlit cream section bg (demo --sand) */
+  --mint: #e7f1e8;          /* soft jungle-green section bg */
+  --mint-2: #fff6ea;        /* alias to sand for warm alternation */
+  --ink: #1e3a30;           /* deep rainforest green text (demo --ink) */
+  --ink-deep: #11241b;      /* darkest green — hero/footer surfaces */
   --ink-2: #2c4a3d;
-  --muted: #5d7268;         /* forest-tinted muted */
-  --green: #14834e;         /* primary */
+  --muted: #7b8a7e;         /* warm forest muted (demo --muted) */
+  --green: #14834e;         /* primary (shared with the demo) */
   --green-d: #0f6b40;       /* hover */
-  --line: #e3ebe4;          /* hairline */
-  --lime: #cdee6b;          /* whisper accent only */
+  --gold: #f4a63c;          /* sunset amber — warm accent */
+  --gold-d: #d98a26;        /* amber hover/border */
+  --gold-bg: #fceed4;       /* amber tint */
+  --line: #ece1ce;          /* warm hairline (demo --line) */
+  --lime: #f4a63c;          /* accent now warm amber, not lime */
   --maxw: 1080px;
 
   color: var(--ink);
@@ -40,8 +45,11 @@
 .mkt-section.tight { padding: 64px 0; }
 .mkt-section.mint { background: var(--mint); }
 .mkt-section.mint-2 { background: var(--mint-2); }
-.mkt-section.ink { background: var(--ink); color: #eaf3ec; }
-.mkt-section.ink .mkt-muted { color: #a9c3b5; }
+.mkt-section.sand { background: var(--sand); }
+.mkt-section.ink { background: var(--ink-deep); color: #f4ede0; }
+.mkt-section.ink .mkt-muted { color: #b7ccbd; }
+.mkt-section.ink .mkt-btn:not(.ghost) { background: var(--gold); color: #2a1a06; }
+.mkt-section.ink .mkt-btn:not(.ghost):hover { background: var(--gold-d); }
 
 /* ---- type ---- */
 .mkt-display {
@@ -65,7 +73,7 @@
 .mkt-muted { color: var(--muted); }
 .mkt-kicker { font-weight: 600; font-size: 14px; color: var(--green); margin: 0 0 14px; }
 .mkt-p { font-size: 16px; color: var(--ink-2); max-width: 64ch; }
-.mkt-lime-underline { box-shadow: inset 0 -0.38em 0 var(--lime); }
+.mkt-lime-underline { box-shadow: inset 0 -0.34em 0 rgba(244, 166, 60, 0.55); }
 
 /* ---- buttons (solid green; ghost = hairline) ---- */
 .mkt-btn {
@@ -82,7 +90,7 @@
 /* ---- top nav + submenus ---- */
 .mkt-nav {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 251, 244, 0.85);
   -webkit-backdrop-filter: saturate(160%) blur(12px);
   backdrop-filter: saturate(160%) blur(12px);
   border-bottom: 1px solid var(--line);
@@ -121,10 +129,25 @@
 .mkt-menu a span { display: block; font-size: 14.5px; font-weight: 600; }
 .mkt-menu a small { display: block; font-size: 12.5px; color: var(--muted); }
 
-/* ---- hero ---- */
-.mkt-hero { padding: 84px 0 40px; }
-.mkt-hero .mkt-lead { margin-top: 18px; }
-.mkt-hero-cta { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+/* ---- hero (dark rainforest block, sunset glow — modeled on the demo) ---- */
+.mkt-hero {
+  padding: 92px 0 56px;
+  background:
+    radial-gradient(120% 130% at 88% 8%, rgba(244, 166, 60, 0.18) 0%, rgba(244, 166, 60, 0) 46%),
+    radial-gradient(90% 120% at 0% 100%, rgba(31, 169, 184, 0.10) 0%, rgba(31, 169, 184, 0) 50%),
+    var(--ink-deep);
+  color: #f6efe2;
+}
+.mkt-hero .mkt-display { color: #fffaf0; }
+.mkt-hero .mkt-lead { margin-top: 18px; color: #d9e6db; }
+.mkt-hero .mkt-kicker { color: var(--gold); }
+.mkt-hero-cta { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+/* primary CTA in the hero goes warm amber, like the demo */
+.mkt-hero .mkt-btn:not(.ghost) { background: var(--gold); color: #2a1a06; }
+.mkt-hero .mkt-btn:not(.ghost):hover { background: var(--gold-d); }
+/* ghost CTA inverts for the dark ground */
+.mkt-hero .mkt-btn.ghost { color: #f6efe2; border-color: rgba(246, 239, 226, 0.34); }
+.mkt-hero .mkt-btn.ghost:hover { background: rgba(246, 239, 226, 0.08); }
 
 /* ---- device frame (floating screenshot) ---- */
 .mkt-device {
@@ -202,6 +225,11 @@
 .mkt-strip { display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: center; color: var(--muted); font-size: 14px; }
 .mkt-strip b { color: var(--ink); font-weight: 600; }
 .mkt-strip .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--line); }
+/* strip lives inside the dark hero — invert for the dark ground */
+.mkt-hero .mkt-strip { color: #b7ccbd; }
+.mkt-hero .mkt-strip b { color: #fffaf0; }
+.mkt-hero .mkt-strip .dot { background: rgba(246, 239, 226, 0.3); }
+.mkt-hero-strip { border-top: 1px solid rgba(246, 239, 226, 0.14); padding-top: 28px; }
 
 /* ---- feature rows (alternating, not identical cards) ---- */
 .mkt-row { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }

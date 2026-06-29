@@ -81,12 +81,12 @@ export default async function Home() {
             </div>
           </div>
           <div>
-            <p className="mkt-kicker">The patient app</p>
+            <p className="mkt-kicker">Personal Health Intelligence</p>
             <h2 className="mkt-h2">A concierge app for every patient.</h2>
             <p className="mkt-p">
-              When patients log in they see their results, their care plan and an AI assistant
-              trained on the clinic&apos;s own knowledge — not a generic chatbot. Booking, messages
-              and intake are all in the same place.
+              Patients get their own Personal Health Intelligence — results, care plan and an AI
+              assistant trained on the clinic&apos;s own knowledge, not a generic chatbot. Booking,
+              messages and intake all live in the same place.
             </p>
             <ul className="mkt-points">
               <li>Results and labs, mapped to trends over time</li>
