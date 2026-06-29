@@ -11,6 +11,8 @@ import {
   type PlanItem,
 } from "@/lib/plan/helpers";
 import PlanEditor from "./PlanEditor";
+import DraftPlanWithAiButton from "./DraftPlanWithAiButton";
+import { aiEnabled } from "@/lib/ai";
 
 export default async function StaffPlanPage({
   params,
@@ -53,10 +55,14 @@ export default async function StaffPlanPage({
         </h1>
         <p className="muted">90-Day Plan</p>
         <div className="card" style={{ marginTop: 18 }}>
-          <p style={{ margin: 0 }}>
-            No plan yet. Add the first item to start a 90-Day Reset for this patient.
+          <p style={{ margin: "0 0 12px" }}>
+            No plan yet. Let AI draft a 90-day plan from this client&apos;s uploaded data — you review
+            and approve it — or add items manually below.
           </p>
-          <PlanEditor patientId={patientId} phases={[]} />
+          <DraftPlanWithAiButton patientId={patientId} aiEnabled={aiEnabled} />
+          <div style={{ marginTop: 18, borderTop: "1px solid var(--line)", paddingTop: 16 }}>
+            <PlanEditor patientId={patientId} phases={[]} />
+          </div>
         </div>
       </div>
     );
