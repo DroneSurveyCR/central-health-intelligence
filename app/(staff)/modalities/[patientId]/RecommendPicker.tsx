@@ -112,7 +112,7 @@ export default function RecommendPicker({
           <textarea
             value={rationale}
             onChange={(e) => setRationale(e.target.value)}
-            placeholder="Patient reports low energy and poor recovery; trialing to observe HRV / energy response."
+            placeholder="Client reports low energy and poor recovery; trialing to observe HRV / energy response."
             rows={3}
             style={fieldStyle}
           />

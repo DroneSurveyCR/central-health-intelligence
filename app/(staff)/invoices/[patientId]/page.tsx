@@ -80,7 +80,7 @@ export default async function InvoicesPage({
 
   if (!patient)
     return (
-      <p className="muted">Patient not found, or you don&apos;t have access.</p>
+      <p className="muted">Client not found, or you don&apos;t have access.</p>
     );
 
   // PHI read — must be audited (no SELECT trigger).

@@ -42,7 +42,7 @@ export default async function StaffInbox() {
     if (!byPatient.has(m.patient_id)) {
       byPatient.set(m.patient_id, {
         patient_id: m.patient_id,
-        name: p ? `${p.first_name} ${p.last_name}`.trim() : "Patient",
+        name: p ? `${p.first_name} ${p.last_name}`.trim() : "Client",
         latest: m,
         unread: 0,
       });

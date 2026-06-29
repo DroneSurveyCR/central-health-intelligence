@@ -75,7 +75,7 @@ export default async function AnalyticsPage() {
       {/* ---------------- Overview: metric tiles ---------------- */}
       <p className="eyebrow">Overview</p>
       <div className="stat-grid" style={{ marginBottom: 28 }}>
-        <Stat label="Patients" value={String(m.totalPatients)} sub="Active records" />
+        <Stat label="Clients" value={String(m.totalPatients)} sub="Active records" />
         <Stat
           label="New patients (30d)"
           value={String(m.newPatients30d)}

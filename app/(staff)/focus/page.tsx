@@ -132,7 +132,7 @@ export default async function FocusPage({
       <div className="card" style={{ maxWidth: 760 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <h1 className="serif" style={{ fontSize: 30, margin: 0 }}>
-            {p ? `${p.first_name} ${p.last_name}` : "Patient"}
+            {p ? `${p.first_name} ${p.last_name}` : "Client"}
           </h1>
           <span className={`badge ${isExisting ? "existing" : "new"}`}>
             {isExisting ? "Existing" : "New"}

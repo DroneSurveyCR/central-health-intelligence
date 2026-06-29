@@ -26,7 +26,7 @@ export default async function PatientRecord({
     .maybeSingle();
 
   if (!patient)
-    return <p className="muted">Patient not found, or you don&apos;t have access.</p>;
+    return <p className="muted">Client not found, or you don&apos;t have access.</p>;
 
   // PHI read — must be audited (no SELECT trigger).
   await logAudit({ action: "view", resource: "patients", resourceId: id, patientId: id });

@@ -18,7 +18,7 @@ type Appt = {
 
 function pname(a: Appt) {
   const p = Array.isArray(a.patients) ? a.patients[0] : a.patients;
-  return p ? `${p.first_name} ${p.last_name?.[0] ?? ""}.` : "Patient";
+  return p ? `${p.first_name} ${p.last_name?.[0] ?? ""}.` : "Client";
 }
 function labelType(t: string | null) {
   return ({ consult: "Consult", follow_up: "Follow-up", scan_review: "Scan review", other: "Visit" } as Record<string, string>)[t ?? ""] ?? "Visit";

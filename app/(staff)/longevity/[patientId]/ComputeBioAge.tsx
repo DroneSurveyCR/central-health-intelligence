@@ -33,7 +33,7 @@ export default function ComputeBioAge({
     setComputeErr("");
     setOk("");
     if (chronoAge == null) {
-      setComputeErr("Patient date of birth is required to compute bio-age.");
+      setComputeErr("Client date of birth is required to compute bio-age.");
       return;
     }
     const map = extractMarkerMap(latestPanelMarkers);
@@ -50,7 +50,7 @@ export default function ComputeBioAge({
 
   async function record(biologicalAge: number, algorithm: string) {
     if (chronoAge == null) {
-      setErr("Patient date of birth is required to record a score.");
+      setErr("Client date of birth is required to record a score.");
       return;
     }
     setBusy(true);

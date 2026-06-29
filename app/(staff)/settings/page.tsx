@@ -44,7 +44,7 @@ export default async function SettingsPage() {
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
         <a className="btn ghost" href="/settings/modules">Modules</a>
         <a className="btn ghost" href="/settings/billing">Plan &amp; billing</a>
-        <a className="btn ghost" href="/settings/payments">Patient payments</a>
+        <a className="btn ghost" href="/settings/payments">Client payments</a>
         <a className="btn ghost" href="/settings/connectors">Connectors</a>
       </div>
 

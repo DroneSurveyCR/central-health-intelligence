@@ -81,7 +81,7 @@ export default async function AuditPage({
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--line)", background: "var(--bg)" }}>
-              {["Timestamp", "Actor ID", "Action", "Resource", "Resource ID", "Patient"].map(h => (
+              {["Timestamp", "Actor ID", "Action", "Resource", "Resource ID", "Client"].map(h => (
                 <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontWeight: 600, color: "var(--muted)", whiteSpace: "nowrap" }}>{h}</th>
               ))}
             </tr>

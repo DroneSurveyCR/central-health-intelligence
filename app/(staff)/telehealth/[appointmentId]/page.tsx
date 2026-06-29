@@ -21,7 +21,7 @@ type Appt = {
 
 function pname(a: Appt) {
   const p = Array.isArray(a.patients) ? a.patients[0] : a.patients;
-  return p ? `${p.first_name} ${p.last_name}` : "Patient";
+  return p ? `${p.first_name} ${p.last_name}` : "Client";
 }
 
 export default async function TelehealthPage({

@@ -20,7 +20,7 @@ export default async function BodyEditPage({
     .eq("id", patientId)
     .is("deleted_at", null)
     .maybeSingle();
-  if (!patient) return <p className="muted">Patient not found.</p>;
+  if (!patient) return <p className="muted">Client not found.</p>;
 
   const { data: scan } = await supabase
     .from("scans")

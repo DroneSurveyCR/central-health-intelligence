@@ -155,7 +155,7 @@ export default function RxPanel({
             <input
               value={pharmacyName}
               onChange={(e) => setPharmacyName(e.target.value)}
-              placeholder="Patient's preferred pharmacy"
+              placeholder="Client's preferred pharmacy"
               style={fieldStyle}
             />
           </label>

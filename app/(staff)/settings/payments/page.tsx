@@ -13,7 +13,7 @@ export default async function PaymentsPage() {
 
   return (
     <div style={{ maxWidth: 760, padding: "8px 4px" }}>
-      <h1 className="serif" style={{ fontSize: 26, marginBottom: 4 }}>Patient Payments</h1>
+      <h1 className="serif" style={{ fontSize: 26, marginBottom: 4 }}>Client Payments</h1>
       <p className="muted" style={{ marginTop: 0 }}>
         Connect your clinic’s own Stripe account so patient card payments land directly in <em>your</em> account.
         Central Health Intelligence never holds these funds — this is separate from your Central Health Intelligence subscription.

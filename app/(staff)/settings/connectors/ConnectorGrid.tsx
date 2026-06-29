@@ -7,7 +7,7 @@ type Connector = { id: string; label: string; description: string | null; accept
 
 const TARGET_LABEL: Record<string, string> = {
   scans: "Scans", lab_results: "Labs", body_composition: "Body comp",
-  files: "Files", patients: "Patients", visits: "Visits",
+  files: "Files", patients: "Clients", visits: "Visits",
 };
 
 export default function ConnectorGrid({ connectors }: { connectors: Connector[] }) {

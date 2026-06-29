@@ -29,7 +29,7 @@ export default async function StaffPlanPage({
     .maybeSingle();
 
   if (!patient)
-    return <p className="muted">Patient not found, or you don&apos;t have access.</p>;
+    return <p className="muted">Client not found, or you don&apos;t have access.</p>;
 
   // PHI read — must be audited (no SELECT trigger).
   await logAudit({ action: "view", resource: "plan", resourceId: patientId, patientId });

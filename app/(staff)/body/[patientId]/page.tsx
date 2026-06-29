@@ -20,7 +20,7 @@ export default async function StaffBody3DPage({
     .eq("id", patientId)
     .is("deleted_at", null)
     .maybeSingle();
-  if (!patient) return <p className="muted">Patient not found, or you don&apos;t have access.</p>;
+  if (!patient) return <p className="muted">Client not found, or you don&apos;t have access.</p>;
 
   await logAudit({ action: "view", resource: "body3d", resourceId: patientId, patientId });
 

@@ -56,7 +56,7 @@ export default async function StaffScansPage({
     .maybeSingle();
 
   if (!patient)
-    return <p className="muted">Patient not found, or you don&apos;t have access.</p>;
+    return <p className="muted">Client not found, or you don&apos;t have access.</p>;
 
   // PHI read — audited (no SELECT trigger).
   await logAudit({ action: "view", resource: "scans", resourceId: patientId, patientId });

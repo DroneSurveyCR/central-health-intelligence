@@ -216,7 +216,7 @@ export default async function ReportsHub({
             <thead>
               <tr>
                 <th style={th}>Number</th>
-                <th style={th}>Patient</th>
+                <th style={th}>Client</th>
                 <th style={th}>Status</th>
                 <th style={thR}>Total</th>
                 <th style={th}>Paid at</th>
@@ -292,7 +292,7 @@ export default async function ReportsHub({
               <thead>
                 <tr>
                   <th style={th}>Number</th>
-                  <th style={th}>Patient</th>
+                  <th style={th}>Client</th>
                   <th style={th}>Status</th>
                   <th style={th}>Due on</th>
                   <th style={thR}>Days overdue</th>

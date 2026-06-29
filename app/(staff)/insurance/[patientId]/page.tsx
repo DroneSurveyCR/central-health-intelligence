@@ -21,7 +21,7 @@ export default async function InsurancePage({
     .maybeSingle();
 
   if (!patient)
-    return <p className="muted">Patient not found, or you don&apos;t have access.</p>;
+    return <p className="muted">Client not found, or you don&apos;t have access.</p>;
 
   await logAudit({ action: "view", resource: "patient_insurance", resourceId: null, patientId });
 

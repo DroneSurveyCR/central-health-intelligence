@@ -58,7 +58,7 @@ export default async function StaffLayout({
       <aside className="side-nav">
         <Link href="/focus" className="brand">Central Health Intelligence</Link>
         <Link href="/focus">{ICONS.focus}<span>Focus</span></Link>
-        <Link href="/patients">{ICONS.patients}<span>Patients</span></Link>
+        <Link href="/patients">{ICONS.patients}<span>Clients</span></Link>
         <Link href="/calendar">{ICONS.calendar}<span>Calendar</span></Link>
         <Link href="/inbox">
           {ICONS.messages}

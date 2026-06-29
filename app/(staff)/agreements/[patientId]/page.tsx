@@ -20,7 +20,7 @@ export default async function StaffAgreementsPage({
     .maybeSingle();
 
   if (!patient)
-    return <p className="muted">Patient not found, or you don&apos;t have access.</p>;
+    return <p className="muted">Client not found, or you don&apos;t have access.</p>;
 
   // PHI read — must be audited.
   await logAudit({

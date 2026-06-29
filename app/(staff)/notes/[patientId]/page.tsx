@@ -41,7 +41,7 @@ export default async function NotesPage({
   if (!patient) {
     return (
       <p className="muted">
-        Patient not found, or you don&apos;t have access.
+        Client not found, or you don&apos;t have access.
       </p>
     );
   }
