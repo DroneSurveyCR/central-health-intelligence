@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getCurrentPractitioner, getCurrentPatient } from "@/lib/auth/roles";
 import SiteShell from "@/components/site/SiteShell";
 
+const SCREENS = "https://cryptorica.vercel.app/health-sync/assets/screens";
+
 export const metadata: Metadata = {
   title: { absolute: "Central Health Intelligence — live health intelligence for clinics" },
   description:
@@ -29,9 +31,8 @@ export default async function Home() {
               One patient <span className="mkt-lime-underline">picture</span>.
             </h1>
             <p className="mkt-lead">
-              Central Health Intelligence keeps your patients&apos; data live — wearables, labs and CGM in
-              one view — with AI that drafts and the doctor approves. Built for the longevity,
-              functional-medicine and integrative clinics the big EHRs overlook.
+              A live health platform for longevity, functional-medicine and integrative clinics.
+              Wearables, labs and CGM in one view — AI drafts, the doctor approves, the patient owns their copy.
             </p>
             <div className="mkt-hero-cta">
               <Link href="/contact" className="mkt-btn lg">Book a demo</Link>
@@ -39,24 +40,14 @@ export default async function Home() {
             </div>
           </div>
           <div className="mkt-row-media">
-            <div className="mkt-device tilt" role="img" aria-label="Central Health Intelligence — clinician morning briefing dashboard">
-              <div className="mkt-briefing-bar">Morning briefing · Mon 9 Jun</div>
-              <div className="mkt-briefing-body">
-                <div className="mkt-briefing-row">
-                  <div className="mkt-briefing-name">Aria Solberg</div>
-                  <div className="mkt-briefing-sub">Longevity · follow-up Tue</div>
-                </div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">HRV 7-day avg</span><span className="mkt-stat-val red">↓ 38 ms</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Glucose, time in range</span><span className="mkt-stat-val red">−12%</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Sleep efficiency</span><span className="mkt-stat-val ink">74%</span></div>
-                <div className="mkt-briefing-row">
-                  <div className="mkt-briefing-name">Marcus Webb</div>
-                  <div className="mkt-briefing-sub">Peptide / GLP-1 · labs due</div>
-                </div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">ApoB</span><span className="mkt-stat-val ink">82 mg/dL</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Weight trend</span><span className="mkt-stat-val green">−1.8 kg</span></div>
-                <div className="mkt-briefing-note">AI-drafted talking points ready · awaiting your review</div>
-              </div>
+            <div className="mkt-screen tilt">
+              <div className="mkt-screen-bar" />
+              <img
+                src={`${SCREENS}/be-dashboard.png`}
+                alt="Central Health Intelligence — clinician morning briefing dashboard"
+                width={680}
+                height={420}
+              />
             </div>
           </div>
         </div>
@@ -73,94 +64,104 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ---- The wedge: Doctor / AI / Patient ---- */}
+      {/* ---- Patient app ---- */}
       <section className="mkt-section mint">
-        <div className="mkt-wrap">
-          <p className="mkt-kicker">Why we&apos;re different</p>
-          <h2 className="mkt-h2">Most systems store your patients&apos; data. We keep it live.</h2>
-          <p className="mkt-lead mkt-wedge-lead">
-            Legacy EHRs are filing cabinets. Central Health Intelligence is a live picture — every source
-            flowing in, AI watching for what changed, the doctor deciding what matters.
-          </p>
-          <div className="mkt-three">
-            <div>
-              <h3>The doctor leads</h3>
-              <p className="mkt-muted mkt-three-p">
-                A morning briefing of what changed since each visit. Nothing is decided without them.
-              </p>
-            </div>
-            <div>
-              <h3>AI synthesizes</h3>
-              <p className="mkt-muted mkt-three-p">
-                Drafts notes, replies and talking points from the live data — and waits for approval.
-              </p>
-            </div>
-            <div>
-              <h3>The patient owns</h3>
-              <p className="mkt-muted mkt-three-p">
-                Their data, their copy — connected from their own devices, portable on request.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---- Connectors (the moat) ---- */}
-      <section className="mkt-section">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
-            <div className="mkt-device" role="img" aria-label="Patient records with live wearable and lab data in one view">
-              <div className="mkt-briefing-bar">Connected sources · Aria Solberg</div>
-              <div className="mkt-briefing-body">
-                <div className="mkt-connector-row"><span>Oura Ring</span><span className="mkt-connector-state on">● synced 2m ago</span></div>
-                <div className="mkt-connector-row"><span>Apple Health</span><span className="mkt-connector-state on">● synced 6m ago</span></div>
-                <div className="mkt-connector-row"><span>Dexcom CGM</span><span className="mkt-connector-state on">● live</span></div>
-                <div className="mkt-connector-row"><span>Withings scale</span><span className="mkt-connector-state on">● synced 1h ago</span></div>
-                <div className="mkt-connector-row"><span>Quest labs</span><span className="mkt-connector-state on">● 3 panels imported</span></div>
-                <div className="mkt-briefing-note">All sources current · next sync in 4m</div>
+            <div className="mkt-phone-row">
+              <div className="mkt-phone">
+                <img src={`${SCREENS}/fe-dashboard.png`} alt="Patient app — health dashboard" width={390} height={844} />
+              </div>
+              <div className="mkt-phone">
+                <img src={`${SCREENS}/fe-plan.png`} alt="Patient app — care plan" width={390} height={844} />
+              </div>
+              <div className="mkt-phone">
+                <img src={`${SCREENS}/fe-assistant.png`} alt="Patient app — AI assistant" width={390} height={844} />
               </div>
             </div>
           </div>
           <div>
-            <p className="mkt-kicker">The connector moat</p>
-            <h2 className="mkt-h2">Real-time data, from every source.</h2>
+            <p className="mkt-kicker">The patient app</p>
+            <h2 className="mkt-h2">A concierge app for every patient.</h2>
             <p className="mkt-p">
-              Wearables, CGM, scales and labs sync continuously into one normalized picture — the thing
-              storage-first EHRs and data-only platforms can&apos;t give a clinic.
+              When patients log in they see their results, their care plan and an AI assistant
+              trained on the clinic&apos;s own knowledge — not a generic chatbot. Booking, messages
+              and intake are all in the same place.
             </p>
             <ul className="mkt-points">
-              <li>Patient-connected — Oura, Apple Health, Garmin, Withings, Dexcom</li>
-              <li>Labs by CSV, PDF or FHIR, mapped to trends automatically</li>
-              <li>One snapshot per patient, scoped so no clinic ever sees another&apos;s data</li>
+              <li>Results and labs, mapped to trends over time</li>
+              <li>AI assistant answers from the clinic&apos;s own protocols</li>
+              <li>Care plan, booking, messages and intake — one app</li>
+              <li>Before / after progress view for motivation</li>
             </ul>
           </div>
         </div>
       </section>
 
-      {/* ---- Briefing feature row ---- */}
-      <section className="mkt-section mint-2">
+      {/* ---- Clinician view ---- */}
+      <section className="mkt-section">
         <div className="mkt-wrap mkt-row">
           <div>
-            <p className="mkt-kicker">Your day, pre-read</p>
+            <p className="mkt-kicker">The clinician dashboard</p>
             <h2 className="mkt-h2">Walk in already knowing what changed.</h2>
             <p className="mkt-p">
-              Each morning, a per-patient delta: what moved since the last visit, what needs attention,
-              and AI-drafted talking points — review and approve, never auto-applied.
+              Each morning the system computes what moved for every patient since their last visit.
+              The clinician opens a short briefing — not a dashboard to assemble. AI drafts talking
+              points from the data; the doctor reads, edits and approves before anything is applied.
             </p>
+            <ul className="mkt-points">
+              <li>Per-patient delta since the last visit, every morning</li>
+              <li>Severity-sorted triage worklist for the whole team</li>
+              <li>AI-drafted notes and talking points — never auto-applied</li>
+              <li>Results review, plan builder, calendar and campaigns</li>
+            </ul>
             <div className="mkt-action">
               <Link href="/platform/intelligence" className="mkt-btn ghost">How the intelligence layer works</Link>
             </div>
           </div>
           <div className="mkt-row-media">
-            <div className="mkt-device tilt" role="img" aria-label="Patient app — personal health intelligence on mobile">
-              <div className="mkt-briefing-bar">Your morning · Mon 9 Jun</div>
-              <div className="mkt-briefing-body">
-                <div className="mkt-stat"><span className="mkt-alert-sub">HRV last night</span><span className="mkt-stat-val green">52 ms ↑</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Sleep</span><span className="mkt-stat-val ink">7h 14m · 81%</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Glucose, 24h avg</span><span className="mkt-stat-val ink">94 mg/dL</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Steps yesterday</span><span className="mkt-stat-val green">9,402</span></div>
-                <div className="mkt-briefing-note">Message from Dr Elara · tap to read</div>
-              </div>
+            <div className="mkt-screen">
+              <div className="mkt-screen-bar" />
+              <img
+                src={`${SCREENS}/be-records.png`}
+                alt="Clinician view — patient records with live data"
+                width={680}
+                height={420}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---- Connectors ---- */}
+      <section className="mkt-section mint-2">
+        <div className="mkt-wrap mkt-row rev">
+          <div className="mkt-row-media">
+            <div className="mkt-screen">
+              <div className="mkt-screen-bar" />
+              <img
+                src={`${SCREENS}/be-results-review.png`}
+                alt="Results review — lab and wearable data in one view"
+                width={680}
+                height={420}
+              />
+            </div>
+          </div>
+          <div>
+            <p className="mkt-kicker">The connector moat</p>
+            <h2 className="mkt-h2">Every source, live.</h2>
+            <p className="mkt-p">
+              Patients connect their own wearables once. From there, Oura, Apple Health, Garmin,
+              Withings and Dexcom CGM sync continuously into one normalized picture — alongside
+              labs imported by CSV, PDF or FHIR feed.
+            </p>
+            <ul className="mkt-points">
+              <li>Oura, Apple Health, Garmin, Withings, Dexcom CGM</li>
+              <li>Labs by CSV, PDF or FHIR — mapped to trends automatically</li>
+              <li>One snapshot per patient, scoped so no clinic sees another&apos;s data</li>
+            </ul>
+            <div className="mkt-action">
+              <Link href="/platform/connectors" className="mkt-btn ghost">Connectors in detail</Link>
             </div>
           </div>
         </div>
@@ -169,31 +170,29 @@ export default async function Home() {
       {/* ---- Two-device showcase ---- */}
       <section className="mkt-section">
         <div className="mkt-wrap">
-          <p className="mkt-kicker">Anywhere</p>
-          <h2 className="mkt-h2">One platform. Clinic and patient, in sync.</h2>
-          <p className="mkt-p">
-            Clinicians work from a full dashboard. Patients connect from their phone — wearables,
-            results and messaging all in one place, with no extra apps to install.
+          <p className="mkt-kicker">Clinic and patient, in sync</p>
+          <h2 className="mkt-h2">One platform. Every touchpoint.</h2>
+          <p className="mkt-p mkt-p-lead-gap">
+            From scheduling and campaigns to the patient&apos;s before-and-after view —
+            everything runs in the same system.
           </p>
           <div className="mkt-devices-duo">
-            <div className="mkt-device" role="img" aria-label="Central Health Intelligence scheduling and calendar view">
-              <div className="mkt-briefing-bar">Today · 6 appointments</div>
-              <div className="mkt-briefing-body">
-                <div className="mkt-stat"><span className="mkt-alert-sub">09:00</span><span>Aria Solberg · follow-up</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">10:30</span><span>Marcus Webb · intake</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">11:15</span><span>Priya Nair · labs review</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">14:00</span><span>James Okafor · peptide check-in</span></div>
-                <div className="mkt-briefing-note">2 AI draft notes ready for review</div>
-              </div>
+            <div className="mkt-screen">
+              <div className="mkt-screen-bar" />
+              <img
+                src={`${SCREENS}/be-calendar.png`}
+                alt="Central Health Intelligence scheduling and calendar view"
+                width={680}
+                height={460}
+              />
             </div>
-            <div className="mkt-device" role="img" aria-label="Patient app — progress tracking and before/after view">
-              <div className="mkt-briefing-bar">Your progress · 90 days</div>
-              <div className="mkt-briefing-body">
-                <div className="mkt-stat"><span className="mkt-alert-sub">Weight</span><span className="mkt-stat-val green">−6.2 kg</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">HRV trend</span><span className="mkt-stat-val green">+14 ms</span></div>
-                <div className="mkt-stat"><span className="mkt-alert-sub">Glucose avg</span><span className="mkt-stat-val green">↓ 8 mg/dL</span></div>
-                <div className="mkt-briefing-note">Next visit: Tue 10:30 with Dr Elara</div>
-              </div>
+            <div className="mkt-phone">
+              <img
+                src={`${SCREENS}/fe-before-after.png`}
+                alt="Patient app — progress tracking and before/after view"
+                width={390}
+                height={844}
+              />
             </div>
           </div>
         </div>

@@ -191,6 +191,13 @@
 .mkt-screen img { width: 100%; display: block; }
 .mkt-screen.tilt { transform: rotate(-1deg); }
 
+/* ---- phone row (patient app screens side by side) ---- */
+.mkt-phone-row { display: flex; gap: 20px; align-items: flex-start; justify-content: center; }
+.mkt-phone-row .mkt-phone { width: 160px; border-radius: 32px; }
+.mkt-phone-row .mkt-phone::before { width: 66px; height: 20px; border-radius: 0 0 14px 14px; }
+@media (max-width: 880px) { .mkt-phone-row { gap: 12px; } .mkt-phone-row .mkt-phone { width: 130px; } }
+@media (max-width: 640px) { .mkt-phone-row { gap: 8px; } .mkt-phone-row .mkt-phone { width: 90px; border-radius: 20px; } }
+
 /* ---- credibility strip ---- */
 .mkt-strip { display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: center; color: var(--muted); font-size: 14px; }
 .mkt-strip b { color: var(--ink); font-weight: 600; }
