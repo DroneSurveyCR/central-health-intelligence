@@ -386,7 +386,8 @@
 .mkt-price-unit { font-size: 13px; color: var(--muted); font-family: var(--sans); }
 
 /* comparison table */
-.mkt-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); }
+.mkt-table-clip { border-radius: 14px; border: 1px solid var(--line); overflow: hidden; }
+.mkt-table-wrap { overflow-x: auto; }
 .mkt-table { width: 100%; min-width: 700px; border-collapse: collapse; }
 .mkt-table th { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); font-weight: 600; font-size: 14px; color: var(--ink); background: var(--mint); vertical-align: bottom; }
 .mkt-table th:last-child { border-right: none; }
@@ -410,7 +411,106 @@
 .mkt-isolation-tier { font-size: 13px; margin: 0; font-weight: 600; color: var(--green); }
 
 /* nav login link */
-.mkt-login-link { font-size: 15px; color: var(--ink-2); padding: 10px 14px; display: inline-flex; align-items: center; min-height: 44px; }
+.mkt-login-link { font-size: 15px; color: var(--ink-2); padding: 10px 14px; display: inline-flex; align-items: center; min-height: 44px; transition: color .12s; }
+.mkt-login-link:hover { color: var(--ink); }
 /* footer overrides */
 .mkt-foot-brand { color: #fff; }
 .mkt-foot-about { margin-top: 14px; max-width: 32ch; font-size: 14px; }
+
+/* module cell description */
+.mkt-module-cell-desc { font-size: 14px; line-height: 1.45; margin: 0; color: var(--muted); }
+/* small sub-paragraph inside three-up cards */
+.mkt-three-sub { font-size: 13.5px; margin: 0; color: var(--muted); }
+/* inline ink-colored emphasis inside muted text */
+.mkt-ink { color: var(--ink); }
+
+/* ====================================================================
+   ROUND-2 ENHANCEMENTS — hover polish, animation, depth, typographic
+   refinements. All via cascade (later rules win).
+   ==================================================================== */
+
+/* Tighter display headline at large sizes */
+.mkt-display { letter-spacing: -0.022em; }
+
+/* Button: lift + glow on hover, reset on active */
+.mkt-btn {
+  transition: background .15s, transform .12s ease, box-shadow .15s;
+}
+.mkt-btn:hover {
+  background: var(--green-d);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(20, 131, 78, 0.28);
+}
+.mkt-btn:active { transform: none; box-shadow: none; }
+.mkt-btn.ghost:hover { background: var(--mint); transform: translateY(-1px); box-shadow: none; }
+
+/* Ghost button on dark (ink) backgrounds */
+.mkt-section.ink .mkt-btn.ghost {
+  color: rgba(255, 255, 255, 0.88);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.mkt-section.ink .mkt-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Three-up cards: subtle lift on hover */
+.mkt-three > div { transition: box-shadow .16s, transform .16s; }
+.mkt-three > div:hover {
+  box-shadow: 0 8px 32px -8px rgba(20, 53, 42, 0.14);
+  transform: translateY(-2px);
+}
+.mkt-three h3 { font-size: 19px; letter-spacing: -0.01em; }
+
+/* Device mock cards: hover highlight */
+.mkt-appt-card, .mkt-item, .mkt-item-row, .mkt-approval-item {
+  transition: border-color .12s, background .12s;
+}
+.mkt-appt-card:hover, .mkt-item:hover { border-color: var(--green); background: var(--mint-2); }
+
+/* Module grid cell hover */
+.mkt-module-cell { transition: background .12s; }
+.mkt-module-cell:hover { background: var(--mint); }
+
+/* Module list row hover */
+.mkt-module-list-row { transition: background .12s; }
+.mkt-module-list-row:hover { background: var(--mint); }
+
+/* FAQ: open animation + summary hover */
+.mkt-faq summary { transition: color .12s; }
+.mkt-faq summary:hover { color: var(--green); }
+.mkt-faq p { animation: faq-in .2s ease both; }
+@keyframes faq-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Comparison table: row hover + CHI row accent strip */
+.mkt-table tbody tr { transition: background .1s; }
+.mkt-table tbody tr:hover:not(.mkt-hl) { background: var(--mint); }
+.mkt-table tr.mkt-hl td:first-child { border-left: 3px solid var(--green); padding-left: 13px; }
+
+/* Table corner clipping — add overflow:hidden to clip border-radius */
+.mkt-table-wrap { overflow: auto; }
+
+/* Briefing / stat / connector / milestone: no border on last child */
+.mkt-briefing-row:last-child { border-bottom: none; }
+.mkt-stat:last-child { border-bottom: none; }
+.mkt-connector-row:last-child { border-bottom: none; }
+.mkt-milestone-row:last-child { border-bottom: none; }
+
+/* Nav items: smooth transition */
+.mkt-navitem > a, .mkt-navitem > button { transition: background .12s, color .12s; }
+
+/* CTA band: slightly tighter vertical padding — it's a band not a feature section */
+.mkt-section.ink.mkt-cta { padding: 80px 0; }
+
+/* Device shadow: richer for more perceived depth */
+.mkt-device {
+  box-shadow:
+    0 32px 72px -36px rgba(20, 53, 42, 0.5),
+    0 4px 16px -4px rgba(20, 53, 42, 0.1);
+}
+
+/* Credibility strip: slightly larger for legibility */
+.mkt-strip { font-size: 13.5px; }
+
+/* Pricing three-up: paragraph needs space before the button */
+.mkt-three > div .mkt-btn { margin-top: 18px; }

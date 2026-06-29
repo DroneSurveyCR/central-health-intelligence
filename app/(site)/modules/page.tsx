@@ -43,7 +43,7 @@ function Grid({ items }: { items: Mod[] }) {
             <span className="mkt-module-cell-name">{m.name}</span>
             <span className="mkt-module-cell-price">{m.price}</span>
           </div>
-          <p className="mkt-muted" style={{ fontSize: 14, margin: 0, lineHeight: 1.45 }}>{m.desc}</p>
+          <p className="mkt-module-cell-desc">{m.desc}</p>
         </div>
       ))}
     </div>

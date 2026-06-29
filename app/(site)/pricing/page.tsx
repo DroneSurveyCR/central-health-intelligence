@@ -114,7 +114,7 @@ export default function PricingPage() {
                 One provider. The full platform — EHR core, scheduling, billing, patient portal,
                 engagement, intelligence, AI and connectors — always on.
               </p>
-              <p className="mkt-muted" style={{ fontSize: "13.5px", margin: 0 }}>Add modules à la carte below.</p>
+              <p className="mkt-three-sub">Add modules à la carte below.</p>
             </div>
             <div>
               <h3>Clinic</h3>
@@ -122,15 +122,15 @@ export default function PricingPage() {
                 Multiple providers, billed per seat. Shared schedule, shared patient records, role-based
                 access — the same live-data platform across the team.
               </p>
-              <p className="mkt-muted" style={{ fontSize: "13.5px", margin: 0 }}>Volume pricing as seats grow.</p>
+              <p className="mkt-three-sub">Volume pricing as seats grow.</p>
             </div>
             <div>
               <h3>HIPAA setup</h3>
               <p className="mkt-muted mkt-three-p">
-                A one-time compliance setup fee — <strong style={{ color: "var(--ink)" }}>$2,000–5,000</strong> —
+                A one-time compliance setup fee — <strong className="mkt-ink">$2,000–5,000</strong> —
                 covering compliant provisioning, BAA, data migration and white-glove onboarding.
               </p>
-              <p className="mkt-muted" style={{ fontSize: "13.5px", margin: 0 }}>Applies to HIPAA Cloud and Private Cloud.</p>
+              <p className="mkt-three-sub">Applies to HIPAA Cloud and Private Cloud.</p>
             </div>
           </div>
         </div>
@@ -172,6 +172,7 @@ export default function PricingPage() {
             Legacy EHRs store records and price per provider. We price the same way — and add the live-data,
             doctor-in-the-loop AI and patient-owned layer they don&apos;t offer.
           </p>
+          <div className="mkt-table-clip">
           <div className="mkt-table-wrap">
             <table className="mkt-table">
               <thead>
@@ -195,6 +196,7 @@ export default function PricingPage() {
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
           <p className="mkt-note">
             Competitor prices reflect publicly cited ranges from industry SaaS pricing surveys and vary by
