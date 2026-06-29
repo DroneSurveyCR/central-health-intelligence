@@ -11,13 +11,18 @@
 
 The sellable multi-tenant app is complete and live. Not a scaffold — the full product.
 
-- **Live:** https://healthsync-cloud-mu.vercel.app (Vercel, personalhealthintelligence team)
+- **Live:** https://healthsync-cloud-mu.vercel.app
 - **Repo:** `DroneSurveyCR/central-health-intelligence`, branch `main`
-- **Build/test health (verified 2026-06-28):** `tsc` clean · **79/79** unit tests · Playwright e2e 21/21 ·
+- **Deploy — ONE source of truth:** a single Vercel project on the **personalhealthintelligence**
+  account, connected to this GitHub repo with **git auto-deploy** (production branch `main`).
+  **Push to `main` → auto-deploys to `-mu`.** No manual CLI deploys, no duplicate projects.
+  (The old DroneSurveyCR `healthsync-cloud`/`-pi` duplicate was deleted 2026-06-29.)
+- **Build/test health (verified 2026-06-28):** `tsc` clean · **82/82** unit tests · Playwright e2e 21/21 ·
   smoke gate 45/45 · runtime tenant-isolation **0 leaks across 18 tables**
 - **Score:** **116/140** — the buildable production ceiling. The remaining ~24 points are
   external-gated (clinician sign-off, BAAs, live keys, dev-app approvals, legal) — see `ACTIVATION.md`.
-- **`middleware.ts` is ACTIVE** (edge-safe session refresh + tenant rewrite; APIs exempt so crons/callbacks survive).
+- **`middleware.ts` is ACTIVE + edge-safe** (uses global Web Crypto, NOT Node `crypto` — the
+  latter crashed the Edge runtime and silently froze prod on an old build; fixed 2026-06-28).
 
 ## What's built (all gated, all deployed)
 
