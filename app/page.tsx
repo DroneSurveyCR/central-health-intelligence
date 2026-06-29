@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentPractitioner, getCurrentPatient } from "@/lib/auth/roles";
 import SiteShell from "@/components/site/SiteShell";
 
-const SCREENS = "https://cryptorica.vercel.app/health-sync/assets/screens";
+const SCREENS = "/screens";
 
 export const metadata: Metadata = {
   title: { absolute: "Central Health Intelligence — live health intelligence for clinics" },
