@@ -24,7 +24,7 @@ export function buildICal(practiceName: string, appts: Appt[]) {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    `PRODID:-//HealthSync//${practiceName}//EN`,
+    `PRODID:-//Central Health Intelligence//${practiceName}//EN`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];

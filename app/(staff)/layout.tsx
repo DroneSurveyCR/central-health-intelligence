@@ -49,7 +49,7 @@ export default async function StaffLayout({
   return (
     <div className="app-shell">
       <aside className="side-nav">
-        <Link href="/focus" className="brand">HealthSync</Link>
+        <Link href="/focus" className="brand">Central Health Intelligence</Link>
         <Link href="/focus">{ICONS.focus}<span>Focus</span></Link>
         <Link href="/patients">{ICONS.patients}<span>Patients</span></Link>
         <Link href="/calendar">{ICONS.calendar}<span>Calendar</span></Link>

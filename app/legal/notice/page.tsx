@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-export const metadata = { title: "Notice of Privacy Practices (HIPAA) — Casa Elev8" };
+export const metadata = { title: "Notice of Privacy Practices (HIPAA) — Health Intelligency" };
 
 const UPDATED = "June 2026";
 
@@ -7,7 +7,7 @@ export default function Notice() {
   return (
     <article>
       <div style={{ background: "rgba(244,166,60,0.12)", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 16px", marginBottom: 24, fontSize: 13.5 }}>
-        <strong>Draft template.</strong> This U.S. HIPAA Notice of Privacy Practices applies only when Casa Elev8 operates as a
+        <strong>Draft template.</strong> This U.S. HIPAA Notice of Privacy Practices applies only when Health Intelligency operates as a
         HIPAA-covered entity (for example, serving U.S. patients). It is a starting point — have it reviewed by qualified U.S.
         healthcare-privacy counsel, and put Business Associate Agreements in place with each vendor, before relying on it.
       </div>
@@ -22,7 +22,7 @@ export default function Notice() {
 
       <h2 className="serif">Our duties</h2>
       <p>
-        Casa Elev8 / Elev8 Health is required by law to maintain the privacy of your protected health information (PHI), to
+        Health Intelligency is required by law to maintain the privacy of your protected health information (PHI), to
         give you this Notice of our legal duties and privacy practices, and to follow the terms of the Notice currently in
         effect. We are required to notify you following a breach of unsecured PHI.
       </p>
@@ -58,7 +58,7 @@ export default function Notice() {
       <p>We may change this Notice and make the new terms effective for all PHI we maintain. The current Notice will always be posted here.</p>
 
       <h2 className="serif">Contact</h2>
-      <p>For questions or to exercise your rights, contact the Casa Elev8 Privacy Officer at <strong>info@elev8.health</strong>.</p>
+      <p>For questions or to exercise your rights, contact the Health Intelligency Privacy Officer at <strong>info@elev8.health</strong>.</p>
     </article>
   );
 }

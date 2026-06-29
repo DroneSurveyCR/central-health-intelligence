@@ -5,7 +5,7 @@ export default function MfaPage() {
     <main className="auth-shell">
       <div className="auth-brand">
         <div className="mark">H</div>
-        <b>HealthSync</b>
+        <b>Central Health Intelligence</b>
       </div>
       <MfaChallenge />
     </main>

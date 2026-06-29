@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-export const metadata = { title: "Terms of Service — Casa Elev8" };
+export const metadata = { title: "Terms of Service — Health Intelligency" };
 
 const UPDATED = "June 2026";
 
@@ -7,20 +7,20 @@ export default function Terms() {
   return (
     <article>
       <div style={{ background: "rgba(244,166,60,0.12)", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 16px", marginBottom: 24, fontSize: 13.5 }}>
-        <strong>Draft template.</strong> Prepared for Casa Elev8 as a starting point. Have it reviewed by qualified legal counsel before relying on it.
+        <strong>Draft template.</strong> Prepared for Health Intelligency as a starting point. Have it reviewed by qualified legal counsel before relying on it.
       </div>
 
       <h1 className="serif" style={{ fontSize: 30, margin: "0 0 4px" }}>Terms of Service</h1>
       <p className="muted" style={{ marginTop: 0 }}>Last updated: {UPDATED}</p>
 
       <p>
-        These Terms govern your use of the HealthSync patient application provided by <strong>Casa Elev8 / Elev8 Health</strong>
+        These Terms govern your use of the Central Health Intelligence patient application provided by <strong>Health Intelligency</strong>
         ("we," "us"). By creating an account or using the Service, you agree to these Terms.
       </p>
 
       <h2 className="serif">1. What the Service is</h2>
       <p>
-        The Service is a tool to help you manage your care with Casa Elev8 — your program, daily plan, results, appointments,
+        The Service is a tool to help you manage your care with Health Intelligency — your program, daily plan, results, appointments,
         messages, and billing. It supports your care; it does not replace the professional judgment of your practitioner.
       </p>
 
@@ -38,7 +38,7 @@ export default function Terms() {
 
       <h2 className="serif">3. Medical disclaimer</h2>
       <p>
-        Information in the app (including plans, educational articles, and scan summaries) is for your care with Casa Elev8 and
+        Information in the app (including plans, educational articles, and scan summaries) is for your care with Health Intelligency and
         general education. It is not a substitute for in-person evaluation, diagnosis, or treatment, and using the app alone does
         not create a practitioner-patient relationship. Always follow your practitioner's directions.
       </p>
@@ -76,7 +76,7 @@ export default function Terms() {
       <p>We may update these Terms and will post the updated version here with a new date. Continued use means you accept the changes.</p>
 
       <h2 className="serif">12. Contact</h2>
-      <p>Questions about these Terms? Contact Casa Elev8 at <strong>info@elev8.health</strong>.</p>
+      <p>Questions about these Terms? Contact Health Intelligency at <strong>info@elev8.health</strong>.</p>
     </article>
   );
 }

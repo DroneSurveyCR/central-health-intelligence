@@ -14,7 +14,7 @@ export default async function PatientLayout({
   return (
     <div>
       <header className="app-top">
-        <Link href="/home" className="brand">HealthSync</Link>
+        <Link href="/home" className="brand">Central Health Intelligence</Link>
         <PatientNav
           wearables={modules.has("wearables")}
           engagement={modules.has("engagement")}

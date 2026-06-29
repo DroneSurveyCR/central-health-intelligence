@@ -44,15 +44,15 @@ export async function generateMetadata({
   const article = data as { title?: string | null; excerpt?: string | null; body?: string | null } | null;
 
   if (!article) {
-    return { title: "Article not found · HealthSync" };
+    return { title: "Article not found · Central Health Intelligence" };
   }
 
-  const title = `${article.title ?? "Article"} · HealthSync`;
+  const title = `${article.title ?? "Article"} · Central Health Intelligence`;
   const snippet = (article.excerpt ?? article.body ?? "")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 160);
-  const description = snippet || "Read this article on HealthSync.";
+  const description = snippet || "Read this article on Central Health Intelligence.";
 
   return {
     title,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Legal — Casa Elev8 / HealthSync" };
+export const metadata = { title: "Legal — Health Intelligency / Central Health Intelligence" };
 
 export default function LegalLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,7 +8,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
       <header style={{ borderBottom: "1px solid var(--line)", padding: "16px 20px" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <Link href="/" className="serif" style={{ fontSize: 18, fontWeight: 600, textDecoration: "none", color: "var(--ink)" }}>
-            Casa Elev8
+            Health Intelligency
           </Link>
           <nav style={{ display: "flex", gap: 18, fontSize: 14 }}>
             <Link href="/legal/privacy">Privacy</Link>

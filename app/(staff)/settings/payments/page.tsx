@@ -16,7 +16,7 @@ export default async function PaymentsPage() {
       <h1 className="serif" style={{ fontSize: 26, marginBottom: 4 }}>Patient Payments</h1>
       <p className="muted" style={{ marginTop: 0 }}>
         Connect your clinic’s own Stripe account so patient card payments land directly in <em>your</em> account.
-        HealthSync never holds these funds — this is separate from your HealthSync subscription.
+        Central Health Intelligence never holds these funds — this is separate from your Central Health Intelligence subscription.
       </p>
 
       {connected ? (

@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Public pages", () => {
   test("login page loads", async ({ page }) => {
     await page.goto("/login");
-    await expect(page).toHaveTitle(/HealthSync|Login/i);
+    await expect(page).toHaveTitle(/Central Health Intelligence|CHI|Login/i);
     await expect(page.locator("form")).toBeVisible();
     await expect(page.locator('input[type="email"], input[name="email"]')).toBeVisible();
   });

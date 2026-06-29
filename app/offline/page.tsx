@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "You're offline · HealthSync",
+  title: "You're offline · Central Health Intelligence",
 };
 
 export default function OfflinePage() {
@@ -44,7 +44,7 @@ export default function OfflinePage() {
           You&apos;re offline
         </h1>
         <p style={{ color: "#4a5a52", lineHeight: 1.5, margin: "0 0 24px" }}>
-          HealthSync can&apos;t reach the internet right now. Check your
+          Central Health Intelligence can&apos;t reach the internet right now. Check your
           connection and try again — your data is safe.
         </p>
         <Link

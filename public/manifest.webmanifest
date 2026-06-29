@@ -1,6 +1,6 @@
 {
-  "name": "HealthSync",
-  "short_name": "HealthSync",
+  "name": "Central Health Intelligence",
+  "short_name": "CHI",
   "description": "Your practice companion — appointments, plans and results in one place.",
   "start_url": "/home",
   "scope": "/",

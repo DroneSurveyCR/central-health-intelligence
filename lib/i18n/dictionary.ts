@@ -1,5 +1,5 @@
 /**
- * Lightweight, dependency-free i18n dictionary for HealthSync.
+ * Lightweight, dependency-free i18n dictionary for Central Health Intelligence.
  *
  * Patient-facing copy for Casa Elev8 (Costa Rica), serving English and
  * Spanish speakers. No runtime deps — just a typed record + a `t()` helper.

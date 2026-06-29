@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-export const metadata = { title: "Privacy Policy — Casa Elev8" };
+export const metadata = { title: "Privacy Policy — Health Intelligency" };
 
 const UPDATED = "June 2026";
 
@@ -7,15 +7,15 @@ export default function PrivacyPolicy() {
   return (
     <article>
       <div style={{ background: "rgba(244,166,60,0.12)", border: "1px solid var(--line)", borderRadius: 12, padding: "12px 16px", marginBottom: 24, fontSize: 13.5 }}>
-        <strong>Draft template.</strong> This document is a starting point prepared for Casa Elev8. Have it reviewed by qualified legal counsel for your jurisdiction (Costa Rica, and the United States if you serve U.S. patients) before relying on it.
+        <strong>Draft template.</strong> This document is a starting point prepared for Health Intelligency. Have it reviewed by qualified legal counsel for your jurisdiction (Costa Rica, and the United States if you serve U.S. patients) before relying on it.
       </div>
 
       <h1 className="serif" style={{ fontSize: 30, margin: "0 0 4px" }}>Privacy Policy</h1>
       <p className="muted" style={{ marginTop: 0 }}>Last updated: {UPDATED}</p>
 
       <p>
-        This Privacy Policy explains how <strong>Casa Elev8 / Elev8 Health</strong> ("we," "us," "the clinic") collects, uses,
-        stores, and protects your personal and health information when you use the HealthSync patient application and
+        This Privacy Policy explains how <strong>Health Intelligency</strong> ("we," "us," "the clinic") collects, uses,
+        stores, and protects your personal and health information when you use the Central Health Intelligence patient application and
         related services (the "Service"). We take the privacy of your health information seriously.
       </p>
 
@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
       <h2 className="serif">5. Who we share information with</h2>
       <p>We do not sell your information. We share it only:</p>
       <ul>
-        <li><strong>With your care team</strong> at Casa Elev8, to provide your care.</li>
+        <li><strong>With your care team</strong> at Health Intelligency, to provide your care.</li>
         <li><strong>With service providers</strong> who help us run the Service under contract and confidentiality obligations — currently our hosting and database provider (Supabase), application hosting (Vercel), transactional email (Resend), and payment processing (Stripe). These providers process data only on our instructions.</li>
         <li><strong>When required by law</strong>, or to protect the rights, safety, and security of patients and the clinic.</li>
       </ul>
@@ -88,7 +88,7 @@ export default function PrivacyPolicy() {
 
       <h2 className="serif">11. Contact us</h2>
       <p>
-        To exercise your rights or ask a privacy question, contact Casa Elev8 at <strong>info@elev8.health</strong>.
+        To exercise your rights or ask a privacy question, contact Health Intelligency at <strong>info@elev8.health</strong>.
         If you are in Costa Rica, you also have the right to lodge a complaint with the national data-protection authority (PRODHAB).
       </p>
     </article>

@@ -25,7 +25,7 @@ export const AGREEMENT_TEMPLATES: AgreementTemplate[] = [
     key: "privacy",
     title: "Privacy & Data Use",
     body:
-      "I understand that Casa Elev8 collects and stores my personal and health information to provide care, schedule appointments, and maintain my records. My information is kept confidential and protected, and access is limited to my care team on a need-to-know basis.\n\nI consent to the secure use of my data within HealthSync for the purposes of treatment, coordination, and practice administration. My information will not be sold, and it will not be shared with third parties except as required to deliver my care or as required by law.",
+      "I understand that Health Intelligency collects and stores my personal and health information to provide care, schedule appointments, and maintain my records. My information is kept confidential and protected, and access is limited to my care team on a need-to-know basis.\n\nI consent to the secure use of my data within Central Health Intelligence for the purposes of treatment, coordination, and practice administration. My information will not be sold, and it will not be shared with third parties except as required to deliver my care or as required by law.",
   },
   {
     key: "recording",

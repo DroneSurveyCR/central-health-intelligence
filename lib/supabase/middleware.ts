@@ -50,6 +50,8 @@ export async function updateSession(
   // API routes self-authenticate and must return JSON errors (or run with their own
   // secret/signed-state auth: cron, OAuth callbacks, webhooks) — never redirect them
   // to an HTML login. The middleware only bounces unauthenticated PAGE navigations.
+  // Public marketing site (the (site) route group) + auth/legal/public-clinic pages.
+  const MARKETING = ["/platform", "/for-clinicians", "/for-patients", "/modules", "/trust", "/pricing", "/company", "/contact"];
   const isPublic =
     path === "/" ||
     path.startsWith("/api/") ||
@@ -57,7 +59,8 @@ export async function updateSession(
     path.startsWith("/onboarding") ||
     path.startsWith("/p/") ||
     path.startsWith("/auth") ||
-    path.startsWith("/legal");
+    path.startsWith("/legal") ||
+    MARKETING.some((p) => path === p || path.startsWith(p + "/"));
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
