@@ -32,12 +32,12 @@ export const MODULES: Record<ModuleId, ModuleDef> = {
     tables: ["invoices", "invoice_items", "payments", "patient_insurance"],
   },
   portal: {
-    id: "portal", label: "Patient Portal (store & content)", price: 0, defaultOn: true,
+    id: "portal", label: "Client Portal (store & content)", price: 0, defaultOn: true,
     tables: ["products", "orders", "articles"],
   },
   engagement: {
-    id: "engagement", label: "Patient Engagement", price: 0, defaultOn: true,
-    // streaks, milestones, nudges, the patient AI assistant, protocol logging.
+    id: "engagement", label: "Client Engagement", price: 0, defaultOn: true,
+    // streaks, milestones, nudges, the client AI assistant, plan/protocol logging.
     tables: ["progress_logs", "plan_completions"],
   },
 
@@ -49,9 +49,12 @@ export const MODULES: Record<ModuleId, ModuleDef> = {
     tables: ["lab_results", "body_composition"],
   },
   wearables: {
-    id: "wearables", label: "Wearables & CGM", price: 49,
-    includedConnectors: ["oura", "apple_health", "garmin_csv", "whoop_csv", "hrv_csv"],
-    addonConnectors: ["terra", "dexcom_realtime", "withings"],
+    id: "wearables", label: "Device & Wearable Uploads", price: 49,
+    // MVP is manual upload only: file/export connectors are included. The live-OAuth
+    // providers (oura, dexcom_realtime, withings, terra) remain in code but are not
+    // shipped as included connectors — gated off until/if a clinic opts into live sync.
+    includedConnectors: ["apple_health", "garmin_csv", "whoop_csv", "hrv_csv"],
+    addonConnectors: ["oura", "terra", "dexcom_realtime", "withings"],
     tables: ["wearable_daily_summaries", "connector_oauth_tokens"],
   },
   weight: {
