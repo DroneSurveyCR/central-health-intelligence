@@ -102,7 +102,7 @@
 .mkt-navitem > button {
   display: inline-flex; align-items: center; gap: 5px;
   font: inherit; font-size: 15px; color: var(--ink-2); background: none; border: 0;
-  padding: 8px 12px; border-radius: 9px; cursor: pointer;
+  padding: 10px 14px; border-radius: 9px; cursor: pointer; min-height: 44px;
 }
 .mkt-navitem > a:hover,
 .mkt-navitem > button:hover { background: var(--mint); color: var(--ink); }
