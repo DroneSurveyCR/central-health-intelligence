@@ -3,27 +3,22 @@ import Link from "next/link";
 export const metadata = {
   title: "Pricing — Central Health Intelligence",
   description:
-    "A per-provider plan with the always-on platform, plus the modules you choose. Three editions — Cloud, HIPAA Cloud and Private Cloud. Honest pricing, live in days.",
+    "A per-provider plan with the always-on platform — intake, scheduling, the AI 90-day plan, the client app and tracking — plus the modules you choose. Three editions: Cloud, HIPAA Cloud and Private Cloud. Honest pricing, live in days.",
 };
 
 const MODULES: [string, string, string][] = [
-  ["Labs", "Panels mapped to trends", "$39"],
-  ["Wearables / CGM", "Oura, Dexcom, Garmin, Withings", "$49"],
-  ["Peptide / KAP / HRT", "Protocols for plant-medicine & hormones", "$79"],
-  ["Longevity", "Biological-age & risk tracking", "$49"],
+  ["Labs", "Upload panels, mapped to trends", "$39"],
   ["Nutrition", "Plans, logging, adherence", "$39"],
-  ["e-Prescribing", "Send & track prescriptions", "$49"],
+  ["Dispensary", "Sell supplements off the plan", "$39"],
   ["Telehealth", "Video visits in the record", "$49"],
-  ["Dispensary", "In-clinic products & supplements", "$39"],
-  ["Reports", "Patient-facing summaries", "$29"],
-  ["Marketplace", "Connect outside services", "$49"],
+  ["Reports", "Client-facing summaries", "$29"],
   ["Multi-site", "Run several locations", "$99"],
 ];
 
 const COMPARISON: { product: string; what: string; price: string; ai: string; patient: string; chi?: boolean }[] = [
   {
     product: "Central Health Intelligence",
-    what: "Live-data EHR + AI + patient layer",
+    what: "AI 90-day plans + client app",
     price: "Per-provider plan + modules",
     ai: "Yes / Yes",
     patient: "Yes",
@@ -48,15 +43,14 @@ export default function PricingPage() {
             <br />
             The modules you <span className="mkt-lime-underline">actually use</span>.
           </h1>
-          <p className="mkt-lead mkt-p-lead-md">
-            A per-provider monthly plan includes the always-on platform — EHR core, scheduling, billing,
-            patient portal, engagement, the intelligence and AI layer, and the connector engine. Add only
-            the modules your specialty needs. At parity with a legacy EHR, with the live-data and AI layer
-            they don&apos;t have.
+          <p className="mkt-lead mkt-hero-lead-wide">
+            A per-provider monthly plan includes the always-on platform — intake, scheduling, the AI
+            90-day plan and notes, the client app with its AI assistant, your dispensary and email list,
+            and progress tracking on both sides. Add only the modules your specialty needs.
           </p>
           <div className="mkt-hero-cta">
             <Link href="/contact" className="mkt-btn lg">Talk to us</Link>
-            <Link href="/modules" className="mkt-btn ghost lg">See the modules</Link>
+            <Link href="/product" className="mkt-btn ghost lg">See how it works →</Link>
           </div>
         </div>
       </section>
@@ -65,31 +59,31 @@ export default function PricingPage() {
       <section className="mkt-section mint">
         <div className="mkt-wrap">
           <p className="mkt-kicker">Three editions</p>
-          <h2 className="mkt-h2">Choose the isolation your clinic needs.</h2>
+          <h2 className="mkt-h2">Choose the isolation your practice needs.</h2>
           <p className="mkt-lead mkt-p-lead-md">
             Same product, same modules — the difference is where it runs and how it&apos;s governed.
           </p>
           <div className="mkt-three">
             <div>
-              <h3>Cloud</h3>
+              <h3 className="mkt-h3">Cloud</h3>
               <p className="mkt-muted mkt-three-p">
-                Shared multi-tenant cloud. Fastest and most affordable — live in days. Best for clinics
+                Shared multi-tenant cloud. Fastest and most affordable — live in days. Best for practices
                 outside the US PHI regime.
               </p>
               <Link href="/contact" className="mkt-btn ghost">Talk to us</Link>
             </div>
             <div>
-              <h3>HIPAA Cloud</h3>
+              <h3 className="mkt-h3">HIPAA Cloud</h3>
               <p className="mkt-muted mkt-three-p">
                 Managed compliant tier with signed BAAs and US-PHI-ready controls. The default for US
-                clinics handling protected health information.
+                practices handling protected health information.
               </p>
               <Link href="/contact" className="mkt-btn ghost">Talk to us</Link>
             </div>
             <div>
-              <h3>Private Cloud</h3>
+              <h3 className="mkt-h3">Private Cloud</h3>
               <p className="mkt-muted mkt-three-p">
-                A dedicated, isolated instance on your clinic&apos;s own VPS. White-label and enterprise,
+                A dedicated, isolated instance on your practice&apos;s own VPS. White-label and enterprise,
                 with full data residency control.
               </p>
               <Link href="/contact" className="mkt-btn ghost">Talk to us</Link>
@@ -109,23 +103,23 @@ export default function PricingPage() {
           </p>
           <div className="mkt-three">
             <div>
-              <h3>Solo</h3>
+              <h3 className="mkt-h3">Solo</h3>
               <p className="mkt-muted mkt-three-p">
-                One provider. The full platform — EHR core, scheduling, billing, patient portal,
-                engagement, intelligence, AI and connectors — always on.
+                One provider. The full platform — intake, scheduling, the AI 90-day plan and notes, the
+                client app and tracking — always on.
               </p>
               <p className="mkt-three-sub">Add modules à la carte below.</p>
             </div>
             <div>
-              <h3>Clinic</h3>
+              <h3 className="mkt-h3">Clinic</h3>
               <p className="mkt-muted mkt-three-p">
-                Multiple providers, billed per seat. Shared schedule, shared patient records, role-based
-                access — the same live-data platform across the team.
+                Multiple providers, billed per seat. Shared schedule, shared client records, role-based
+                access — the same platform across the team.
               </p>
               <p className="mkt-three-sub">Volume pricing as seats grow.</p>
             </div>
             <div>
-              <h3>HIPAA setup</h3>
+              <h3 className="mkt-h3">HIPAA setup</h3>
               <p className="mkt-muted mkt-three-p">
                 A one-time compliance setup fee — <strong className="mkt-ink">$2,000–5,000</strong> —
                 covering compliant provisioning, BAA, data migration and white-glove onboarding.
@@ -139,7 +133,7 @@ export default function PricingPage() {
       {/* ---- Module add-ons ---- */}
       <section className="mkt-section mint-2">
         <div className="mkt-wrap">
-          <p className="mkt-kicker">Land and expand</p>
+          <p className="mkt-kicker">Add what you need</p>
           <h2 className="mkt-h2">Modules, per month.</h2>
           <p className="mkt-lead mkt-p-lead-md">
             Start with the platform. Switch on a module the day you need it — and only pay for what you run.
@@ -167,10 +161,10 @@ export default function PricingPage() {
       <section className="mkt-section">
         <div className="mkt-wrap">
           <p className="mkt-kicker">How we compare</p>
-          <h2 className="mkt-h2">A live picture, not a filing cabinet.</h2>
+          <h2 className="mkt-h2">A plan they follow, not a filing cabinet.</h2>
           <p className="mkt-lead mkt-p-lead-md">
-            Legacy EHRs store records and price per provider. We price the same way — and add the live-data,
-            doctor-in-the-loop AI and patient-owned layer they don&apos;t offer.
+            Legacy EHRs store records and price per provider. We price the same way — and add the
+            AI-drafted 90-day plan, the doctor-approves workflow and the client app they don&apos;t offer.
           </p>
           <div className="mkt-table-clip">
           <div className="mkt-table-wrap">
@@ -180,14 +174,14 @@ export default function PricingPage() {
                   <th>Product</th>
                   <th>What it is</th>
                   <th>Typical price</th>
-                  <th>Live data + doctor-<br />in-the-loop AI?</th>
-                  <th>Patient-owned layer?</th>
+                  <th>AI plan + doctor-<br />approves?</th>
+                  <th>Client app + AI assistant?</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON.map((row) => (
                   <tr key={row.product} className={row.chi ? "mkt-hl" : undefined}>
-                    <td className={`fw${row.chi ? "" : ""}`}>{row.product}</td>
+                    <td>{row.product}</td>
                     <td>{row.what}</td>
                     <td>{row.price}</td>
                     <td className={row.chi ? "accent" : undefined}>{row.ai}</td>
@@ -209,7 +203,7 @@ export default function PricingPage() {
       {/* ---- CTA ---- */}
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2">Let&apos;s price it for your clinic.</h2>
+          <h2 className="mkt-h2">Let&apos;s price it for your practice.</h2>
           <p className="mkt-lead mkt-cta-lead">
             Tell us your specialty and team size — we&apos;ll map a plan, the modules and the right edition.
           </p>

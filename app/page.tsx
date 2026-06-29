@@ -7,9 +7,9 @@ import SiteShell from "@/components/site/SiteShell";
 const SCREENS = "/screens";
 
 export const metadata: Metadata = {
-  title: { absolute: "Central Health Intelligence — live health intelligence for clinics" },
+  title: { absolute: "Central Health Intelligence — a clear 90-day plan for every client" },
   description:
-    "Central Health Intelligence keeps patient data live — wearables, labs and CGM in one picture, with AI that drafts and the doctor approves. For longevity, functional-medicine and integrative clinics. By Health Intelligency.",
+    "Upload your client's data, we turn it into a simple visual, AI drafts the 90-day plan you approve, and you both track progress every session. For longevity, functional-medicine and integrative practices. By Health Intelligency.",
 };
 
 /** A clean browser window around a desktop screenshot. */
@@ -49,21 +49,21 @@ export default async function Home() {
         <div className="mkt-wrap mkt-row">
           <div>
             <h1 className="mkt-display">
-              Every signal.
+              From a scan to a plan
               <br />
-              One patient <span className="mkt-lime-underline">picture</span>.
+              they&apos;ll <span className="mkt-lime-underline">actually follow</span>.
             </h1>
             <p className="mkt-lead">
-              A live health platform for longevity, functional-medicine and integrative clinics.
-              Wearables, labs and CGM in one view — AI drafts, the doctor approves.
+              Upload your client&apos;s data and we turn it into a simple visual. AI drafts the 90-day
+              plan, you approve it, and you both track progress every session.
             </p>
             <div className="mkt-hero-cta">
               <Link href="/contact" className="mkt-btn lg">Book a demo</Link>
-              <a href="/api/demo" className="mkt-btn ghost lg">Try it live →</a>
+              <Link href="/product" className="mkt-btn ghost lg">See how it works →</Link>
             </div>
           </div>
           <div className="mkt-row-media">
-            <Browser src="be-dashboard.png" alt="Central Health Intelligence — clinician morning briefing dashboard" label="app.healthintelligency.com" tilt />
+            <Browser src="be-plan-builder.png" alt="A doctor's 90-day plan builder" label="app.healthintelligency.com/plan" tilt />
           </div>
         </div>
         <div className="mkt-wrap mkt-hero-strip">
@@ -72,82 +72,100 @@ export default async function Home() {
             <span className="dot" />
             <span><b>HIPAA-ready</b></span>
             <span className="dot" />
-            <span><b>0</b> cross-tenant leaks</span>
-            <span className="dot" />
             <span>Live in <b>days</b>, not months</span>
           </div>
         </div>
       </section>
 
-      {/* ---- Personal Health Intelligence (patient app) ---- */}
+      {/* ---- 1. Upload → visual ---- */}
       <section className="mkt-section mint">
-        <div className="mkt-wrap mkt-row rev">
-          <div className="mkt-row-media mkt-phone-center">
-            <Phone src="fe-dashboard.png" alt="Personal Health Intelligence — the patient's health dashboard" tilt />
-          </div>
-          <div>
-            <p className="mkt-kicker">Personal Health Intelligence</p>
-            <h2 className="mkt-h2">A concierge app for every patient.</h2>
-            <p className="mkt-p">
-              Patients get their own Personal Health Intelligence — results, care plan and an AI
-              assistant trained on the clinic&apos;s own knowledge, not a generic chatbot.
-            </p>
-            <ul className="mkt-points">
-              <li>Results and labs, mapped to trends over time</li>
-              <li>An AI assistant that answers from the clinic&apos;s protocols</li>
-              <li>Care plan, booking and messages in one app</li>
-            </ul>
-            <p className="mkt-device-hint">Hover a phone to scroll the screen.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ---- Clinician dashboard ---- */}
-      <section className="mkt-section">
         <div className="mkt-wrap mkt-row">
           <div>
-            <p className="mkt-kicker">The clinician dashboard</p>
-            <h2 className="mkt-h2">Walk in already knowing what changed.</h2>
+            <p className="mkt-kicker">Step one</p>
+            <h2 className="mkt-h2">Upload a scan. We make it simple.</h2>
             <p className="mkt-p">
-              Each morning the system computes what moved for every patient since their last visit.
-              AI drafts the talking points; the doctor reads, edits and approves — nothing is applied
-              on its own.
+              Drop in a scan, a lab PDF or a device export. Central Health Intelligence turns the dense
+              data into a clean visual your client can actually understand — no live device hookups to set up.
             </p>
             <ul className="mkt-points">
-              <li>A per-patient delta since the last visit, every morning</li>
-              <li>A severity-sorted triage worklist for the whole team</li>
-              <li>AI-drafted notes — reviewed, never auto-applied</li>
+              <li>Upload scans, labs and device exports — by file, not fuss</li>
+              <li>We map the numbers into a simple, visual picture</li>
+              <li>The client sees their body and results in plain language</li>
             </ul>
-            <div className="mkt-action">
-              <Link href="/platform/intelligence" className="mkt-btn ghost">How the intelligence layer works</Link>
-            </div>
           </div>
           <div className="mkt-row-media">
-            <Browser src="be-records.png" alt="Clinician view — patient records with live data" label="app.healthintelligency.com/records" />
+            <Browser src="be-results-review.png" alt="A client's results turned into a simple visual" label="app.healthintelligency.com/results" />
           </div>
         </div>
       </section>
 
-      {/* ---- Connectors ---- */}
-      <section className="mkt-section sand">
+      {/* ---- 2. AI 90-day plan ---- */}
+      <section className="mkt-section">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
-            <Browser src="be-results-review.png" alt="Results review — lab and wearable data in one view" label="app.healthintelligency.com/results" />
+            <Browser src="be-plan-synthesis.png" alt="AI drafting a 90-day plan for the doctor to approve" label="app.healthintelligency.com/plan" />
           </div>
           <div>
-            <p className="mkt-kicker">The connector moat</p>
-            <h2 className="mkt-h2">Every source, live.</h2>
+            <p className="mkt-kicker">Step two</p>
+            <h2 className="mkt-h2">The 90-day plan, drafted by AI.</h2>
             <p className="mkt-p">
-              Patients connect their own wearables once. Oura, Apple Health, Garmin, Withings and
-              Dexcom CGM then sync continuously into one picture — alongside labs by CSV, PDF or FHIR.
+              From the data, AI drafts a structured 90-day plan — vitamins, minerals, exercise and
+              modalities, laid out on a schedule. You work the AI to shape it, then approve. Your notes
+              are AI-assisted too. Nothing reaches the client until you sign off.
             </p>
             <ul className="mkt-points">
-              <li>Oura, Apple Health, Garmin, Withings, Dexcom CGM</li>
-              <li>Labs mapped to trends automatically</li>
-              <li>One snapshot per patient, isolated per clinic</li>
+              <li>AI proposes the plan; the doctor edits and approves</li>
+              <li>Phased and scheduled — every step has a date</li>
+              <li>AI-assisted notes, so the writing isn&apos;t your job</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ---- 3. Client app: clean plan + AI assistant ---- */}
+      <section className="mkt-section sand">
+        <div className="mkt-wrap mkt-row">
+          <div>
+            <p className="mkt-kicker">Personal Health Intelligence</p>
+            <h2 className="mkt-h2">A clean plan your client actually follows.</h2>
+            <p className="mkt-p">
+              The client opens their app to a simple daily schedule — what to take, what to do, today.
+              When they have a question, they ask the AI assistant, grounded in your plan and your
+              clinic&apos;s knowledge. No more back-and-forth filling your inbox.
+            </p>
+            <ul className="mkt-points">
+              <li>A scheduled plan where every to-do is simple and clear</li>
+              <li>An AI assistant that answers questions about their plan</li>
+              <li>Far fewer messages back to you</li>
+            </ul>
+          </div>
+          <div className="mkt-row-media mkt-phone-center">
+            <Phone src="fe-plan.png" alt="The client's clean, scheduled 90-day plan" tilt />
+          </div>
+        </div>
+      </section>
+
+      {/* ---- 4. Track both sides ---- */}
+      <section className="mkt-section">
+        <div className="mkt-wrap mkt-row rev">
+          <div className="mkt-row-media mkt-phone-center">
+            <Phone src="fe-today.png" alt="The client tracking their progress day to day" tilt />
+          </div>
+          <div>
+            <p className="mkt-kicker">Both ends</p>
+            <h2 className="mkt-h2">Track progress, every session.</h2>
+            <p className="mkt-p">
+              The client logs their days and watches their own progress build. You see how each client
+              is tracking against their plan before they walk in — so every session picks up where the
+              last one left off.
+            </p>
+            <ul className="mkt-points">
+              <li>The client tracks their own progress and streaks</li>
+              <li>The doctor sees what moved since the last visit</li>
+              <li>Plus your dispensary and email list, in the same place</li>
             </ul>
             <div className="mkt-action">
-              <Link href="/platform/connectors" className="mkt-btn ghost">Connectors in detail</Link>
+              <Link href="/product" className="mkt-btn ghost">See the whole flow</Link>
             </div>
           </div>
         </div>
@@ -157,7 +175,7 @@ export default async function Home() {
       <section className="mkt-section mint">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Three ways to run it.</h2>
-          <p className="mkt-lead mkt-editions-lead">Same product — choose the isolation and compliance your clinic needs.</p>
+          <p className="mkt-lead mkt-editions-lead">Same product — choose the isolation and compliance your practice needs.</p>
           <div className="mkt-three">
             <div>
               <h3 className="mkt-h3">Cloud</h3>
@@ -173,7 +191,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="mkt-action-lg">
-            <Link href="/pricing" className="mkt-btn ghost">Compare editions &amp; pricing</Link>
+            <Link href="/pricing" className="mkt-btn ghost">See pricing</Link>
           </div>
         </div>
       </section>
@@ -184,11 +202,11 @@ export default async function Home() {
           <h2 className="mkt-h2 mkt-faq-heading">Questions, answered.</h2>
           <div className="mkt-faq">
             {[
-              ["Is it HIPAA compliant?", "The HIPAA Cloud edition runs with signed BAAs and the compliance controls US clinics need. Non-US clinics can start on Cloud today."],
+              ["How does the client data get in?", "You upload it — a scan, a lab PDF, or a device export. No live device integrations to configure; just drop in the file and we turn it into a visual."],
+              ["Does the AI decide anything?", "No. The AI drafts the plan and the notes; the doctor reviews, edits and approves. Nothing reaches the client until you sign off."],
+              ["What does the client actually see?", "A clean, scheduled 90-day plan — what to take and do each day — plus an AI assistant that answers their questions about it, so they're not messaging you."],
+              ["Is it HIPAA compliant?", "The HIPAA Cloud edition runs with signed BAAs and the compliance controls US practices need. Non-US practices can start on Cloud today."],
               ["How fast can we launch?", "Days, not the 12–24-month implementations enterprise EHRs require. You can migrate from a spreadsheet, Jane or Noterro."],
-              ["Which specialties is it for?", "Longevity, functional medicine, peptide/GLP-1, hormone/HRT and plant-medicine/KAP clinics — the verticals mainstream EHRs don't serve well."],
-              ["Do patients really own their data?", "Yes. Patients connect their own devices and can export a full, portable copy of their record on request."],
-              ["How is it priced?", "A per-provider plan plus the modules you choose — at parity with a legacy EHR, but with the live-data and AI layer they don't have."],
             ].map(([q, a]) => (
               <details key={q}>
                 <summary>{q}</summary>
@@ -202,7 +220,7 @@ export default async function Home() {
       {/* ---- CTA ---- */}
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2">See it on your clinic&apos;s data.</h2>
+          <h2 className="mkt-h2">See it on your clients&apos; data.</h2>
           <p className="mkt-lead mkt-cta-lead">
             A short demo, your specialty, your questions.
           </p>

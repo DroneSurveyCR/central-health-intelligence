@@ -77,6 +77,23 @@ const nextConfig: NextConfig = {
       { source: "/((?!bodymap).*)", headers: securityHeaders },
     ];
   },
+
+  // The marketing IA was collapsed to the core story (Home · Product · Pricing ·
+  // Security · Company · Contact). Old deep pages now redirect to /product so any
+  // existing links and search results don't 404.
+  async redirects() {
+    const toProduct = [
+      "/platform/intelligence",
+      "/platform/ai",
+      "/platform/connectors",
+      "/platform/ehr",
+      "/platform",
+      "/modules",
+      "/for-clinicians",
+      "/for-patients",
+    ];
+    return toProduct.map((source) => ({ source, destination: "/product", permanent: true }));
+  },
 };
 
 export default nextConfig;

@@ -2,29 +2,18 @@ import Link from "next/link";
 
 const COLS: { title: string; links: { href: string; label: string }[] }[] = [
   {
-    title: "Platform",
+    title: "Product",
     links: [
-      { href: "/platform/intelligence", label: "Intelligence" },
-      { href: "/platform/ai", label: "AI drafts" },
-      { href: "/platform/connectors", label: "Connectors" },
-      { href: "/platform/ehr", label: "Modular EHR" },
-    ],
-  },
-  {
-    title: "Solutions",
-    links: [
-      { href: "/for-clinicians", label: "For clinicians" },
-      { href: "/for-patients", label: "For patients" },
-      { href: "/modules", label: "Modules" },
+      { href: "/product", label: "How it works" },
+      { href: "/pricing", label: "Pricing" },
+      { href: "/trust", label: "Security" },
     ],
   },
   {
     title: "Company",
     links: [
       { href: "/company", label: "Health Intelligency" },
-      { href: "/trust", label: "Security" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/contact", label: "Contact" },
+      { href: "/contact", label: "Book a demo" },
     ],
   },
   {
@@ -48,8 +37,8 @@ export default function SiteFooter() {
               <b>Central Health Intelligence</b>
             </div>
             <p className="mkt-muted mkt-foot-about">
-              Live health intelligence for longevity, functional-medicine and integrative clinics.
-              By Health Intelligency.
+              A clear 90-day plan for every client — built with AI, approved by the doctor,
+              tracked on both sides. By Health Intelligency.
             </p>
           </div>
           {COLS.map((c) => (

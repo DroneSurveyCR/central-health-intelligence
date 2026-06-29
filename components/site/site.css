@@ -236,6 +236,9 @@
 /* small caption under a device ("hover to scroll") */
 .mkt-device-hint { font-size: 13px; color: var(--muted); margin-top: 18px; font-weight: 500; }
 
+/* wide hero lead for full-width hero sections (no media column) */
+.mkt-hero-lead-wide { max-width: 62ch; margin-top: 18px; }
+
 /* ---- browser / laptop screen mockup ---- */
 .mkt-screen {
   border-radius: 12px;
@@ -336,7 +339,7 @@
 .mkt-footer { background: var(--ink); color: #cfe0d6; padding: 64px 0 40px; }
 .mkt-footer a { color: #cfe0d6; }
 .mkt-footer a:hover { color: #fff; }
-.mkt-foot-grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px; }
+.mkt-foot-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; }
 .mkt-foot-grid h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: #8fae9d; margin: 0 0 14px; font-weight: 600; }
 .mkt-foot-grid ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; font-size: 14px; }
 .mkt-foot-bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 48px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; color: #8fae9d; }
