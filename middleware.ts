@@ -52,7 +52,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const response = await updateSession(request, { "x-request-id": requestId });
+  // Forward the path so server components (e.g. requireStaff's mandatory-MFA check) can
+  // exempt specific routes without a redirect loop.
+  const response = await updateSession(request, { "x-request-id": requestId, "x-pathname": path });
   response.headers.set("x-request-id", requestId);
   return response;
 }

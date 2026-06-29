@@ -1,0 +1,28 @@
+name: Preview Smoke
+
+# Auto-runs the HTTP smoke gate against every successful Vercel PREVIEW deployment.
+# Vercel emits a `deployment_status` event when a deploy finishes; we smoke the
+# preview URL so a build that compiles but crashes at runtime (e.g. the edge
+# middleware regression) is caught BEFORE it can be promoted to production.
+on:
+  deployment_status:
+
+jobs:
+  smoke:
+    # Only on a successful NON-production deployment (i.e. PR/branch previews).
+    if: >
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment != 'Production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Smoke the preview deployment
+        run: node scripts/smoke.mjs
+        env:
+          PROVE_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          # CRON_SECRET optional — without it the engine checks are skipped, the
+          # HTTP gating/auth checks (the ones that catch a crashing build) still run.
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

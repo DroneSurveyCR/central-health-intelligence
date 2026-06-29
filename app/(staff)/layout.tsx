@@ -22,6 +22,7 @@ const ICONS: Record<string, React.ReactNode> = {
   modalities: (<svg {...S}><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3z" /></svg>),
   reports: (<svg {...S}><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5M8 13h8M8 17h8M8 9h3" /></svg>),
   bell: (<svg {...S}><path d="M6 9a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6" /><path d="M10 20a2 2 0 004 0" /></svg>),
+  support: (<svg {...S}><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 014.6 1.4c0 1.6-2.1 2-2.1 3.1" /><path d="M12 17h.01" /></svg>),
 };
 
 export default async function StaffLayout({
@@ -74,6 +75,7 @@ export default async function StaffLayout({
         {isAdmin && <Link href="/articles">{ICONS.articles}<span>Articles</span></Link>}
         {isAdmin && <Link href="/analytics">{ICONS.analytics}<span>Analytics</span></Link>}
         {isAdmin && <Link href="/import">{ICONS.import}<span>Import</span></Link>}
+        <Link href="/support">{ICONS.support}<span>Support</span></Link>
         <Link href="/security">{ICONS.security}<span>Security</span></Link>
         {isAdmin && <Link href="/audit">{ICONS.audit}<span>Audit</span></Link>}
         <div className="who">

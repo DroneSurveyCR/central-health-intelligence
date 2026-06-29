@@ -38,7 +38,9 @@ export async function POST(request: Request) {
   // Public, unauthenticated endpoint that creates a tenant via the service-role client.
   // Throttle per IP so it can't be scripted into thousands of spam practices/auth users.
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (!(await rateLimit(`onboarding:${ip}`, 5, 3600)))
+  // Fail CLOSED: this is public + creates tenants via the service-role client, so a limiter
+  // outage must not silently remove all abuse protection.
+  if (!(await rateLimit(`onboarding:${ip}`, 5, 3600, { failClosed: true })))
     return NextResponse.json(
       { error: "Too many signups from this network. Please try again later." },
       { status: 429 },

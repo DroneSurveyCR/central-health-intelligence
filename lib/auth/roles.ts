@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export type StaffRole = "doctor" | "admin" | "assistant";
@@ -50,6 +51,20 @@ export async function requireStaff(roles?: StaffRole[]) {
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2")
     redirect("/mfa");
+
+  // Mandatory MFA enrollment (opt-in via REQUIRE_STAFF_MFA): for a PHI app, staff
+  // should not be able to use the dashboard without a second factor. Off by default
+  // so it can be rolled out deliberately. /security (enrollment) and /mfa are exempt
+  // to avoid a redirect loop; the current path comes from the middleware-set header.
+  if (process.env.REQUIRE_STAFF_MFA === "true") {
+    const path = (await headers()).get("x-pathname") ?? "";
+    const exempt = path.startsWith("/security") || path.startsWith("/mfa");
+    if (!exempt) {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const enrolled = factors?.totp?.some((f) => f.status === "verified") ?? false;
+      if (!enrolled) redirect("/security?mfa=required");
+    }
+  }
 
   if (roles && !roles.includes(p.role as StaffRole)) redirect("/focus");
   return p;
