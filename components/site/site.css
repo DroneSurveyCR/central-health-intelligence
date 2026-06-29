@@ -267,3 +267,12 @@
   .mkt-foot-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
   .mkt-nav-links { display: none; }
 }
+
+@media (max-width: 640px) {
+  .mkt-section { padding: 52px 0; }
+  .mkt-wrap { padding: 0 16px; }
+  .mkt-devices-duo { flex-direction: column; align-items: center; gap: 24px; padding: 24px 0 0; }
+  .mkt-devices-duo .mkt-screen { max-width: 100%; flex: 1 1 auto; }
+  .mkt-devices-duo .mkt-phone { margin-bottom: 0; }
+  .mkt-foot-grid { grid-template-columns: 1fr; }
+}
