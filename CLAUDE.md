@@ -1,10 +1,21 @@
 # HealthSync Cloud — CLAUDE.md
 
-> 🛑 **STOP — SINGLE-OWNER REPO (Nick's directive, 2026-06-29).** Only ONE agent works in this
-> repo (Central Health Intelligence / Track B). If you are the **Casa Elev8 / Track A** agent
-> (`../healthsync-app`), **do NOT commit, push, or deploy here — stay on your own track.**
-> Two agents on this repo caused collisions and duplicate Vercel projects. If you're unsure
-> which track you are, STOP and ask Nick before touching this repo. See `COORDINATION.md`.
+> 🛑 **TRACK BOUNDARY (Nick's directive, 2026-06-29) — ONE agent, ONE track.**
+>
+> **This repo = Central Health Intelligence, the multi-tenant SaaS CLOUD (Track B).** The agent
+> who works here is the **Cloud / SaaS agent** and works ONLY here:
+> - Repo `DroneSurveyCR/central-health-intelligence` (local `healthsync-cloud`)
+> - Deploy: ONE Vercel project, **personalhealthintelligence** account → `healthsync-cloud-mu.vercel.app`
+>   (git auto-deploy from `main` — just push; never manual `vercel deploy`)
+>
+> ⛔ The Cloud agent **never touches Casa Elev8 (Track A)**: not the `DroneSurveyCR/healthsync`
+> repo / `../healthsync-app`, not `my.elev8.health`, not the `healthsync-app` Vercel project.
+>
+> ⛔ If you are the **Casa Elev8 / Track A** agent, you are in the WRONG repo — **do NOT commit,
+> push, or deploy here.** Go back to `../healthsync-app`.
+>
+> Two agents in one repo + manual CLI deploys caused collisions, wiped env vars, and a duplicate
+> Vercel project. If you're EVER unsure which track a task is, STOP and ask Nick. See `COORDINATION.md`.
 
 > **Read `STATUS.md` first, every session.** It is the single source of truth.
 
