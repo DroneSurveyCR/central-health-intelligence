@@ -43,11 +43,11 @@ export default function SiteFooter() {
       <div className="mkt-wrap">
         <div className="mkt-foot-grid">
           <div>
-            <div className="mkt-brand" style={{ color: "#fff" }}>
+            <div className="mkt-brand mkt-foot-brand">
               <span className="mark" aria-hidden>C</span>
               <b>Central Health Intelligence</b>
             </div>
-            <p className="mkt-muted" style={{ marginTop: 14, maxWidth: "32ch", fontSize: 14 }}>
+            <p className="mkt-muted mkt-foot-about">
               Live health intelligence for longevity, functional-medicine and integrative clinics.
               By Health Intelligency.
             </p>

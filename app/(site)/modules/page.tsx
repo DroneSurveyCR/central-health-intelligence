@@ -36,23 +36,12 @@ const ADDONS: Mod[] = [
 
 function Grid({ items }: { items: Mod[] }) {
   return (
-    <div
-      style={{
-        marginTop: 28,
-        border: "1px solid var(--line)",
-        borderRadius: 16,
-        overflow: "hidden",
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-        background: "var(--line)",
-        gap: 1,
-      }}
-    >
+    <div className="mkt-module-grid">
       {items.map((m) => (
-        <div key={m.name} style={{ background: "#fff", padding: "20px 22px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
-            <span style={{ fontWeight: 600, fontSize: 16, letterSpacing: "-0.005em" }}>{m.name}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--green)", whiteSpace: "nowrap" }}>{m.price}</span>
+        <div key={m.name} className="mkt-module-cell">
+          <div className="mkt-module-cell-hd">
+            <span className="mkt-module-cell-name">{m.name}</span>
+            <span className="mkt-module-cell-price">{m.price}</span>
           </div>
           <p className="mkt-muted" style={{ fontSize: 14, margin: 0, lineHeight: 1.45 }}>{m.desc}</p>
         </div>
@@ -68,10 +57,10 @@ export default function ModulesPage() {
       <section className="mkt-section mkt-hero">
         <div className="mkt-wrap">
           <p className="mkt-kicker">The catalog</p>
-          <h1 className="mkt-display" style={{ maxWidth: "14ch" }}>
+          <h1 className="mkt-display mkt-display-sm">
             Build the clinic you <span className="mkt-lime-underline">actually</span> run.
           </h1>
-          <p className="mkt-lead" style={{ marginTop: 18 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             Central Health Intelligence ships with a complete clinical core for free. Everything else is
             a module — enable only what you need, add the rest as you grow.
           </p>
@@ -105,9 +94,9 @@ export default function ModulesPage() {
             and plant-medicine protocols. Flat monthly pricing, per clinic.
           </p>
           <Grid items={ADDONS} />
-          <p className="mkt-p" style={{ marginTop: 28 }}>
+          <p className="mkt-p mkt-cta-actions">
             Enable only what you need — and add modules any time.{" "}
-            <Link href="/pricing" style={{ color: "var(--green)", fontWeight: 600 }}>See how it adds up on the pricing page →</Link>
+            <Link href="/pricing" className="mkt-content-link">See how it adds up on the pricing page →</Link>
           </p>
         </div>
       </section>
@@ -115,7 +104,7 @@ export default function ModulesPage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint-2">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 32 }}>Questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["Do I have to take every module?", "No. The core is free and complete on its own. You add only the modules your specialty needs, and you can turn them on or off at any time."],
@@ -136,7 +125,7 @@ export default function ModulesPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Not sure which modules you need?</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             Tell us your specialty and we&apos;ll map a setup to it.
           </p>
           <Link href="/contact" className="mkt-btn lg">Book a demo</Link>

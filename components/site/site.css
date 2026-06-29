@@ -296,4 +296,121 @@
   .mkt-devices-duo .mkt-screen { max-width: 100%; flex: 1 1 auto; }
   .mkt-devices-duo .mkt-phone { margin-bottom: 0; }
   .mkt-foot-grid { grid-template-columns: 1fr; }
+  .mkt-module-grid { grid-template-columns: 1fr; }
 }
+
+/* ---- mock device UI patterns (shared across all pages) ---- */
+.mkt-mock-bar { background: var(--mint); padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.mkt-mock-body { padding: 18px; }
+.mkt-mock-grid { padding: 18px; display: grid; gap: 10px; }
+
+/* stat row — label | colored value */
+.mkt-stat { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.mkt-stat:last-of-type { border-bottom: none; }
+.mkt-stat-val { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mkt-stat-val.green { color: var(--green); }
+.mkt-stat-val.red { color: #bb5234; }
+.mkt-stat-val.ink { color: var(--ink); font-weight: 500; }
+
+/* bordered list item / row */
+.mkt-item { padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; font-size: 15px; }
+.mkt-item-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; }
+
+/* appointment card (schedule briefing) */
+.mkt-appt-card { padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; }
+.mkt-appt-meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 3px; }
+.mkt-appt-pre { color: var(--green); }
+.mkt-appt-name { font-family: var(--serif); font-size: 16px; }
+.mkt-appt-note { font-size: 13px; color: var(--ink-2); }
+
+/* alert / triage rows */
+.mkt-alert-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 11px; }
+.mkt-tier { font-size: 12px; font-weight: 600; min-width: 52px; }
+.mkt-tier.high { color: #bb5234; }
+.mkt-tier.watch { color: var(--green); }
+.mkt-tier.routine, .mkt-tier.info { color: var(--muted); }
+.mkt-alert-who { flex: 1; }
+.mkt-alert-sub { font-size: 13px; color: var(--muted); }
+.mkt-alert-when { font-size: 12px; color: var(--muted); }
+
+/* approval queue items */
+.mkt-approval-item { padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; }
+.mkt-approval-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.mkt-approval-kind { font-weight: 600; font-size: 15px; }
+.mkt-badge { font-size: 12px; font-weight: 600; color: var(--green); background: var(--mint); padding: 3px 9px; border-radius: 20px; }
+.mkt-approval-sub { font-size: 13px; color: var(--muted); }
+.mkt-actions-hint { display: flex; gap: 8px; font-size: 13px; color: var(--muted); padding-top: 4px; }
+.mkt-ghost-action { padding: 7px 12px; border: 1px solid var(--line); border-radius: 9px; }
+.mkt-ghost-action.primary { color: var(--green); font-weight: 600; }
+
+/* patient connector rows */
+.mkt-connector-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.mkt-connector-state { font-size: 13px; font-weight: 600; }
+.mkt-connector-state.on { color: var(--green); }
+.mkt-connector-state.off { color: var(--muted); }
+
+/* AI chat bubbles */
+.mkt-chat { padding: 18px; display: grid; gap: 12px; }
+.mkt-chat-q { align-self: flex-end; max-width: 82%; padding: 10px 13px; background: var(--mint); border: 1px solid var(--line); border-radius: 12px; font-size: 14px; }
+.mkt-chat-a { max-width: 88%; padding: 11px 13px; background: var(--mint-2); border: 1px solid var(--line); border-radius: 12px; font-size: 14px; color: var(--ink-2); }
+.mkt-chat-fine { font-size: 12px; color: var(--muted); padding-top: 2px; }
+
+/* streak tracker */
+.mkt-streak-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+.mkt-streak-title { font-family: var(--serif); font-size: 18px; }
+.mkt-streak-label { font-size: 13px; font-weight: 600; color: var(--green); }
+.mkt-streak-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+.mkt-streak-pip { flex: 1; height: 8px; border-radius: 4px; background: var(--green); }
+.mkt-streak-pip.empty { background: var(--line); }
+.mkt-milestone-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.mkt-milestone-tag { font-size: 12px; color: var(--green); }
+
+/* status dot (inline-value green dot) */
+.mkt-dot-val { font-size: 13px; color: var(--green); }
+.mkt-dot-val.muted { color: var(--muted); }
+
+/* module grid (modules page) */
+.mkt-module-grid { margin-top: 28px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); background: var(--line); gap: 1px; }
+.mkt-module-cell { background: #fff; padding: 20px 22px; }
+.mkt-module-cell-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.mkt-module-cell-name { font-weight: 600; font-size: 16px; letter-spacing: -0.005em; }
+.mkt-module-cell-price { font-size: 13px; font-weight: 600; color: var(--green); white-space: nowrap; }
+
+/* module list rows (pricing page) */
+.mkt-module-list { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; }
+.mkt-module-list-row { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.mkt-module-list-row:last-child { border-bottom: none; }
+.mkt-module-list-name { font-weight: 600; font-size: 16px; color: var(--ink); }
+.mkt-module-list-desc { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.mkt-price-display { font-family: var(--serif); font-size: 19px; color: var(--ink); white-space: nowrap; }
+.mkt-price-unit { font-size: 13px; color: var(--muted); font-family: var(--sans); }
+
+/* comparison table */
+.mkt-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--line); }
+.mkt-table { width: 100%; min-width: 700px; border-collapse: collapse; }
+.mkt-table th { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); font-weight: 600; font-size: 14px; color: var(--ink); background: var(--mint); vertical-align: bottom; }
+.mkt-table th:last-child { border-right: none; }
+.mkt-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); font-size: 15px; color: var(--ink-2); vertical-align: top; }
+.mkt-table td:last-child { border-right: none; }
+.mkt-table tr.mkt-hl { background: var(--mint-2); }
+.mkt-table .fw { font-weight: 600; color: var(--ink); }
+.mkt-table .accent { color: var(--green); font-weight: 600; }
+
+/* spacer utilities */
+.mkt-p-lead-gap { margin-bottom: 40px; }
+.mkt-p-lead-md { margin-bottom: 36px; }
+.mkt-note { font-size: 14px; color: var(--muted); margin-top: 16px; }
+.mkt-content-link { color: var(--green); font-weight: 600; }
+.mkt-display-narrow { max-width: 16ch; }
+.mkt-display-sm { max-width: 14ch; }
+.mkt-cta-actions { margin-top: 28px; }
+.mkt-contact-expect { margin-top: 32px; }
+.mkt-contact-divider { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
+.mkt-contact-fine { font-size: 15px; margin: 0; }
+.mkt-isolation-tier { font-size: 13px; margin: 0; font-weight: 600; color: var(--green); }
+
+/* nav login link */
+.mkt-login-link { font-size: 15px; color: var(--ink-2); padding: 10px 14px; display: inline-flex; align-items: center; min-height: 44px; }
+/* footer overrides */
+.mkt-foot-brand { color: #fff; }
+.mkt-foot-about { margin-top: 14px; max-width: 32ch; font-size: 14px; }

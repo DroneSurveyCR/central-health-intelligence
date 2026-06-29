@@ -30,28 +30,27 @@ export default function ForCliniciansPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device tilt" role="img" aria-label="A morning briefing of the day's patients with what changed since each visit">
-              <div style={{ background: "var(--mint)", padding: "14px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Morning briefing · Tue · 9 patients
-              </div>
-              <div style={{ padding: 18, display: "grid", gap: 10 }}>
+              <div className="mkt-mock-bar">Morning briefing · Tue · 9 patients</div>
+              <div className="mkt-mock-grid">
                 {[
                   ["08:30", "Ken Patterson", "Sleep down, glucose drifting"],
                   ["09:15", "Dana Ruiz", "Labs back — TSH flagged"],
                   ["10:00", "Marcus Bell", "Resting HR +9 since visit"],
                 ].map(([t, n, note]) => (
-                  <div key={n} style={{ padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 11 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--muted)", marginBottom: 3 }}>
-                      <span>{t}</span><span style={{ color: "var(--green)" }}>Pre-read</span>
+                  <div key={n} className="mkt-appt-card">
+                    <div className="mkt-appt-meta">
+                      <span>{t}</span>
+                      <span className="mkt-appt-pre">Pre-read</span>
                     </div>
-                    <div style={{ fontFamily: "var(--serif)", fontSize: 16 }}>{n}</div>
-                    <div style={{ fontSize: 13, color: "var(--ink-2)" }}>{note}</div>
+                    <div className="mkt-appt-name">{n}</div>
+                    <div className="mkt-appt-note">{note}</div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-        <div className="mkt-wrap" style={{ marginTop: 44 }}>
+        <div className="mkt-wrap mkt-hero-strip">
           <div className="mkt-strip">
             <span><b>~50%</b> of practitioner time is admin</span>
             <span className="dot" />
@@ -80,21 +79,21 @@ export default function ForCliniciansPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18 }}>
-                <div style={{ fontFamily: "var(--serif)", fontSize: 19, marginBottom: 2 }}>Ken Patterson</div>
-                <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>Since last visit · 11 days</div>
+              <div className="mkt-mock-body">
+                <div className="mkt-briefing-name">Ken Patterson</div>
+                <div className="mkt-briefing-sub">Since last visit · 11 days</div>
                 {[
                   ["Resting HR", "+9 bpm", "up"],
                   ["Sleep", "−1.4 h / night", "down"],
                   ["Glucose, time in range", "−12%", "down"],
                 ].map(([k, v, dir]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+                  <div key={k} className="mkt-briefing-row">
                     <span>{k}</span>
-                    <strong style={{ color: dir === "down" ? "#bb5234" : "var(--ink)" }}>{v}</strong>
+                    <strong className={dir === "down" ? "mkt-val-down" : "mkt-val-up"}>{v}</strong>
                   </div>
                 ))}
-                <div style={{ marginTop: 14, padding: "11px 13px", background: "var(--mint-2)", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13.5, color: "var(--ink-2)" }}>
-                  <strong style={{ color: "var(--green)" }}>AI draft</strong> · Talking points ready for review — sleep and glucose trend.
+                <div className="mkt-briefing-draft">
+                  <strong className="mkt-draft-label">AI draft</strong> · Talking points ready for review — sleep and glucose trend.
                 </div>
               </div>
             </div>
@@ -107,21 +106,21 @@ export default function ForCliniciansPage() {
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ background: "var(--mint)", padding: "12px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Triage worklist · 4 to review
-              </div>
-              <div style={{ padding: 18, display: "grid", gap: 10 }}>
+              <div className="mkt-mock-bar">Triage worklist · 4 to review</div>
+              <div className="mkt-mock-grid">
                 {[
-                  ["High", "Glucose over 200 for 6h", "Dana Ruiz", "#bb5234"],
-                  ["Watch", "Resting HR trending up", "Marcus Bell", "var(--green)"],
-                  ["Watch", "Sleep under 5h, 4 nights", "Ken Patterson", "var(--green)"],
-                  ["Info", "Lab panel imported", "Ana Flores", "var(--muted)"],
-                ].map(([sev, msg, who, c]) => (
-                  <div key={msg} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 12px", border: "1px solid var(--line)", borderRadius: 11 }}>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: c, minWidth: 42 }}>{sev}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14 }}>{msg}</div>
-                      <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{who}</div>
+                  ["high", "Glucose over 200 for 6h", "Dana Ruiz"],
+                  ["watch", "Resting HR trending up", "Marcus Bell"],
+                  ["watch", "Sleep under 5h, 4 nights", "Ken Patterson"],
+                  ["info", "Lab panel imported", "Ana Flores"],
+                ].map(([sev, msg, who]) => (
+                  <div key={msg} className="mkt-alert-item">
+                    <span className={`mkt-tier ${sev}`}>
+                      {sev.charAt(0).toUpperCase() + sev.slice(1)}
+                    </span>
+                    <div className="mkt-alert-who">
+                      <div>{msg}</div>
+                      <div className="mkt-alert-sub">{who}</div>
                     </div>
                   </div>
                 ))}
@@ -162,24 +161,22 @@ export default function ForCliniciansPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ background: "var(--mint)", padding: "12px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Approvals · 3 awaiting you
-              </div>
-              <div style={{ padding: 18, display: "grid", gap: 10 }}>
+              <div className="mkt-mock-bar">Approvals · 3 awaiting you</div>
+              <div className="mkt-mock-grid">
                 {[
                   ["SOAP note", "Marcus Bell · from ambient visit"],
                   ["Message reply", "Dana Ruiz · re: lab results"],
                   ["Superbill", "Ken Patterson · 99214 + add-on"],
                 ].map(([kind, sub]) => (
-                  <div key={kind} style={{ padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 11 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                      <strong style={{ fontSize: 14.5 }}>{kind}</strong>
-                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--green)", background: "var(--mint)", padding: "3px 9px", borderRadius: 20 }}>AI draft</span>
+                  <div key={kind} className="mkt-approval-item">
+                    <div className="mkt-approval-head">
+                      <strong className="mkt-approval-kind">{kind}</strong>
+                      <span className="mkt-badge">AI draft</span>
                     </div>
-                    <div style={{ fontSize: 13, color: "var(--muted)" }}>{sub}</div>
+                    <div className="mkt-approval-sub">{sub}</div>
                   </div>
                 ))}
-                <div style={{ display: "flex", gap: 8, fontSize: 12.5, color: "var(--muted)", paddingTop: 2 }}>
+                <div className="mkt-actions-hint">
                   Approve · Edit · Dismiss on every item
                 </div>
               </div>
@@ -193,26 +190,26 @@ export default function ForCliniciansPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">The whole clinic, not just the chart</p>
           <h2 className="mkt-h2">A front desk and a care team, in one view.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 40 }}>
+          <p className="mkt-lead mkt-p-lead-gap">
             Intelligence is only useful if the clinic runs on it. CHI gives the front desk its own
             board and the care team clear roles, so work moves without a huddle.
           </p>
           <div className="mkt-three">
             <div>
               <h3>Front-desk view</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Today&apos;s arrivals, check-ins, intake status and outstanding balances — the desk&apos;s own home screen.
               </p>
             </div>
             <div>
               <h3>Care-team roles</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Provider, nurse, health coach and admin each see scoped access and the right work.
               </p>
             </div>
             <div>
               <h3>Tasks that route</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Assign a follow-up, a recheck or a callback — it lands on the right person&apos;s list.
               </p>
             </div>
@@ -223,7 +220,7 @@ export default function ForCliniciansPage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 32 }}>Questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["Does the AI ever act on its own?", "No. Every AI output — notes, replies, superbills, talking points — lands in an approvals queue. Nothing is sent, charted or billed until a clinician approves it, and you can edit any draft first."],
@@ -244,7 +241,7 @@ export default function ForCliniciansPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">See your day, pre-read.</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             A short demo on your specialty, with your questions.
           </p>
           <Link href="/contact" className="mkt-btn lg">Book a demo</Link>

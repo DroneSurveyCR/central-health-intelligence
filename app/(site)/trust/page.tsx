@@ -31,23 +31,21 @@ export default function SecurityPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device tilt" role="img" aria-label="A tenant-isolation check showing zero cross-tenant leaks across eighteen tables">
-              <div style={{ background: "var(--mint)", padding: "14px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Isolation check · nightly
-              </div>
-              <div style={{ padding: 18 }}>
+              <div className="mkt-mock-bar">Isolation check · nightly</div>
+              <div className="mkt-mock-body">
                 {[
                   ["Tables scoped by practice_id", "18 / 18"],
                   ["Row-level security policies", "enforced"],
                   ["Cross-tenant rows returned", "0"],
                   ["Connector tokens encrypted", "AES-256-GCM"],
                 ].map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+                  <div key={k} className="mkt-stat">
                     <span>{k}</span>
-                    <span style={{ fontSize: 12.5, color: "var(--green)" }}>● {v}</span>
+                    <span className="mkt-stat-val green">● {v}</span>
                   </div>
                 ))}
-                <div style={{ marginTop: 14, padding: "11px 13px", background: "var(--mint-2)", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13.5, color: "var(--ink-2)" }}>
-                  <strong style={{ color: "var(--green)" }}>Passed</strong> · No record crossed a clinic boundary.
+                <div className="mkt-briefing-draft">
+                  <strong className="mkt-draft-label">Passed</strong> · No record crossed a clinic boundary.
                 </div>
               </div>
             </div>
@@ -62,7 +60,7 @@ export default function SecurityPage() {
             <p className="mkt-kicker">Tenant isolation</p>
             <h2 className="mkt-h2">One clinic can never see another&apos;s data.</h2>
             <p className="mkt-p">
-              Every record carries a <code style={{ fontFamily: "var(--serif)" }}>practice_id</code>. Row-level
+              Every record carries a <code>practice_id</code>. Row-level
               security enforces that boundary at the database, not just in application code — so a query
               physically cannot return another tenant&apos;s rows.
             </p>
@@ -74,16 +72,16 @@ export default function SecurityPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18, display: "grid", gap: 10 }}>
+              <div className="mkt-mock-grid">
                 {[
                   ["patients", "WHERE practice_id = :you"],
                   ["observations", "WHERE practice_id = :you"],
                   ["lab_results", "WHERE practice_id = :you"],
                   ["audit_log", "WHERE practice_id = :you"],
                 ].map(([t, clause]) => (
-                  <div key={t} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 11, fontSize: 13.5 }}>
+                  <div key={t} className="mkt-item-row">
                     <strong>{t}</strong>
-                    <span style={{ color: "var(--muted)", fontFamily: "var(--serif)", fontSize: 12.5 }}>{clause}</span>
+                    <span className="mkt-alert-when">{clause}</span>
                   </div>
                 ))}
               </div>
@@ -92,12 +90,12 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      {/* ---- Controls (alternating, not an icon grid) ---- */}
+      {/* ---- Controls ---- */}
       <section className="mkt-section">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18 }}>
+              <div className="mkt-mock-body">
                 {[
                   ["Staff MFA", "TOTP required"],
                   ["Audit log", "append-only · WORM"],
@@ -105,9 +103,9 @@ export default function SecurityPage() {
                   ["API rate limiting", "on"],
                   ["CSP / HSTS headers", "enforced"],
                 ].map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid var(--line)", fontSize: 14.5 }}>
+                  <div key={k} className="mkt-stat">
                     <span>{k}</span>
-                    <span style={{ fontSize: 12.5, color: "var(--green)" }}>● {v}</span>
+                    <span className="mkt-stat-val green">● {v}</span>
                   </div>
                 ))}
               </div>
@@ -131,47 +129,41 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      {/* ---- The compliance ladder: editions ---- */}
+      {/* ---- The isolation ladder ---- */}
       <section className="mkt-section mint-2">
         <div className="mkt-wrap">
           <p className="mkt-kicker">The isolation ladder</p>
           <h2 className="mkt-h2">Three editions, increasing isolation.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 36 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             Same product. You choose how far apart your clinic&apos;s data sits from everyone else&apos;s.
           </p>
           <div className="mkt-three">
             <div>
               <h3>Cloud</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 14px" }}>
+              <p className="mkt-muted mkt-three-p">
                 Shared multi-tenant. Strict row-level isolation by practice_id, full control stack,
                 live in days. The fastest way to start.
               </p>
-              <p className="mkt-muted" style={{ fontSize: 13, margin: 0, color: "var(--green)", fontWeight: 600 }}>
-                Logical isolation
-              </p>
+              <p className="mkt-isolation-tier">Logical isolation</p>
             </div>
             <div>
               <h3>HIPAA Cloud</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 14px" }}>
+              <p className="mkt-muted mkt-three-p">
                 Managed compliant tier: signed BAAs, US-PHI-ready, with the same controls operated to a
                 documented compliance standard.
               </p>
-              <p className="mkt-muted" style={{ fontSize: 13, margin: 0, color: "var(--green)", fontWeight: 600 }}>
-                Signed BAAs · US-PHI-ready
-              </p>
+              <p className="mkt-isolation-tier">Signed BAAs · US-PHI-ready</p>
             </div>
             <div>
               <h3>Private Cloud</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 14px" }}>
+              <p className="mkt-muted mkt-three-p">
                 A dedicated, isolated instance on the clinic&apos;s own VPS. Physically separate,
                 white-label, enterprise.
               </p>
-              <p className="mkt-muted" style={{ fontSize: 13, margin: 0, color: "var(--green)", fontWeight: 600 }}>
-                Dedicated instance · your infrastructure
-              </p>
+              <p className="mkt-isolation-tier">Dedicated instance · your infrastructure</p>
             </div>
           </div>
-          <div style={{ marginTop: 28 }}>
+          <div className="mkt-cta-actions">
             <Link href="/pricing" className="mkt-btn ghost">See editions &amp; pricing</Link>
           </div>
         </div>
@@ -180,7 +172,7 @@ export default function SecurityPage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 32 }}>Security questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Security questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["Are you HIPAA compliant?", "The HIPAA Cloud edition runs with signed BAAs and is US-PHI-ready, operating our controls to a documented compliance standard. Non-US clinics can start on Cloud, which uses the same technical isolation and security controls."],
@@ -203,7 +195,7 @@ export default function SecurityPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Bring your security checklist.</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             We&apos;ll walk it line by line on a short call.
           </p>
           <Link href="/contact" className="mkt-btn lg">Book a demo</Link>

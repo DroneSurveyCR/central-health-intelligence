@@ -30,22 +30,20 @@ export default function ForPatientsPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device tilt" role="img" aria-label="A patient's connected devices and a grounded AI assistant explaining a recent trend">
-              <div style={{ background: "var(--mint)", padding: "14px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Your health · this week
-              </div>
-              <div style={{ padding: 18 }}>
+              <div className="mkt-mock-bar">Your health · this week</div>
+              <div className="mkt-mock-body">
                 {[
                   ["Oura", "synced 2m ago"],
                   ["Apple Health", "live"],
                   ["Quest labs", "2 panels"],
                 ].map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 14.5 }}>
+                  <div key={k} className="mkt-connector-row">
                     <span>{k}</span>
-                    <span style={{ fontSize: 12.5, color: "var(--green)" }}>● {v}</span>
+                    <span className="mkt-connector-state on">● {v}</span>
                   </div>
                 ))}
-                <div style={{ marginTop: 14, padding: "11px 13px", background: "var(--mint-2)", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13.5, color: "var(--ink-2)" }}>
-                  <strong style={{ color: "var(--green)" }}>Assistant</strong> · Your sleep is up 40 min this week. I&apos;ll flag the lab question for your care team.
+                <div className="mkt-briefing-draft">
+                  <strong className="mkt-draft-label">Assistant</strong> · Your sleep is up 40 min this week. I&apos;ll flag the lab question for your care team.
                 </div>
               </div>
             </div>
@@ -71,17 +69,17 @@ export default function ForPatientsPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18, display: "grid", gap: 10 }}>
+              <div className="mkt-mock-grid">
                 {[
-                  ["Oura ring", "Connected"],
-                  ["Apple Health", "Connected"],
-                  ["Withings scale", "Connect"],
-                  ["Dexcom CGM", "Connect"],
-                ].map(([k, state]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 11, fontSize: 14.5 }}>
+                  ["Oura ring", true],
+                  ["Apple Health", true],
+                  ["Withings scale", false],
+                  ["Dexcom CGM", false],
+                ].map(([k, on]) => (
+                  <div key={String(k)} className="mkt-item-row">
                     <span>{k}</span>
-                    <span style={{ fontSize: 12.5, fontWeight: 600, color: state === "Connected" ? "var(--green)" : "var(--muted)" }}>
-                      {state === "Connected" ? "● Connected" : "Connect →"}
+                    <span className={`mkt-connector-state ${on ? "on" : "off"}`}>
+                      {on ? "● Connected" : "Connect →"}
                     </span>
                   </div>
                 ))}
@@ -96,15 +94,15 @@ export default function ForPatientsPage() {
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18, display: "grid", gap: 12 }}>
-                <div style={{ alignSelf: "flex-end", maxWidth: "82%", padding: "10px 13px", background: "var(--mint)", border: "1px solid var(--line)", borderRadius: 12, fontSize: 14 }}>
+              <div className="mkt-chat">
+                <div className="mkt-chat-q">
                   What does my latest A1c mean?
                 </div>
-                <div style={{ maxWidth: "88%", padding: "11px 13px", background: "var(--mint-2)", border: "1px solid var(--line)", borderRadius: 12, fontSize: 13.5, color: "var(--ink-2)" }}>
+                <div className="mkt-chat-a">
                   Your A1c is 5.4% — in the typical range, and down slightly from last time. I can explain the
                   trend, but your care team makes any clinical decisions. Want me to add a question for them?
                 </div>
-                <div style={{ fontSize: 11.5, color: "var(--muted)", paddingTop: 2 }}>
+                <div className="mkt-chat-fine">
                   Educational only · never diagnoses or doses · defers to your clinic
                 </div>
               </div>
@@ -145,23 +143,23 @@ export default function ForPatientsPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-                  <div style={{ fontFamily: "var(--serif)", fontSize: 18 }}>Daily check-in</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--green)" }}>🔥 14-day streak</div>
+              <div className="mkt-mock-body">
+                <div className="mkt-streak-header">
+                  <span className="mkt-streak-title">Daily check-in</span>
+                  <span className="mkt-streak-label">14-day streak</span>
                 </div>
-                <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+                <div className="mkt-streak-bar">
                   {Array.from({ length: 14 }).map((_, i) => (
-                    <span key={i} style={{ flex: 1, height: 8, borderRadius: 4, background: i < 13 ? "var(--green)" : "var(--line)" }} />
+                    <span key={i} className={`mkt-streak-pip${i === 13 ? " empty" : ""}`} />
                   ))}
                 </div>
                 {[
-                  ["Milestone", "30 nights of 7h+ sleep"],
-                  ["Milestone", "First lab panel synced"],
-                ].map(([tag, label]) => (
-                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+                  ["30 nights of 7h+ sleep", "Milestone"],
+                  ["First lab panel synced", "Milestone"],
+                ].map(([label, tag]) => (
+                  <div key={label} className="mkt-milestone-row">
                     <span>{label}</span>
-                    <span style={{ fontSize: 12, color: "var(--green)" }}>{tag} ✓</span>
+                    <span className="mkt-milestone-tag">{tag} ✓</span>
                   </div>
                 ))}
               </div>
@@ -175,26 +173,26 @@ export default function ForPatientsPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">You own it</p>
           <h2 className="mkt-h2">Your data is yours — to keep, and to take.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 40 }}>
+          <p className="mkt-lead mkt-p-lead-gap">
             Personal Health Intelligence is built on the idea that the record belongs to you. You decide
             what is shared, and you can take a complete copy with you at any time.
           </p>
           <div className="mkt-three">
             <div>
               <h3>Full portable export</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Request a complete, portable copy of your record in a standard format — your right under GDPR Article 20.
               </p>
             </div>
             <div>
               <h3>Per-domain consent</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Control sharing by domain — wearables, labs, notes — and turn any of it off without losing the rest.
               </p>
             </div>
             <div>
               <h3>Always reversible</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Disconnect a source or withdraw consent whenever you choose. Nothing is locked in.
               </p>
             </div>
@@ -205,7 +203,7 @@ export default function ForPatientsPage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 32 }}>Questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["Can the assistant diagnose me or change my meds?", "No. It explains your labs and trends in plain language for education only. It never diagnoses, never doses, and defers any clinical decision to your care team."],
@@ -226,7 +224,7 @@ export default function ForPatientsPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Bring Personal Health Intelligence to your care.</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             Ask your clinic about Central Health Intelligence — or talk to us directly.
           </p>
           <Link href="/contact" className="mkt-btn lg">Get in touch</Link>

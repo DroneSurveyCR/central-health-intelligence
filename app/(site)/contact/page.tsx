@@ -25,7 +25,7 @@ export default function ContactPage() {
               in action. No slide deck unless you want one.
             </p>
 
-            <div style={{ marginTop: 32 }}>
+            <div className="mkt-contact-expect">
               <p className="mkt-kicker" style={{ marginBottom: 14 }}>What to expect</p>
               <ul className="mkt-points">
                 <li>A reply within one business day to find a time</li>
@@ -34,14 +34,14 @@ export default function ContactPage() {
               </ul>
             </div>
 
-            <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid var(--line)" }}>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+            <div className="mkt-contact-divider">
+              <p className="mkt-muted mkt-contact-fine">
                 Prefer email? Reach us at{" "}
-                <a href="mailto:hello@healthintelligency.com" style={{ color: "var(--green)", fontWeight: 600 }}>
+                <a href="mailto:hello@healthintelligency.com" className="mkt-content-link">
                   hello@healthintelligency.com
                 </a>
                 {" "}— or read our{" "}
-                <Link href="/trust" style={{ color: "var(--green)", fontWeight: 600 }}>security &amp; compliance</Link>
+                <Link href="/trust" className="mkt-content-link">security &amp; compliance</Link>
                 {" "}page first.
               </p>
             </div>

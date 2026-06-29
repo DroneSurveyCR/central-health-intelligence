@@ -36,26 +36,6 @@ const COMPARISON: { product: string; what: string; price: string; ai: string; pa
   { product: "Epic", what: "Enterprise hospital EHR", price: "Enterprise, 12–24-month implementation", ai: "No / No", patient: "No" },
 ];
 
-const th: React.CSSProperties = {
-  textAlign: "left",
-  padding: "14px 16px",
-  borderBottom: "1px solid var(--line)",
-  borderRight: "1px solid var(--line)",
-  fontWeight: 600,
-  fontSize: 13.5,
-  color: "var(--ink)",
-  background: "var(--mint)",
-  verticalAlign: "bottom",
-};
-const td: React.CSSProperties = {
-  padding: "14px 16px",
-  borderBottom: "1px solid var(--line)",
-  borderRight: "1px solid var(--line)",
-  fontSize: 14.5,
-  color: "var(--ink-2)",
-  verticalAlign: "top",
-};
-
 export default function PricingPage() {
   return (
     <>
@@ -68,7 +48,7 @@ export default function PricingPage() {
             <br />
             The modules you <span className="mkt-lime-underline">actually use</span>.
           </h1>
-          <p className="mkt-lead" style={{ marginTop: 18 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             A per-provider monthly plan includes the always-on platform — EHR core, scheduling, billing,
             patient portal, engagement, the intelligence and AI layer, and the connector engine. Add only
             the modules your specialty needs. At parity with a legacy EHR, with the live-data and AI layer
@@ -86,13 +66,13 @@ export default function PricingPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">Three editions</p>
           <h2 className="mkt-h2">Choose the isolation your clinic needs.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 36 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             Same product, same modules — the difference is where it runs and how it&apos;s governed.
           </p>
           <div className="mkt-three">
             <div>
               <h3>Cloud</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 18px" }}>
+              <p className="mkt-muted mkt-three-p">
                 Shared multi-tenant cloud. Fastest and most affordable — live in days. Best for clinics
                 outside the US PHI regime.
               </p>
@@ -100,7 +80,7 @@ export default function PricingPage() {
             </div>
             <div>
               <h3>HIPAA Cloud</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 18px" }}>
+              <p className="mkt-muted mkt-three-p">
                 Managed compliant tier with signed BAAs and US-PHI-ready controls. The default for US
                 clinics handling protected health information.
               </p>
@@ -108,7 +88,7 @@ export default function PricingPage() {
             </div>
             <div>
               <h3>Private Cloud</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 18px" }}>
+              <p className="mkt-muted mkt-three-p">
                 A dedicated, isolated instance on your clinic&apos;s own VPS. White-label and enterprise,
                 with full data residency control.
               </p>
@@ -123,34 +103,34 @@ export default function PricingPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">The plan</p>
           <h2 className="mkt-h2">Priced per provider. Nothing hidden.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 36 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             One monthly plan per provider includes the always-on platform. Solo runs a single provider;
             Clinic adds providers per seat.
           </p>
           <div className="mkt-three">
             <div>
               <h3>Solo</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 14px" }}>
+              <p className="mkt-muted mkt-three-p">
                 One provider. The full platform — EHR core, scheduling, billing, patient portal,
                 engagement, intelligence, AI and connectors — always on.
               </p>
-              <p className="mkt-muted" style={{ fontSize: 13.5, margin: 0 }}>Add modules à la carte below.</p>
+              <p className="mkt-muted" style={{ fontSize: "13.5px", margin: 0 }}>Add modules à la carte below.</p>
             </div>
             <div>
               <h3>Clinic</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 14px" }}>
+              <p className="mkt-muted mkt-three-p">
                 Multiple providers, billed per seat. Shared schedule, shared patient records, role-based
                 access — the same live-data platform across the team.
               </p>
-              <p className="mkt-muted" style={{ fontSize: 13.5, margin: 0 }}>Volume pricing as seats grow.</p>
+              <p className="mkt-muted" style={{ fontSize: "13.5px", margin: 0 }}>Volume pricing as seats grow.</p>
             </div>
             <div>
               <h3>HIPAA setup</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: "0 0 14px" }}>
+              <p className="mkt-muted mkt-three-p">
                 A one-time compliance setup fee — <strong style={{ color: "var(--ink)" }}>$2,000–5,000</strong> —
                 covering compliant provisioning, BAA, data migration and white-glove onboarding.
               </p>
-              <p className="mkt-muted" style={{ fontSize: 13.5, margin: 0 }}>Applies to HIPAA Cloud and Private Cloud.</p>
+              <p className="mkt-muted" style={{ fontSize: "13.5px", margin: 0 }}>Applies to HIPAA Cloud and Private Cloud.</p>
             </div>
           </div>
         </div>
@@ -161,41 +141,23 @@ export default function PricingPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">Land and expand</p>
           <h2 className="mkt-h2">Modules, per month.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 36 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             Start with the platform. Switch on a module the day you need it — and only pay for what you run.
           </p>
-          <div
-            style={{
-              border: "1px solid var(--line)",
-              borderRadius: 14,
-              overflow: "hidden",
-              background: "#fff",
-            }}
-          >
-            {MODULES.map(([name, desc, price], i) => (
-              <div
-                key={name}
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  gap: 24,
-                  padding: "16px 20px",
-                  borderBottom: i === MODULES.length - 1 ? "none" : "1px solid var(--line)",
-                }}
-              >
+          <div className="mkt-module-list">
+            {MODULES.map(([name, desc, price]) => (
+              <div key={name} className="mkt-module-list-row">
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 15.5, color: "var(--ink)" }}>{name}</div>
-                  <div style={{ fontSize: 13.5, color: "var(--muted)" }}>{desc}</div>
+                  <div className="mkt-module-list-name">{name}</div>
+                  <div className="mkt-module-list-desc">{desc}</div>
                 </div>
-                <div style={{ fontFamily: "var(--serif)", fontSize: 19, color: "var(--ink)", whiteSpace: "nowrap" }}>
-                  {price}
-                  <span style={{ fontSize: 12.5, color: "var(--muted)", fontFamily: "var(--sans)" }}> / mo</span>
+                <div className="mkt-price-display">
+                  {price}<span className="mkt-price-unit"> / mo</span>
                 </div>
               </div>
             ))}
           </div>
-          <p className="mkt-muted" style={{ fontSize: 13.5, marginTop: 16 }}>
+          <p className="mkt-note">
             Module pricing is per provider, per month. We&apos;ll map a package to your specialty on the call.
           </p>
         </div>
@@ -206,59 +168,35 @@ export default function PricingPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">How we compare</p>
           <h2 className="mkt-h2">A live picture, not a filing cabinet.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 36 }}>
+          <p className="mkt-lead mkt-p-lead-md">
             Legacy EHRs store records and price per provider. We price the same way — and add the live-data,
             doctor-in-the-loop AI and patient-owned layer they don&apos;t offer.
           </p>
-          <div style={{ overflowX: "auto" }}>
-            <table
-              style={{
-                width: "100%",
-                minWidth: 720,
-                borderCollapse: "collapse",
-                border: "1px solid var(--line)",
-                borderRadius: 14,
-                overflow: "hidden",
-              }}
-            >
+          <div className="mkt-table-wrap">
+            <table className="mkt-table">
               <thead>
                 <tr>
-                  <th style={th}>Product</th>
-                  <th style={th}>What it is</th>
-                  <th style={th}>Typical price</th>
-                  <th style={th}>
-                    Live data + doctor-
-                    <br />
-                    in-the-loop AI?
-                  </th>
-                  <th style={{ ...th, borderRight: "none" }}>Patient-owned layer?</th>
+                  <th>Product</th>
+                  <th>What it is</th>
+                  <th>Typical price</th>
+                  <th>Live data + doctor-<br />in-the-loop AI?</th>
+                  <th>Patient-owned layer?</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON.map((row) => (
-                  <tr key={row.product} style={row.chi ? { background: "var(--mint-2)" } : undefined}>
-                    <td style={{ ...td, fontWeight: row.chi ? 600 : 500, color: "var(--ink)" }}>{row.product}</td>
-                    <td style={td}>{row.what}</td>
-                    <td style={td}>{row.price}</td>
-                    <td style={{ ...td, color: row.chi ? "var(--green)" : "var(--ink-2)", fontWeight: row.chi ? 600 : 400 }}>
-                      {row.ai}
-                    </td>
-                    <td
-                      style={{
-                        ...td,
-                        borderRight: "none",
-                        color: row.chi ? "var(--green)" : "var(--ink-2)",
-                        fontWeight: row.chi ? 600 : 400,
-                      }}
-                    >
-                      {row.patient}
-                    </td>
+                  <tr key={row.product} className={row.chi ? "mkt-hl" : undefined}>
+                    <td className={`fw${row.chi ? "" : ""}`}>{row.product}</td>
+                    <td>{row.what}</td>
+                    <td>{row.price}</td>
+                    <td className={row.chi ? "accent" : undefined}>{row.ai}</td>
+                    <td className={row.chi ? "accent" : undefined}>{row.patient}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mkt-muted" style={{ fontSize: 13, marginTop: 16 }}>
+          <p className="mkt-note">
             Competitor prices reflect publicly cited ranges from industry SaaS pricing surveys and vary by
             plan, term and add-ons. Central Health Intelligence goes live in days, not the 12–24-month
             implementations enterprise EHRs require.
@@ -270,7 +208,7 @@ export default function PricingPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Let&apos;s price it for your clinic.</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             Tell us your specialty and team size — we&apos;ll map a plan, the modules and the right edition.
           </p>
           <Link href="/contact" className="mkt-btn lg">Talk to us</Link>

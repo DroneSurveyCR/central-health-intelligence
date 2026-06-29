@@ -53,7 +53,7 @@ export default function SiteNav() {
           <Menu label="Company" items={COMPANY} />
         </nav>
         <span className="mkt-nav-spacer" />
-        <Link href="/login" className="mkt-navitem" style={{ fontSize: 15, color: "var(--ink-2)", padding: "8px 12px" }}>
+        <Link href="/login" className="mkt-login-link">
           Log in
         </Link>
         <a href="/api/demo" className="mkt-btn ghost">Try demo</a>
