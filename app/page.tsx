@@ -35,7 +35,7 @@ export default async function Home() {
             </p>
             <div className="mkt-hero-cta">
               <Link href="/contact" className="mkt-btn lg">Book a demo</Link>
-              <Link href="/platform/intelligence" className="mkt-btn ghost lg">See the platform</Link>
+              <a href="/api/demo" className="mkt-btn ghost lg">Try it live →</a>
             </div>
           </div>
           <div className="mkt-row-media">

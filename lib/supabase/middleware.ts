@@ -51,7 +51,7 @@ export async function updateSession(
   // secret/signed-state auth: cron, OAuth callbacks, webhooks) — never redirect them
   // to an HTML login. The middleware only bounces unauthenticated PAGE navigations.
   // Public marketing site (the (site) route group) + auth/legal/public-clinic pages.
-  const MARKETING = ["/platform", "/for-clinicians", "/for-patients", "/modules", "/trust", "/pricing", "/company", "/contact"];
+  const MARKETING = ["/platform", "/for-clinicians", "/for-patients", "/modules", "/trust", "/pricing", "/company", "/contact", "/demo"];
   const isPublic =
     path === "/" ||
     path.startsWith("/api/") ||

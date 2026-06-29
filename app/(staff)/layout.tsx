@@ -34,6 +34,13 @@ export default async function StaffLayout({
   const isAdmin = me.role === "doctor" || me.role === "admin";
   const mods = await getEnabledModules();
   const supabase = await createClient();
+
+  const { data: practice } = await supabase
+    .from("practices")
+    .select("slug")
+    .eq("id", me.practice_id)
+    .maybeSingle();
+  const isDemo = practice?.slug === "chi-demo";
   const { count: unread } = await supabase
     .from("messages")
     .select("id", { count: "exact", head: true })
@@ -84,6 +91,12 @@ export default async function StaffLayout({
         </div>
       </aside>
       <div className="side-main">
+        {isDemo && (
+          <div className="demo-banner">
+            <span>You&apos;re in the CHI demo — data resets daily, no real PHI.</span>
+            <a href="/contact">Book a real demo →</a>
+          </div>
+        )}
         <main id="main" className="app-main">{children}</main>
       </div>
     </div>

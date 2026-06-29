@@ -285,7 +285,26 @@ body {
   flex: 1;
   min-width: 0;
   background: var(--sand);
+  display: flex;
+  flex-direction: column;
 }
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 9px 16px;
+  background: #fff8e1;
+  border-bottom: 1px solid #ffe082;
+  font-size: 13px;
+  color: #5a4200;
+}
+.demo-banner a {
+  color: #1a6b3c;
+  font-weight: 600;
+  text-decoration: none;
+}
+.demo-banner a:hover { text-decoration: underline; }
 .side-main .app-main {
   padding: 30px 32px 56px;
   max-width: 1120px;

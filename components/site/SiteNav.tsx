@@ -56,6 +56,7 @@ export default function SiteNav() {
         <Link href="/login" className="mkt-navitem" style={{ fontSize: 15, color: "var(--ink-2)", padding: "8px 12px" }}>
           Log in
         </Link>
+        <a href="/api/demo" className="mkt-btn ghost">Try demo</a>
         <Link href="/contact" className="mkt-btn">Book a demo</Link>
       </div>
     </header>
