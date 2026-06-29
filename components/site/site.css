@@ -550,7 +550,23 @@
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgba(20, 131, 78, 0.14);
 }
+.mkt-form-input::placeholder, .mkt-form-textarea::placeholder { color: var(--muted); opacity: 1; }
 .mkt-btn-gap { margin-top: 20px; }
+
+/* Button keyboard focus */
+.mkt-btn:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+.mkt-btn.ghost:focus-visible { outline-color: var(--green); }
+
+/* Custom scrollbar on table horizontal scroll */
+.mkt-table-wrap::-webkit-scrollbar { height: 5px; }
+.mkt-table-wrap::-webkit-scrollbar-track { background: var(--mint); }
+.mkt-table-wrap::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
+
+/* Selection colour */
+::selection { background: rgba(20, 131, 78, 0.18); }
 /* dim timestamp/count line inside device */
 .mkt-device-subhead { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
 /* footnote at base of device body */
