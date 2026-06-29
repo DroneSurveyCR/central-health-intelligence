@@ -7,6 +7,35 @@ export const metadata: Metadata = {
     "A per-patient morning briefing of what changed since the last visit, an alerts engine with a triage worklist and alert-fatigue tuning, and AI-drafted talking points the doctor reviews — built on a nightly delta.",
 };
 
+const DELTA_ROWS: [string, string, "down" | "up" | "flat"][] = [
+  ["HRV", "−18 ms", "down"],
+  ["Glucose, time in range", "−12%", "down"],
+  ["Sleep", "−1.4 h / night", "down"],
+  ["Weight", "+1.6 kg", "up"],
+  ["Med adherence", "94%", "flat"],
+];
+
+const NIGHTLY_STATS: [string, string][] = [
+  ["Read new readings", "11,408 points"],
+  ["Computed deltas vs. last visit", "142 patients"],
+  ["Flagged for review", "9"],
+  ["Drafted talking points", "9"],
+];
+
+const TRIAGE_ROWS: [string, "high" | "watch" | "routine", string, string][] = [
+  ["Urgent", "high", "Marlene O. · glucose excursion", "now"],
+  ["Urgent", "high", "David R. · resting HR +14 bpm", "now"],
+  ["Watch", "watch", "Ken P. · sleep regression", "today"],
+  ["Watch", "watch", "Aria S. · weight trend", "today"],
+  ["Routine", "routine", "Tomas L. · labs due", "this week"],
+];
+
+const TALKING_POINTS = [
+  "Sleep down 1.4 h/night for two weeks — ask about evening routine and travel.",
+  "Glucose time-in-range slipping — revisit dinner timing before adjusting the plan.",
+  "HRV trending down with the above — likely linked, worth naming together.",
+];
+
 export default function IntelligencePage() {
   return (
     <>
@@ -30,26 +59,18 @@ export default function IntelligencePage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device tilt" role="img" aria-label="A morning briefing showing what changed for one patient since their last visit">
-              <div style={{ background: "var(--mint)", padding: "14px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Morning briefing · since last visit
-              </div>
-              <div style={{ padding: 18 }}>
-                <div style={{ fontFamily: "var(--serif)", fontSize: 19, marginBottom: 2 }}>Ken Patterson</div>
-                <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 14 }}>11 days · 5 sources</div>
-                {[
-                  ["HRV", "−18 ms", "down"],
-                  ["Glucose, time in range", "−12%", "down"],
-                  ["Sleep", "−1.4 h / night", "down"],
-                  ["Weight", "+1.6 kg", "up"],
-                  ["Med adherence", "94%", "flat"],
-                ].map(([k, v, dir]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+              <div className="mkt-briefing-bar">Morning briefing · since last visit</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-briefing-name">Ken Patterson</div>
+                <div className="mkt-briefing-sub">11 days · 5 sources</div>
+                {DELTA_ROWS.map(([k, v, dir]) => (
+                  <div key={k} className="mkt-briefing-row">
                     <span>{k}</span>
-                    <strong style={{ color: dir === "down" ? "#bb5234" : "var(--ink)" }}>{v}</strong>
+                    <strong className={dir === "down" ? "mkt-stat-val red" : "mkt-stat-val ink"}>{v}</strong>
                   </div>
                 ))}
-                <div style={{ marginTop: 14, padding: "11px 13px", background: "var(--mint-2)", border: "1px solid var(--line)", borderRadius: 10, fontSize: 13.5, color: "var(--ink-2)" }}>
-                  <strong style={{ color: "var(--green)" }}>AI draft</strong> · Talking points ready — sleep regression and glucose trend.
+                <div className="mkt-briefing-draft">
+                  <strong className="mkt-draft-label">AI draft</strong> · Talking points ready — sleep regression and glucose trend.
                 </div>
               </div>
             </div>
@@ -62,17 +83,12 @@ export default function IntelligencePage() {
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18 }}>
-                <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 12 }}>Last night · 02:14 · 142 patients</div>
-                {[
-                  ["Read new readings", "11,408 points"],
-                  ["Computed deltas vs. last visit", "142 patients"],
-                  ["Flagged for review", "9"],
-                  ["Drafted talking points", "9"],
-                ].map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+              <div className="mkt-briefing-body">
+                <div className="mkt-device-subhead">Last night · 02:14 · 142 patients</div>
+                {NIGHTLY_STATS.map(([k, v]) => (
+                  <div key={k} className="mkt-stat">
                     <span>{k}</span>
-                    <span style={{ fontSize: 12.5, color: "var(--green)" }}>● {v}</span>
+                    <span className="mkt-stat-val green">● {v}</span>
                   </div>
                 ))}
               </div>
@@ -102,7 +118,8 @@ export default function IntelligencePage() {
             <p className="mkt-kicker">Alerts &amp; the triage worklist</p>
             <h2 className="mkt-h2">One worklist, ordered by severity.</h2>
             <p className="mkt-p">
-              The alerts engine turns the nightly delta into a <code style={{ fontFamily: "var(--sans)", color: "var(--green)" }}>/triage</code>{" "}
+              The alerts engine turns the nightly delta into a{" "}
+              <code className="mkt-code-accent">/triage</code>{" "}
               worklist — patients sorted into severity tiers so the team works the most important cases first,
               not the most recent.
             </p>
@@ -114,21 +131,13 @@ export default function IntelligencePage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ background: "var(--mint)", padding: "12px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                /triage · 9 to review
-              </div>
-              <div style={{ padding: 16, display: "grid", gap: 10 }}>
-                {[
-                  ["Urgent", "#bb5234", "Marlene O. · glucose excursion", "now"],
-                  ["Urgent", "#bb5234", "David R. · resting HR +14 bpm", "now"],
-                  ["Watch", "var(--green)", "Ken P. · sleep regression", "today"],
-                  ["Watch", "var(--green)", "Aria S. · weight trend", "today"],
-                  ["Routine", "var(--muted)", "Tomas L. · labs due", "this week"],
-                ].map(([tier, color, who, when], i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", border: "1px solid var(--line)", borderRadius: 11, fontSize: 13.5 }}>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color, minWidth: 56 }}>{tier}</span>
-                    <span style={{ flex: 1 }}>{who}</span>
-                    <span style={{ fontSize: 12, color: "var(--muted)" }}>{when}</span>
+              <div className="mkt-mock-bar">/triage · 9 to review</div>
+              <div className="mkt-mock-grid">
+                {TRIAGE_ROWS.map(([tier, sev, who, when], i) => (
+                  <div key={i} className="mkt-alert-item">
+                    <span className={`mkt-tier ${sev}`}>{tier}</span>
+                    <span className="mkt-alert-who">{who}</span>
+                    <span className="mkt-alert-when">{when}</span>
                   </div>
                 ))}
               </div>
@@ -142,27 +151,27 @@ export default function IntelligencePage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">Tuned against alert fatigue</p>
           <h2 className="mkt-h2">Only the urgent ones interrupt.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 40 }}>
+          <p className="mkt-lead mkt-p-lead-gap">
             An alerting system that cries wolf gets muted. Severity thresholds are set per clinic, so the
             briefing stays quiet and the interruptions stay meaningful.
           </p>
           <div className="mkt-three">
             <div>
               <h3 className="mkt-h3">Urgent interrupts</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 A small, deliberate set of conditions can break through in real time. Everything else waits
                 for the morning briefing.
               </p>
             </div>
             <div>
               <h3 className="mkt-h3">Thresholds you set</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Tune what counts as a meaningful change per metric and per clinic — your population, your bar.
               </p>
             </div>
             <div>
               <h3 className="mkt-h3">Quiet by default</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Routine drift is summarized, not pushed. The team trusts the alert because it&apos;s rare.
               </p>
             </div>
@@ -175,20 +184,14 @@ export default function IntelligencePage() {
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ background: "var(--mint)", padding: "12px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Talking points · draft for review
-              </div>
-              <div style={{ padding: 18, display: "grid", gap: 12 }}>
-                {[
-                  "Sleep down 1.4 h/night for two weeks — ask about evening routine and travel.",
-                  "Glucose time-in-range slipping — revisit dinner timing before adjusting the plan.",
-                  "HRV trending down with the above — likely linked, worth naming together.",
-                ].map((t) => (
-                  <div key={t} style={{ padding: "12px 14px", border: "1px solid var(--line)", borderRadius: 11, fontSize: 14, color: "var(--ink-2)" }}>{t}</div>
+              <div className="mkt-mock-bar">Talking points · draft for review</div>
+              <div className="mkt-chat">
+                {TALKING_POINTS.map((t) => (
+                  <div key={t} className="mkt-item">{t}</div>
                 ))}
-                <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
-                  <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--green)", padding: "7px 12px", border: "1px solid var(--line)", borderRadius: 9 }}>Approve</span>
-                  <span style={{ fontSize: 12.5, color: "var(--muted)", padding: "7px 12px", border: "1px solid var(--line)", borderRadius: 9 }}>Edit</span>
+                <div className="mkt-action-row">
+                  <span className="mkt-action-btn accent">Approve</span>
+                  <span className="mkt-action-btn">Edit</span>
                 </div>
               </div>
             </div>
@@ -201,7 +204,7 @@ export default function IntelligencePage() {
               a starting place for the conversation. They&apos;re a draft until you review them; nothing is
               decided for you.
             </p>
-            <div style={{ marginTop: 24 }}>
+            <div className="mkt-action">
               <Link href="/platform/ai" className="mkt-btn ghost">How the approval queue works</Link>
             </div>
           </div>
@@ -211,7 +214,7 @@ export default function IntelligencePage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 32 }}>Questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["What exactly is in the briefing?", "A per-patient delta of what changed since the last visit — HRV, glucose, sleep, weight and adherence — plus any flags and AI-drafted talking points for review."],
@@ -233,7 +236,7 @@ export default function IntelligencePage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">See your morning briefing.</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             A short demo on a sample panel, in your specialty.
           </p>
           <Link href="/contact" className="mkt-btn lg">Book a demo</Link>

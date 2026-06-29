@@ -514,3 +514,32 @@
 
 /* Pricing three-up: paragraph needs space before the button */
 .mkt-three > div .mkt-btn { margin-top: 18px; }
+
+/* ====================================================================
+   PLATFORM PAGE — additional mock-UI patterns
+   ==================================================================== */
+
+/* inline code accent (used for /triage, /endpoint references) */
+.mkt-code-accent { font-family: var(--sans); color: var(--green); font-style: normal; }
+/* dim timestamp/count line inside device */
+.mkt-device-subhead { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+/* footnote at base of device body */
+.mkt-device-note { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+/* inline pair: value + status chip */
+.mkt-stat-pair { display: flex; gap: 12px; align-items: center; }
+/* mint (not mint-2) note block inside device */
+.mkt-briefing-note { margin-top: 14px; padding: 11px 13px; background: var(--mint); border: 1px solid var(--line); border-radius: 10px; font-size: 13px; color: var(--ink-2); }
+/* additional stat-val color variant */
+.mkt-stat-val.muted { color: var(--muted); font-weight: 500; }
+/* inline "Draft" label (no pill) */
+.mkt-draft-tag { font-size: 11.5px; font-weight: 600; color: var(--green); }
+/* SOAP note rows */
+.mkt-soap-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.mkt-soap-row:last-of-type { border-bottom: none; }
+.mkt-soap-key { color: var(--green); min-width: 16px; font-weight: 600; }
+.mkt-soap-val { color: var(--ink-2); }
+/* mock action button row */
+.mkt-action-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.mkt-action-btn { display: inline-flex; align-items: center; font-size: 12.5px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); white-space: nowrap; }
+.mkt-action-btn.accent { color: var(--green); font-weight: 600; border-color: var(--green); }
+.mkt-action-btn.filled { color: #fff; background: var(--green); font-weight: 600; border-color: var(--green); }

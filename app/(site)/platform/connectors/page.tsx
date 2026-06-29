@@ -7,6 +7,37 @@ export const metadata: Metadata = {
     "Real-time sync from Oura, Apple Health, Garmin, Withings and Dexcom CGM, plus labs by CSV, PDF or FHIR — normalized into one daily patient picture, isolated per tenant, with a webhook and retry job queue. The connector moat.",
 };
 
+const LIVE_SOURCES: [string, string][] = [
+  ["Oura", "synced 2m ago"],
+  ["Apple Health", "synced 6m ago"],
+  ["Garmin", "synced 18m ago"],
+  ["Withings scale", "synced 1h ago"],
+  ["Dexcom CGM", "live"],
+  ["Quest labs", "3 panels imported"],
+];
+
+const WEARABLE_CARDS: [string, string][] = [
+  ["Oura", "Sleep, HRV, readiness"],
+  ["Apple Health", "Activity, vitals, workouts"],
+  ["Garmin", "Training load, sleep"],
+  ["Withings", "Weight, body composition, BP"],
+  ["Dexcom", "Continuous glucose"],
+];
+
+const LAB_ROWS: [string, string, "in range" | "watch"][] = [
+  ["HbA1c", "5.4%", "in range"],
+  ["ApoB", "82 mg/dL", "watch"],
+  ["hs-CRP", "0.9 mg/L", "in range"],
+  ["Ferritin", "210 ng/mL", "in range"],
+];
+
+const JOB_STATS: [string, string, "green" | "muted"][] = [
+  ["Webhooks received", "4,206", "green"],
+  ["Processed", "4,206", "green"],
+  ["Retried (transient)", "11", "muted"],
+  ["Failed after retry", "0", "green"],
+];
+
 export default function ConnectorsPage() {
   return (
     <>
@@ -30,21 +61,12 @@ export default function ConnectorsPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device tilt" role="img" aria-label="A list of connected data sources, each showing a live sync status">
-              <div style={{ background: "var(--mint)", padding: "14px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Connected sources · this tenant
-              </div>
-              <div style={{ padding: 18 }}>
-                {[
-                  ["Oura", "synced 2m ago"],
-                  ["Apple Health", "synced 6m ago"],
-                  ["Garmin", "synced 18m ago"],
-                  ["Withings scale", "synced 1h ago"],
-                  ["Dexcom CGM", "live"],
-                  ["Quest labs", "3 panels imported"],
-                ].map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 14.5 }}>
+              <div className="mkt-briefing-bar">Connected sources · this tenant</div>
+              <div className="mkt-briefing-body">
+                {LIVE_SOURCES.map(([k, v]) => (
+                  <div key={k} className="mkt-connector-row">
                     <span>{k}</span>
-                    <span style={{ fontSize: 12.5, color: "var(--green)" }}>● {v}</span>
+                    <span className="mkt-connector-state on">● {v}</span>
                   </div>
                 ))}
               </div>
@@ -58,17 +80,11 @@ export default function ConnectorsPage() {
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ padding: 18, display: "grid", gap: 10 }}>
-                {[
-                  ["Oura", "Sleep, HRV, readiness"],
-                  ["Apple Health", "Activity, vitals, workouts"],
-                  ["Garmin", "Training load, sleep"],
-                  ["Withings", "Weight, body composition, BP"],
-                  ["Dexcom", "Continuous glucose"],
-                ].map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "11px 13px", border: "1px solid var(--line)", borderRadius: 11, fontSize: 14 }}>
-                    <strong style={{ fontWeight: 600 }}>{k}</strong>
-                    <span style={{ color: "var(--muted)", fontSize: 13 }}>{v}</span>
+              <div className="mkt-mock-grid">
+                {WEARABLE_CARDS.map(([k, v]) => (
+                  <div key={k} className="mkt-item-row">
+                    <strong>{k}</strong>
+                    <span className="mkt-alert-sub">{v}</span>
                   </div>
                 ))}
               </div>
@@ -108,25 +124,18 @@ export default function ConnectorsPage() {
           </div>
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ background: "var(--mint)", padding: "12px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Lab import · mapped
-              </div>
-              <div style={{ padding: 18 }}>
-                {[
-                  ["HbA1c", "5.4%", "in range"],
-                  ["ApoB", "82 mg/dL", "watch"],
-                  ["hs-CRP", "0.9 mg/L", "in range"],
-                  ["Ferritin", "210 ng/mL", "in range"],
-                ].map(([k, v, s]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+              <div className="mkt-mock-bar">Lab import · mapped</div>
+              <div className="mkt-briefing-body">
+                {LAB_ROWS.map(([k, v, s]) => (
+                  <div key={k} className="mkt-stat">
                     <span>{k}</span>
-                    <span style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <span className="mkt-stat-pair">
                       <strong>{v}</strong>
-                      <span style={{ fontSize: 11.5, color: s === "watch" ? "#bb5234" : "var(--green)" }}>{s}</span>
+                      <span className={s === "watch" ? "mkt-tier high" : "mkt-tier watch"}>{s}</span>
                     </span>
                   </div>
                 ))}
-                <div style={{ marginTop: 12, fontSize: 12.5, color: "var(--muted)" }}>Imported from PDF · 1 panel, 38 markers</div>
+                <div className="mkt-device-note">Imported from PDF · 1 panel, 38 markers</div>
               </div>
             </div>
           </div>
@@ -138,26 +147,26 @@ export default function ConnectorsPage() {
         <div className="mkt-wrap">
           <p className="mkt-kicker">One daily picture</p>
           <h2 className="mkt-h2">Many feeds in. One patient out.</h2>
-          <p className="mkt-lead" style={{ marginBottom: 40 }}>
+          <p className="mkt-lead mkt-p-lead-gap">
             Different devices, units and formats are normalized into a single, comparable daily snapshot —
             the thing the briefing and the AI read from.
           </p>
           <div className="mkt-three">
             <div>
               <h3 className="mkt-h3">Normalized</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Units and metrics are reconciled across sources so a trend means the same thing everywhere.
               </p>
             </div>
             <div>
               <h3 className="mkt-h3">Per-tenant isolation</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 Each clinic&apos;s data is scoped to its own tenant. No clinic ever sees another&apos;s patients.
               </p>
             </div>
             <div>
               <h3 className="mkt-h3">One snapshot</h3>
-              <p className="mkt-muted" style={{ fontSize: 15, margin: 0 }}>
+              <p className="mkt-muted mkt-three-p">
                 The result is a single daily picture per patient — what everything else reads from.
               </p>
             </div>
@@ -170,19 +179,12 @@ export default function ConnectorsPage() {
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
-              <div style={{ background: "var(--mint)", padding: "12px 16px", borderBottom: "1px solid var(--line)", fontSize: 13, color: "var(--muted)" }}>
-                Job queue · last hour
-              </div>
-              <div style={{ padding: 18 }}>
-                {[
-                  ["Webhooks received", "4,206", "var(--green)"],
-                  ["Processed", "4,206", "var(--green)"],
-                  ["Retried (transient)", "11", "var(--muted)"],
-                  ["Failed after retry", "0", "var(--green)"],
-                ].map(([k, v, c]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: "1px solid var(--line)", fontSize: 14 }}>
+              <div className="mkt-mock-bar">Job queue · last hour</div>
+              <div className="mkt-briefing-body">
+                {JOB_STATS.map(([k, v, c]) => (
+                  <div key={k} className="mkt-stat">
                     <span>{k}</span>
-                    <strong style={{ color: c as string }}>{v}</strong>
+                    <strong className={`mkt-stat-val ${c}`}>{v}</strong>
                   </div>
                 ))}
               </div>
@@ -207,7 +209,7 @@ export default function ConnectorsPage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2" style={{ textAlign: "center", marginBottom: 32 }}>Questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["Which sources connect today?", "Oura, Apple Health, Garmin, Withings and Dexcom CGM for device data, plus labs by CSV, PDF or FHIR."],
@@ -229,7 +231,7 @@ export default function ConnectorsPage() {
       <section className="mkt-section ink mkt-cta">
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Connect a source, see it land.</h2>
-          <p className="mkt-lead" style={{ margin: "0 auto 26px", textAlign: "center" }}>
+          <p className="mkt-lead mkt-cta-lead">
             A short demo with your devices and a real lab panel.
           </p>
           <Link href="/contact" className="mkt-btn lg">Book a demo</Link>

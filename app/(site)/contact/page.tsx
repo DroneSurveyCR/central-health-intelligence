@@ -26,7 +26,7 @@ export default function ContactPage() {
             </p>
 
             <div className="mkt-contact-expect">
-              <p className="mkt-kicker" style={{ marginBottom: 14 }}>What to expect</p>
+              <p className="mkt-kicker">What to expect</p>
               <ul className="mkt-points">
                 <li>A reply within one business day to find a time</li>
                 <li>A 30-minute demo tailored to your specialty</li>
