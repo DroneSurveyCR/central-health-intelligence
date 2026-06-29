@@ -284,9 +284,13 @@
   .mkt-section { padding: 64px 0; }
   .mkt-row, .mkt-row.rev { grid-template-columns: 1fr; gap: 32px; }
   .mkt-row.rev .mkt-row-media { order: 0; }
-  .mkt-three { grid-template-columns: 1fr; }
+  /* Two-column on tablets — smoother than 3→1 jump */
+  .mkt-three { grid-template-columns: repeat(2, 1fr); }
+  /* Center a lone last card when item count is odd */
+  .mkt-three > div:last-child:nth-child(odd) { grid-column: 1 / -1; max-width: 60%; margin: 0 auto; }
   .mkt-foot-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
   .mkt-nav-links { display: none; }
+  .mkt-nav-row { gap: 12px; }
 }
 
 @media (max-width: 640px) {
@@ -297,6 +301,21 @@
   .mkt-devices-duo .mkt-phone { margin-bottom: 0; }
   .mkt-foot-grid { grid-template-columns: 1fr; }
   .mkt-module-grid { grid-template-columns: 1fr; }
+  /* Single column on phones */
+  .mkt-three { grid-template-columns: 1fr; }
+  .mkt-three > div:last-child:nth-child(odd) { grid-column: auto; max-width: none; margin: 0; }
+  /* Hide secondary nav actions — keep only the primary CTA */
+  .mkt-login-link { display: none; }
+  .mkt-nav-row .mkt-btn.ghost { display: none; }
+  .mkt-nav-row { gap: 10px; }
+}
+
+@media (max-width: 420px) {
+  /* Brand: show just the mark monogram, hide full wordmark */
+  .mkt-brand b { display: none; }
+  .mkt-nav-row { gap: 8px; }
+  /* Module list: stack the price below the name */
+  .mkt-module-list-row { flex-direction: column; align-items: flex-start; gap: 4px; }
 }
 
 /* ---- mock device UI patterns (shared across all pages) ---- */
