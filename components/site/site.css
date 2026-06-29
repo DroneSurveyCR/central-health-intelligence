@@ -69,7 +69,7 @@
 
 /* ---- buttons (solid green; ghost = hairline) ---- */
 .mkt-btn {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
   background: var(--green); color: #fff; font-weight: 600; font-size: 15px;
   padding: 12px 22px; border-radius: 12px; border: 0; cursor: pointer;
   transition: background .18s ease, transform .18s ease;
@@ -278,6 +278,7 @@
 }
 .mkt-devices-duo .mkt-screen { flex: 1; max-width: 620px; }
 .mkt-devices-duo .mkt-phone { align-self: center; margin-bottom: 16px; }
+.mkt-devices-duo .mkt-device { flex: 1; max-width: 460px; }
 
 /* ---- responsive ---- */
 @media (max-width: 880px) {
@@ -430,7 +431,7 @@
 .mkt-isolation-tier { font-size: 13px; margin: 0; font-weight: 600; color: var(--green); }
 
 /* nav login link */
-.mkt-login-link { font-size: 15px; color: var(--ink-2); padding: 10px 14px; display: inline-flex; align-items: center; min-height: 44px; transition: color .12s; }
+.mkt-login-link { font-size: 15px; color: var(--ink-2); padding: 10px 14px; display: inline-flex; align-items: center; min-height: 44px; white-space: nowrap; transition: color .12s; }
 .mkt-login-link:hover { color: var(--ink); }
 /* footer overrides */
 .mkt-foot-brand { color: #fff; }

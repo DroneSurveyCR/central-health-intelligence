@@ -4,8 +4,6 @@ import { redirect } from "next/navigation";
 import { getCurrentPractitioner, getCurrentPatient } from "@/lib/auth/roles";
 import SiteShell from "@/components/site/SiteShell";
 
-const SCREENS = "https://cryptorica.vercel.app/assets/screens";
-
 export const metadata: Metadata = {
   title: { absolute: "Central Health Intelligence — live health intelligence for clinics" },
   description:
@@ -41,14 +39,24 @@ export default async function Home() {
             </div>
           </div>
           <div className="mkt-row-media">
-            <div className="mkt-screen tilt">
-              <div className="mkt-screen-bar" />
-              <img
-                src={`${SCREENS}/be-dashboard.png`}
-                alt="Central Health Intelligence — clinician morning briefing dashboard"
-                width={680}
-                height={480}
-              />
+            <div className="mkt-device tilt" role="img" aria-label="Central Health Intelligence — clinician morning briefing dashboard">
+              <div className="mkt-briefing-bar">Morning briefing · Mon 9 Jun</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-briefing-row">
+                  <div className="mkt-briefing-name">Aria Solberg</div>
+                  <div className="mkt-briefing-sub">Longevity · follow-up Tue</div>
+                </div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">HRV 7-day avg</span><span className="mkt-stat-val red">↓ 38 ms</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Glucose, time in range</span><span className="mkt-stat-val red">−12%</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Sleep efficiency</span><span className="mkt-stat-val ink">74%</span></div>
+                <div className="mkt-briefing-row">
+                  <div className="mkt-briefing-name">Marcus Webb</div>
+                  <div className="mkt-briefing-sub">Peptide / GLP-1 · labs due</div>
+                </div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">ApoB</span><span className="mkt-stat-val ink">82 mg/dL</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Weight trend</span><span className="mkt-stat-val green">−1.8 kg</span></div>
+                <div className="mkt-briefing-note">AI-drafted talking points ready · awaiting your review</div>
+              </div>
             </div>
           </div>
         </div>
@@ -101,14 +109,16 @@ export default async function Home() {
       <section className="mkt-section">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
-            <div className="mkt-screen">
-              <div className="mkt-screen-bar" />
-              <img
-                src={`${SCREENS}/be-records.png`}
-                alt="Patient records with live wearable and lab data in one view"
-                width={680}
-                height={480}
-              />
+            <div className="mkt-device" role="img" aria-label="Patient records with live wearable and lab data in one view">
+              <div className="mkt-briefing-bar">Connected sources · Aria Solberg</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-connector-row"><span>Oura Ring</span><span className="mkt-connector-state on">● synced 2m ago</span></div>
+                <div className="mkt-connector-row"><span>Apple Health</span><span className="mkt-connector-state on">● synced 6m ago</span></div>
+                <div className="mkt-connector-row"><span>Dexcom CGM</span><span className="mkt-connector-state on">● live</span></div>
+                <div className="mkt-connector-row"><span>Withings scale</span><span className="mkt-connector-state on">● synced 1h ago</span></div>
+                <div className="mkt-connector-row"><span>Quest labs</span><span className="mkt-connector-state on">● 3 panels imported</span></div>
+                <div className="mkt-briefing-note">All sources current · next sync in 4m</div>
+              </div>
             </div>
           </div>
           <div>
@@ -142,13 +152,15 @@ export default async function Home() {
             </div>
           </div>
           <div className="mkt-row-media">
-            <div className="mkt-phone tilt">
-              <img
-                src={`${SCREENS}/fe-dashboard.png`}
-                alt="Patient app — personal health intelligence on mobile"
-                width={390}
-                height={844}
-              />
+            <div className="mkt-device tilt" role="img" aria-label="Patient app — personal health intelligence on mobile">
+              <div className="mkt-briefing-bar">Your morning · Mon 9 Jun</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-stat"><span className="mkt-alert-sub">HRV last night</span><span className="mkt-stat-val green">52 ms ↑</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Sleep</span><span className="mkt-stat-val ink">7h 14m · 81%</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Glucose, 24h avg</span><span className="mkt-stat-val ink">94 mg/dL</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Steps yesterday</span><span className="mkt-stat-val green">9,402</span></div>
+                <div className="mkt-briefing-note">Message from Dr Elara · tap to read</div>
+              </div>
             </div>
           </div>
         </div>
@@ -164,22 +176,24 @@ export default async function Home() {
             results and messaging all in one place, with no extra apps to install.
           </p>
           <div className="mkt-devices-duo">
-            <div className="mkt-screen">
-              <div className="mkt-screen-bar" />
-              <img
-                src={`${SCREENS}/be-calendar.png`}
-                alt="Central Health Intelligence scheduling and calendar view"
-                width={680}
-                height={460}
-              />
+            <div className="mkt-device" role="img" aria-label="Central Health Intelligence scheduling and calendar view">
+              <div className="mkt-briefing-bar">Today · 6 appointments</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-stat"><span className="mkt-alert-sub">09:00</span><span>Aria Solberg · follow-up</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">10:30</span><span>Marcus Webb · intake</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">11:15</span><span>Priya Nair · labs review</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">14:00</span><span>James Okafor · peptide check-in</span></div>
+                <div className="mkt-briefing-note">2 AI draft notes ready for review</div>
+              </div>
             </div>
-            <div className="mkt-phone">
-              <img
-                src={`${SCREENS}/fe-before-after.png`}
-                alt="Patient app — progress tracking and before/after view"
-                width={390}
-                height={844}
-              />
+            <div className="mkt-device" role="img" aria-label="Patient app — progress tracking and before/after view">
+              <div className="mkt-briefing-bar">Your progress · 90 days</div>
+              <div className="mkt-briefing-body">
+                <div className="mkt-stat"><span className="mkt-alert-sub">Weight</span><span className="mkt-stat-val green">−6.2 kg</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">HRV trend</span><span className="mkt-stat-val green">+14 ms</span></div>
+                <div className="mkt-stat"><span className="mkt-alert-sub">Glucose avg</span><span className="mkt-stat-val green">↓ 8 mg/dL</span></div>
+                <div className="mkt-briefing-note">Next visit: Tue 10:30 with Dr Elara</div>
+              </div>
             </div>
           </div>
         </div>
