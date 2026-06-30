@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Security & compliance",
   description:
-    "How Central Health Intelligence protects client data: HIPAA-ready BAAs, in-country data residency with the AI model running in-region, strict tenant isolation, MFA, append-only audit logs and AES-256 encryption — plus dedicated Private Cloud (VPS) deployments for multi-location groups.",
+    "How Central Health Intelligence protects client data: worldwide out of the box, with US HIPAA and Canadian compliance provisioned through partners (AWS hosting + a BAA-signing AI provider, in-region), strict tenant isolation, MFA, audit logs and AES-256 encryption — plus dedicated Private Cloud (VPS) deployments for multi-location groups.",
 };
 
 export default function SecurityPage() {
@@ -57,15 +57,15 @@ export default function SecurityPage() {
       <section className="mkt-section">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
-            <div className="mkt-device" role="img" aria-label="A deployment showing data and AI hosted in-region with a signed BAA">
-              <div className="mkt-mock-bar">Deployment · your region</div>
+            <div className="mkt-device" role="img" aria-label="Deployment options: worldwide out of the box, with compliant US and Canada deployments through partners">
+              <div className="mkt-mock-bar">Deployment options</div>
               <div className="mkt-mock-body">
                 {[
-                  ["Data hosted in", "your country"],
-                  ["AI model runs in", "same region"],
-                  ["Leaves the jurisdiction", "never"],
-                  ["HIPAA BAA", "signed"],
-                  ["Encryption in transit / at rest", "TLS · AES-256"],
+                  ["Out of the box", "worldwide"],
+                  ["US HIPAA / Canada", "on request"],
+                  ["Hosting partner", "AWS · in-region"],
+                  ["AI provider (signs BAA)", "Claude / OpenAI"],
+                  ["Encryption", "TLS · AES-256"],
                 ].map(([k, v]) => (
                   <div key={k} className="mkt-stat">
                     <span>{k}</span>
@@ -77,17 +77,19 @@ export default function SecurityPage() {
           </div>
           <div>
             <p className="mkt-kicker">Compliance &amp; data residency</p>
-            <h2 className="mkt-h2">Your data — and your AI — stay in your country.</h2>
+            <h2 className="mkt-h2">Worldwide out of the box. Compliant where you need it.</h2>
             <p className="mkt-p">
-              Health data is regulated where your clients live. We deploy in the region you serve, and
-              the AI model runs in that same jurisdiction — so protected health information never leaves
-              the country it&apos;s governed by, whether that&apos;s HIPAA in the US, GDPR in the EU, or your
-              local regime.
+              Out of the box, Central Health Intelligence runs anywhere in the world. When you need US
+              HIPAA or Canadian compliance, we provision a compliant deployment through our partners —
+              hosting on AWS in your region, with an AI provider that signs a BAA and processes in-region
+              (Claude or OpenAI) — so your client data and the AI stay in the jurisdiction that governs
+              them. We set this up with you.
             </p>
             <ul className="mkt-points">
-              <li>HIPAA-ready, with signed BAAs for US protected health information</li>
-              <li>In-country hosting — data residency in the region you operate</li>
-              <li>The AI model runs in-region too; PHI is never sent out of jurisdiction</li>
+              <li>Works worldwide out of the box — start anywhere, today</li>
+              <li>US HIPAA and Canadian compliance provisioned through our partners</li>
+              <li>Hosted on compliant infrastructure (AWS) in the region you serve</li>
+              <li>AI via providers that sign BAAs and run in-region — Claude or OpenAI</li>
               <li>Encrypted in transit (TLS) and at rest (AES-256)</li>
             </ul>
           </div>
@@ -263,9 +265,9 @@ export default function SecurityPage() {
           <h2 className="mkt-h2 mkt-faq-heading">Security questions, answered.</h2>
           <div className="mkt-faq">
             {[
-              ["Are you HIPAA compliant?", "The HIPAA Cloud edition runs with signed BAAs and is US-PHI-ready, operating our controls to a documented compliance standard. Non-US clinics can start on Cloud, which uses the same technical isolation and security controls."],
-              ["Where is our data hosted — does it stay in our country?", "Yes. We deploy in the region you serve, so client data has residency in your jurisdiction — HIPAA in the US, GDPR in the EU, or your local regime. On Private Cloud it lives on your own server."],
-              ["Does the AI run in our jurisdiction too?", "Yes. The AI model runs in the same region as your data, so protected health information is never sent out of the country it's regulated in."],
+              ["Are you HIPAA compliant?", "Out of the box, CHI runs worldwide. For US HIPAA or Canadian compliance, we provision a compliant deployment through our partners — hosting on AWS in your region and an AI provider that signs a BAA (Claude or OpenAI). We set this up with you as part of onboarding."],
+              ["Where is our data hosted — does it stay in our country?", "By default you can run anywhere. When compliance requires it, we deploy on partner infrastructure (AWS) in your region so client data has residency in your jurisdiction. On Private Cloud it lives on your own server."],
+              ["Does the AI run in our jurisdiction too?", "For compliant deployments we use AI providers (Claude or OpenAI) that sign BAAs and offer in-region processing, so protected health information stays in the jurisdiction that governs it."],
               ["Can we get a dedicated server for our group?", "Yes — Private Cloud is a standalone, dedicated instance on your own VPS: faster, fully isolated, white-labeled, and built for multi-location groups with many doctors and unlimited users."],
               ["How do you guarantee tenant isolation?", "Every record carries a practice_id, and row-level security enforces that boundary in the database itself. We verify it continuously — the most recent check returned 0 cross-tenant rows across 18 tables."],
               ["How is staff access protected?", "Every staff account requires MFA via TOTP. All access is written to an append-only, WORM audit log that cannot be silently edited or deleted."],
