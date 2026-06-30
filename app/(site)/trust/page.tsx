@@ -30,14 +30,15 @@ export default function SecurityPage() {
             </div>
           </div>
           <div className="mkt-row-media">
-            <div className="mkt-device tilt" role="img" aria-label="A tenant-isolation check showing zero cross-tenant leaks across eighteen tables">
-              <div className="mkt-mock-bar">Isolation check · nightly</div>
+            <div className="mkt-device tilt" role="img" aria-label="How Central Health Intelligence protects client data at a glance">
+              <div className="mkt-mock-bar">Your client data · at a glance</div>
               <div className="mkt-mock-body">
                 {[
-                  ["Tables scoped by practice_id", "18 / 18"],
-                  ["Row-level security policies", "enforced"],
-                  ["Cross-tenant rows returned", "0"],
-                  ["Connector tokens encrypted", "AES-256-GCM"],
+                  ["Each clinic's data", "isolated"],
+                  ["Every access", "logged · WORM"],
+                  ["Encryption", "TLS · AES-256"],
+                  ["Compliance", "HIPAA via partners"],
+                  ["Where it runs", "cloud or your VPS"],
                 ].map(([k, v]) => (
                   <div key={k} className="mkt-stat">
                     <span>{k}</span>
@@ -45,7 +46,7 @@ export default function SecurityPage() {
                   </div>
                 ))}
                 <div className="mkt-briefing-draft">
-                  <strong className="mkt-draft-label">Passed</strong> · No record crossed a clinic boundary.
+                  <strong className="mkt-draft-label">Yours</strong> · your data, in your jurisdiction.
                 </div>
               </div>
             </div>
@@ -96,45 +97,8 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      {/* ---- Tenant isolation ---- */}
-      <section className="mkt-section mint">
-        <div className="mkt-wrap mkt-row">
-          <div>
-            <p className="mkt-kicker">Tenant isolation</p>
-            <h2 className="mkt-h2">One clinic can never see another&apos;s data.</h2>
-            <p className="mkt-p">
-              Every record carries a <code>practice_id</code>. Row-level
-              security enforces that boundary at the database, not just in application code — so a query
-              physically cannot return another tenant&apos;s rows.
-            </p>
-            <ul className="mkt-points">
-              <li>Row-level security on every client-data table</li>
-              <li>Verified: 0 cross-tenant rows returned across 18 tables</li>
-              <li>Nightly isolation checks, re-run on every schema change</li>
-            </ul>
-          </div>
-          <div className="mkt-row-media">
-            <div className="mkt-device">
-              <div className="mkt-mock-grid">
-                {[
-                  ["patients", "WHERE practice_id = :you"],
-                  ["observations", "WHERE practice_id = :you"],
-                  ["lab_results", "WHERE practice_id = :you"],
-                  ["audit_log", "WHERE practice_id = :you"],
-                ].map(([t, clause]) => (
-                  <div key={t} className="mkt-item-row">
-                    <strong>{t}</strong>
-                    <span className="mkt-alert-when">{clause}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ---- Controls ---- */}
-      <section className="mkt-section">
+      <section className="mkt-section mint">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
             <div className="mkt-device">
@@ -269,7 +233,7 @@ export default function SecurityPage() {
               ["Where is our data hosted — does it stay in our country?", "By default you can run anywhere. When compliance requires it, we deploy on partner infrastructure (AWS) in your region so client data has residency in your jurisdiction. On Private Cloud it lives on your own server."],
               ["Does the AI run in our jurisdiction too?", "For compliant deployments we use AI providers (Claude or OpenAI) that sign BAAs and offer in-region processing, so protected health information stays in the jurisdiction that governs it."],
               ["Can we get a dedicated server for our group?", "Yes — Private Cloud is a standalone, dedicated instance on your own VPS: faster, fully isolated, white-labeled, and built for multi-location groups with many doctors and unlimited users."],
-              ["How do you guarantee tenant isolation?", "Every record carries a practice_id, and row-level security enforces that boundary in the database itself. We verify it continuously — the most recent check returned 0 cross-tenant rows across 18 tables."],
+              ["Is one clinic's data separated from another's?", "Yes. Each clinic's data is isolated at the database layer, so one clinic's queries can't reach another's records. On Private Cloud, your data sits on a separate server entirely."],
               ["How is staff access protected?", "Every staff account requires MFA via TOTP. All access is written to an append-only, WORM audit log that cannot be silently edited or deleted."],
               ["How are uploads and credentials stored?", "Uploaded files and any connector credentials are encrypted at rest with AES-256-GCM. They are never exposed to other tenants or written to logs in plaintext."],
               ["What protects the application itself?", "Rate limiting on the API surface, plus CSP and HSTS headers on every response to defend against injection and downgrade attacks."],
