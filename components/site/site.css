@@ -246,8 +246,8 @@
   gap: 20px;
 }
 .mkt-vert-card {
-  display: flex; flex-direction: column; gap: 8px;
-  padding: 24px 22px 20px;
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 24px 22px 22px;
   border: 1px solid var(--line); border-radius: 16px; background: #fff;
   transition: transform .16s ease, box-shadow .18s ease, border-color .18s ease;
 }
@@ -256,10 +256,28 @@
   box-shadow: 0 22px 44px -28px rgba(20, 53, 42, 0.4);
   border-color: rgba(20, 131, 78, 0.4);
 }
+/* icon emblem */
+.mkt-vert-icon {
+  width: 46px; height: 46px; border-radius: 13px;
+  display: grid; place-items: center; margin-bottom: 8px;
+}
+.mkt-vert-icon svg { width: 24px; height: 24px; }
+.mkt-vert-icon.tint-mint { background: var(--mint); color: var(--green); }
+.mkt-vert-icon.tint-gold { background: var(--gold-bg); color: var(--gold-d); }
+.mkt-vert-icon.tint-sky { background: #d9f1f3; color: #0f7d8a; }
 .mkt-vert-name { font-family: var(--serif); font-weight: 800; font-size: 19px; letter-spacing: -0.02em; color: var(--ink); }
 .mkt-vert-doctor { font-size: 13px; font-weight: 600; color: var(--green); }
 .mkt-vert-lead { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin-top: 2px; }
-.mkt-vert-go { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 6px; }
+/* a real button look at the bottom of each card (the whole card is the link) */
+.mkt-vert-btn {
+  align-self: flex-start; margin-top: 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 16px; border-radius: 10px;
+  border: 1.5px solid var(--line); background: #fff;
+  font-size: 13.5px; font-weight: 700; color: var(--ink);
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+.mkt-vert-card:hover .mkt-vert-btn { background: var(--green); border-color: var(--green); color: #fff; }
 .mkt-vert-note { text-align: center; margin-top: 28px; }
 @media (max-width: 880px) { .mkt-vert-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .mkt-vert-grid { grid-template-columns: 1fr; } }
