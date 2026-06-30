@@ -49,7 +49,7 @@ export default function PricingPage() {
             and progress tracking on both sides. Add only the modules your specialty needs.
           </p>
           <div className="mkt-hero-cta">
-            <Link href="/contact" className="mkt-btn lg">Talk to us</Link>
+            <Link href="/contact?intent=pricing" className="mkt-btn lg">Talk to us</Link>
             <Link href="/product" className="mkt-btn ghost lg">See how it works →</Link>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function PricingPage() {
                 Shared multi-tenant cloud. Fastest and most affordable — live in days. Best for practices
                 outside the US PHI regime.
               </p>
-              <Link href="/contact" className="mkt-btn ghost">Talk to us</Link>
+              <Link href="/contact?intent=pricing" className="mkt-btn ghost">Talk to us</Link>
             </div>
             <div>
               <h3 className="mkt-h3">HIPAA Cloud</h3>
@@ -78,7 +78,7 @@ export default function PricingPage() {
                 Managed compliant tier with signed BAAs and US-PHI-ready controls. The default for US
                 practices handling protected health information.
               </p>
-              <Link href="/contact" className="mkt-btn ghost">Talk to us</Link>
+              <Link href="/contact?intent=pricing" className="mkt-btn ghost">Talk to us</Link>
             </div>
             <div>
               <h3 className="mkt-h3">Private Cloud</h3>
@@ -86,7 +86,7 @@ export default function PricingPage() {
                 A dedicated, isolated instance on your practice&apos;s own VPS. White-label and enterprise,
                 with full data residency control.
               </p>
-              <Link href="/contact" className="mkt-btn ghost">Talk to us</Link>
+              <Link href="/contact?intent=pricing" className="mkt-btn ghost">Talk to us</Link>
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function PricingPage() {
           <p className="mkt-lead mkt-cta-lead">
             Tell us your specialty and team size — we&apos;ll map a plan, the modules and the right edition.
           </p>
-          <Link href="/contact" className="mkt-btn lg">Talk to us</Link>
+          <Link href="/contact?intent=pricing" className="mkt-btn lg">Talk to us</Link>
         </div>
       </section>
     </>

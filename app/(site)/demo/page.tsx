@@ -12,20 +12,20 @@ export default function DemoPage() {
       {/* ---- Hero ---- */}
       <section className="mkt-section mkt-hero">
         <div className="mkt-wrap mkt-demo-hero">
-          <p className="mkt-kicker">No signup required</p>
+          <p className="mkt-kicker">Get a demo</p>
           <h1 className="mkt-display mkt-demo-display">
             See CHI with real data.
           </h1>
           <p className="mkt-lead">
             A fully loaded demo practice — clients on AI-drafted, doctor-approved 90-day plans, with the
-            client app and progress tracking on both sides. Click in and explore.
+            client app and progress tracking on both sides. Tell us your specialty and we&apos;ll walk you
+            through it on your data.
           </p>
           <div className="mkt-hero-cta center">
-            <a href="/api/demo" className="mkt-btn lg">Enter demo →</a>
-            <Link href="/contact" className="mkt-btn ghost lg">Book a real demo</Link>
+            <Link href="/contact?intent=demo" className="mkt-btn lg">Request a demo →</Link>
           </div>
           <p className="mkt-demo-fine">
-            Demo data resets daily · no real PHI
+            We reply within one business day · no real PHI in the demo
           </p>
         </div>
       </section>
@@ -110,9 +110,9 @@ export default function DemoPage() {
         <div className="mkt-wrap">
           <h2 className="mkt-h2">Ready to see it?</h2>
           <p className="mkt-lead mkt-demo-cta-lead">
-            One click. No account needed.
+            Tell us your specialty and we&apos;ll tailor the walkthrough.
           </p>
-          <a href="/api/demo" className="mkt-btn lg">Enter demo →</a>
+          <Link href="/contact?intent=demo" className="mkt-btn lg">Request a demo →</Link>
         </div>
       </section>
     </>

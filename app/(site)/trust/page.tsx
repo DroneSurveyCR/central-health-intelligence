@@ -177,7 +177,7 @@ export default function SecurityPage() {
               <li>White-labeled to your brand, on your own domain</li>
             </ul>
             <div className="mkt-action">
-              <Link href="/contact" className="mkt-btn ghost">Talk about a private deployment</Link>
+              <Link href="/contact?intent=pricing" className="mkt-btn ghost">Talk about a private deployment</Link>
             </div>
           </div>
         </div>
