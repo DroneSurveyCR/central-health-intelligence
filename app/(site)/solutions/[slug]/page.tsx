@@ -33,21 +33,23 @@ export default async function VerticalPage({
 
   return (
     <>
-      {/* ---- Hero ---- */}
+      {/* ---- Hero (image only when we have a real screenshot for this vertical) ---- */}
       <section className="mkt-section mkt-hero">
-        <div className="mkt-wrap mkt-row">
+        <div className={`mkt-wrap${v.shot ? " mkt-row" : ""}`}>
           <div>
             <p className="mkt-kicker">{v.doctor}</p>
             <h1 className="mkt-display">{v.headline}</h1>
-            <p className="mkt-lead">{v.lead}</p>
+            <p className={`mkt-lead${v.shot ? "" : " mkt-hero-lead-wide"}`}>{v.lead}</p>
             <div className="mkt-hero-cta">
               <Link href="/contact" className="mkt-btn lg">Book a demo</Link>
               <Link href="/product" className="mkt-btn ghost lg">How it works →</Link>
             </div>
           </div>
-          <div className="mkt-row-media">
-            <Browser src={v.shot} alt={`${v.name} in Central Health Intelligence`} label="app.healthintelligency.com" tilt />
-          </div>
+          {v.shot ? (
+            <div className="mkt-row-media">
+              <Browser src={v.shot} alt={`${v.name} in Central Health Intelligence`} label="app.healthintelligency.com" tilt />
+            </div>
+          ) : null}
         </div>
       </section>
 

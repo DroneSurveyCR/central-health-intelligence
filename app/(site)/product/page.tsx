@@ -75,7 +75,7 @@ export default function ProductPage() {
       <section className="mkt-section mint">
         <div className="mkt-wrap mkt-row rev">
           <div className="mkt-row-media">
-            <Browser src="be-scan.png" alt="Uploading a scan, turned into a simple visual" label="app.healthintelligency.com/scans" />
+            <Browser src="be-results-review.png" alt="Uploaded data turned into a simple visual" label="app.healthintelligency.com/results" />
           </div>
           <div>
             <p className="mkt-kicker">Step 2 · Upload &amp; visualize</p>

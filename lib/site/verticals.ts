@@ -41,7 +41,7 @@ export const VERTICALS: Vertical[] = [
       "Findings painted onto a 3D body the client understands",
       "Re-scan deltas tracked session over session",
     ],
-    shot: "bodymap-2d.png",
+    shot: "",
     faq: [
       ["Do I need to change my scanner?", "No. You keep your device — you just upload its PDF report and we turn it into the visual and the plan."],
       ["What if the data isn't structured?", "We parse the report's text into systems and severity. Anything we can't structure is still kept as the source document."],
@@ -166,7 +166,7 @@ export const VERTICALS: Vertical[] = [
       "Before / after visuals the client actually understands",
       "Progress tracked adjustment to adjustment",
     ],
-    shot: "be-scan.png",
+    shot: "",
     faq: [
       ["Do you support my scanner?", "Spine and posture scan reports and photos import today as files; a dedicated posture parser is on the roadmap."],
       ["Can I show before / after?", "Yes — alignment photos and findings sit side by side so progress is obvious to the client."],
