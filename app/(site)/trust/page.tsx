@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Security & compliance",
   description:
-    "How Central Health Intelligence protects client data: HIPAA-ready BAAs, strict tenant isolation, MFA, append-only audit logs, AES-256-GCM encryption and modern security headers — across Cloud, HIPAA Cloud and Private Cloud editions.",
+    "How Central Health Intelligence protects client data: HIPAA-ready BAAs, in-country data residency with the AI model running in-region, strict tenant isolation, MFA, append-only audit logs and AES-256 encryption — plus dedicated Private Cloud (VPS) deployments for multi-location groups.",
 };
 
 export default function SecurityPage() {
@@ -49,6 +49,47 @@ export default function SecurityPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---- Compliance & data residency ---- */}
+      <section className="mkt-section">
+        <div className="mkt-wrap mkt-row rev">
+          <div className="mkt-row-media">
+            <div className="mkt-device" role="img" aria-label="A deployment showing data and AI hosted in-region with a signed BAA">
+              <div className="mkt-mock-bar">Deployment · your region</div>
+              <div className="mkt-mock-body">
+                {[
+                  ["Data hosted in", "your country"],
+                  ["AI model runs in", "same region"],
+                  ["Leaves the jurisdiction", "never"],
+                  ["HIPAA BAA", "signed"],
+                  ["Encryption in transit / at rest", "TLS · AES-256"],
+                ].map(([k, v]) => (
+                  <div key={k} className="mkt-stat">
+                    <span>{k}</span>
+                    <span className="mkt-stat-val green">● {v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div>
+            <p className="mkt-kicker">Compliance &amp; data residency</p>
+            <h2 className="mkt-h2">Your data — and your AI — stay in your country.</h2>
+            <p className="mkt-p">
+              Health data is regulated where your clients live. We deploy in the region you serve, and
+              the AI model runs in that same jurisdiction — so protected health information never leaves
+              the country it&apos;s governed by, whether that&apos;s HIPAA in the US, GDPR in the EU, or your
+              local regime.
+            </p>
+            <ul className="mkt-points">
+              <li>HIPAA-ready, with signed BAAs for US protected health information</li>
+              <li>In-country hosting — data residency in the region you operate</li>
+              <li>The AI model runs in-region too; PHI is never sent out of jurisdiction</li>
+              <li>Encrypted in transit (TLS) and at rest (AES-256)</li>
+            </ul>
           </div>
         </div>
       </section>
@@ -129,6 +170,53 @@ export default function SecurityPage() {
         </div>
       </section>
 
+      {/* ---- Private Cloud / VPS ---- */}
+      <section className="mkt-section sand">
+        <div className="mkt-wrap mkt-row rev">
+          <div className="mkt-row-media">
+            <div className="mkt-device" role="img" aria-label="A dedicated private-cloud instance with its resources and scale">
+              <div className="mkt-mock-bar">Private Cloud · your-clinic.health</div>
+              <div className="mkt-mock-body">
+                {[
+                  ["Instance", "dedicated · yours alone"],
+                  ["Tenants on this server", "1"],
+                  ["Locations", "unlimited"],
+                  ["Doctors & staff", "unlimited"],
+                  ["Data control", "fully yours"],
+                ].map(([k, v]) => (
+                  <div key={k} className="mkt-stat">
+                    <span>{k}</span>
+                    <span className="mkt-stat-val green">● {v}</span>
+                  </div>
+                ))}
+                <div className="mkt-briefing-draft">
+                  <strong className="mkt-draft-label">White-label</strong> · your brand, your domain, your box.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p className="mkt-kicker">Private Cloud · run it standalone</p>
+            <h2 className="mkt-h2">Your own server. Faster, and fully private.</h2>
+            <p className="mkt-p">
+              For groups that want everything to themselves, we deploy a dedicated Private Cloud instance
+              on your own VPS — standalone, with no neighbours sharing the machine. It&apos;s faster, the
+              most secure tier, and your data stays entirely under your control.
+            </p>
+            <ul className="mkt-points">
+              <li>A standalone, dedicated instance — your data on your own server</li>
+              <li>Faster: no shared tenancy, resources are yours alone</li>
+              <li>The most secure tier — full isolation and control</li>
+              <li>Multi-location and multi-doctor, with unlimited users</li>
+              <li>White-labeled to your brand, on your own domain</li>
+            </ul>
+            <div className="mkt-action">
+              <Link href="/contact" className="mkt-btn ghost">Talk about a private deployment</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ---- The isolation ladder ---- */}
       <section className="mkt-section mint-2">
         <div className="mkt-wrap">
@@ -176,6 +264,9 @@ export default function SecurityPage() {
           <div className="mkt-faq">
             {[
               ["Are you HIPAA compliant?", "The HIPAA Cloud edition runs with signed BAAs and is US-PHI-ready, operating our controls to a documented compliance standard. Non-US clinics can start on Cloud, which uses the same technical isolation and security controls."],
+              ["Where is our data hosted — does it stay in our country?", "Yes. We deploy in the region you serve, so client data has residency in your jurisdiction — HIPAA in the US, GDPR in the EU, or your local regime. On Private Cloud it lives on your own server."],
+              ["Does the AI run in our jurisdiction too?", "Yes. The AI model runs in the same region as your data, so protected health information is never sent out of the country it's regulated in."],
+              ["Can we get a dedicated server for our group?", "Yes — Private Cloud is a standalone, dedicated instance on your own VPS: faster, fully isolated, white-labeled, and built for multi-location groups with many doctors and unlimited users."],
               ["How do you guarantee tenant isolation?", "Every record carries a practice_id, and row-level security enforces that boundary in the database itself. We verify it continuously — the most recent check returned 0 cross-tenant rows across 18 tables."],
               ["How is staff access protected?", "Every staff account requires MFA via TOTP. All access is written to an append-only, WORM audit log that cannot be silently edited or deleted."],
               ["How are uploads and credentials stored?", "Uploaded files and any connector credentials are encrypted at rest with AES-256-GCM. They are never exposed to other tenants or written to logs in plaintext."],
