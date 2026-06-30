@@ -239,6 +239,31 @@
 /* wide hero lead for full-width hero sections (no media column) */
 .mkt-hero-lead-wide { max-width: 62ch; margin-top: 18px; }
 
+/* ---- vertical (solutions) cards ---- */
+.mkt-vert-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.mkt-vert-card {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 24px 22px 20px;
+  border: 1px solid var(--line); border-radius: 16px; background: #fff;
+  transition: transform .16s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.mkt-vert-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 44px -28px rgba(20, 53, 42, 0.4);
+  border-color: rgba(20, 131, 78, 0.4);
+}
+.mkt-vert-name { font-family: var(--serif); font-weight: 800; font-size: 19px; letter-spacing: -0.02em; color: var(--ink); }
+.mkt-vert-doctor { font-size: 13px; font-weight: 600; color: var(--green); }
+.mkt-vert-lead { font-size: 14px; color: var(--ink-2); line-height: 1.5; margin-top: 2px; }
+.mkt-vert-go { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 6px; }
+.mkt-vert-note { text-align: center; margin-top: 28px; }
+@media (max-width: 880px) { .mkt-vert-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .mkt-vert-grid { grid-template-columns: 1fr; } }
+
 /* ---- browser / laptop screen mockup ---- */
 .mkt-screen {
   border-radius: 12px;
