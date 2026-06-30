@@ -45,6 +45,7 @@ export default async function SuperAdminPage() {
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <h1 className="serif" style={{ fontSize: 28, margin: 0 }}>Platform · All Practices</h1>
         <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <Link href="/superadmin/leads" className="btn ghost" style={{ fontSize: 13, padding: "8px 14px" }}>Leads</Link>
           <Link href="/superadmin/new" className="btn" style={{ fontSize: 13, padding: "8px 14px" }}>+ New instance</Link>
           <span className="muted" style={{ fontSize: 13 }}>{user.email}</span>
         </span>

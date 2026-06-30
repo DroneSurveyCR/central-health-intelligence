@@ -207,7 +207,10 @@ export default function PricingPage() {
           <p className="mkt-lead mkt-cta-lead">
             Tell us your specialty and team size — we&apos;ll map a plan, the modules and the right edition.
           </p>
-          <Link href="/contact?intent=pricing" className="mkt-btn lg">Talk to us</Link>
+          <div className="mkt-hero-cta center">
+            <Link href="/contact?intent=get_started" className="mkt-btn lg">Get the software →</Link>
+            <Link href="/contact?intent=pricing" className="mkt-btn ghost lg">Talk to us</Link>
+          </div>
         </div>
       </section>
     </>
