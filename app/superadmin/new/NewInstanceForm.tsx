@@ -10,14 +10,33 @@ function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
 }
 
-export default function NewInstanceForm({ modules, defaultOn }: { modules: Mod[]; defaultOn: string[] }) {
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
+export type InstanceInitial = {
+  practiceName?: string;
+  ownerName?: string;
+  ownerEmail?: string;
+  vertical?: Vertical | "";
+};
+
+export default function NewInstanceForm({
+  modules,
+  defaultOn,
+  initial,
+}: {
+  modules: Mod[];
+  defaultOn: string[];
+  initial?: InstanceInitial;
+}) {
+  const [name, setName] = useState(initial?.practiceName ?? "");
+  const [slug, setSlug] = useState(initial?.practiceName ? slugify(initial.practiceName) : "");
   const [slugEdited, setSlugEdited] = useState(false);
-  const [ownerName, setOwnerName] = useState("");
-  const [ownerEmail, setOwnerEmail] = useState("");
-  const [vertical, setVertical] = useState<Vertical | "">("");
-  const [enabled, setEnabled] = useState<Set<string>>(new Set(defaultOn));
+  const [ownerName, setOwnerName] = useState(initial?.ownerName ?? "");
+  const [ownerEmail, setOwnerEmail] = useState(initial?.ownerEmail ?? "");
+  const [vertical, setVertical] = useState<Vertical | "">(initial?.vertical ?? "");
+  const [enabled, setEnabled] = useState<Set<string>>(() => {
+    const set = new Set(defaultOn);
+    if (initial?.vertical) for (const id of VERTICAL_MODULES[initial.vertical]) set.add(id);
+    return set;
+  });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [result, setResult] = useState<{ practiceId: string; handoffLink: string | null } | null>(null);

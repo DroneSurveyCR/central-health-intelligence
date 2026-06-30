@@ -53,11 +53,12 @@ export default async function SuperAdminLeadsPage() {
               <th style={th}>Intent</th>
               <th style={th}>Vertical</th>
               <th style={th}>Needs</th>
+              <th style={th}></th>
             </tr>
           </thead>
           <tbody>
             {leads.length === 0 ? (
-              <tr><td style={td} colSpan={7}><span className="muted">No leads yet.</span></td></tr>
+              <tr><td style={td} colSpan={8}><span className="muted">No leads yet.</span></td></tr>
             ) : leads.map((l) => (
               <tr key={l.id}>
                 <td style={{ ...td, whiteSpace: "nowrap" }} className="muted">{new Date(l.created_at).toLocaleString()}</td>
@@ -72,6 +73,15 @@ export default async function SuperAdminLeadsPage() {
                 <td style={td}>
                   <span style={{ fontSize: 13 }}>{(l.options ?? []).join(", ") || "—"}</span>
                   {l.message && <div className="muted" style={{ fontSize: 12.5, marginTop: 3, maxWidth: 280 }}>{l.message}</div>}
+                </td>
+                <td style={{ ...td, whiteSpace: "nowrap" }}>
+                  <Link
+                    href={`/superadmin/new?name=${encodeURIComponent(l.name)}&email=${encodeURIComponent(l.email)}&clinic=${encodeURIComponent(l.clinic ?? "")}&vertical=${encodeURIComponent(l.vertical ?? "")}`}
+                    className="btn ghost"
+                    style={{ fontSize: 12, padding: "6px 10px" }}
+                  >
+                    Create instance →
+                  </Link>
                 </td>
               </tr>
             ))}
