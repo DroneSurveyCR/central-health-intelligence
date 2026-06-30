@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { MODULES, DEFAULT_ON } from "@/lib/modules/manifest";
 import type { ModuleId } from "@/lib/modules/types";
+import { type Vertical, VERTICAL_MODULES } from "@/lib/modules/bundles";
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -19,19 +20,8 @@ const labelStyle: React.CSSProperties = {
   marginBottom: 4,
 };
 
-// ---------------------------------------------------------------------------
-// Vertical -> extra modules preselected (ON TOP of DEFAULT_ON, which is always
-// applied). These are suggestions the user can toggle in Step 3. The API
-// re-validates every id against the manifest and always re-adds DEFAULT_ON.
-// ---------------------------------------------------------------------------
-type Vertical =
-  | "integrative"
-  | "longevity"
-  | "peptide"
-  | "psychedelic"
-  | "functional"
-  | "womens";
-
+// Vertical bundles (the preselected module sets) live in lib/modules/bundles.ts —
+// shared with admin provisioning. Here we only add the onboarding UI labels/blurbs.
 const VERTICALS: { id: Vertical; label: string; blurb: string }[] = [
   { id: "integrative", label: "Integrative", blurb: "Whole-person care across labs & wearables." },
   { id: "longevity", label: "Longevity", blurb: "Biomarkers, biological age, optimization." },
@@ -40,16 +30,6 @@ const VERTICALS: { id: Vertical; label: string; blurb: string }[] = [
   { id: "functional", label: "Functional", blurb: "Labs, nutrition & root-cause workups." },
   { id: "womens", label: "Women's Health", blurb: "Hormone optimization (HRT) + labs." },
 ];
-
-// Extra (vertical-specific) modules on top of DEFAULT_ON.
-const VERTICAL_MODULES: Record<Vertical, ModuleId[]> = {
-  integrative: ["labs", "wearables", "nutrition"],
-  longevity: ["labs", "wearables", "weight", "longevity"],
-  peptide: ["labs", "rx", "peptide"],
-  psychedelic: ["labs", "psychedelic"],
-  functional: ["labs", "nutrition", "weight"],
-  womens: ["labs", "rx", "hrt"],
-};
 
 const ALL_IDS = Object.keys(MODULES) as ModuleId[];
 const DEFAULT_SET = new Set<ModuleId>(DEFAULT_ON as ModuleId[]);
