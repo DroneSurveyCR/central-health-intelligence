@@ -1,7 +1,6 @@
 import { requireStaffApi } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
-import { MODULES, ALWAYS_ON } from "@/lib/modules/manifest";
-import type { ModuleId } from "@/lib/modules/types";
+import { setPracticeModule } from "@/lib/modules/setModule";
 import { NextResponse } from "next/server";
 
 export async function PATCH(request: Request) {
@@ -15,35 +14,19 @@ export async function PATCH(request: Request) {
     .json()
     .catch(() => ({}))) as { moduleId?: string; enabled?: boolean };
 
-  if (!moduleId || !(moduleId in MODULES))
-    return NextResponse.json({ error: "unknown module" }, { status: 400 });
-  if (ALWAYS_ON.includes(moduleId as ModuleId))
-    return NextResponse.json({ error: "cannot change core module" }, { status: 400 });
-
   const supabase = await createClient();
   // RLS returns only the caller's practice row.
   const { data: practice, error: readErr } = await supabase
     .from("practices")
-    .select("id, modules")
+    .select("id")
     .limit(1)
     .maybeSingle();
   if (readErr || !practice)
     return NextResponse.json({ error: readErr?.message ?? "no practice" }, { status: 400 });
 
-  const current = new Set<string>((practice.modules as string[]) ?? []);
-  if (enabled) {
-    current.add(moduleId);
-    for (const dep of MODULES[moduleId as ModuleId].dependsOn ?? []) current.add(dep);
-  } else {
-    current.delete(moduleId);
-  }
-  const next = [...current];
-
-  const { error: updErr } = await supabase
-    .from("practices")
-    .update({ modules: next })
-    .eq("id", practice.id);
-  if (updErr) return NextResponse.json({ error: updErr.message }, { status: 400 });
-
-  return NextResponse.json({ ok: true, modules: next });
+  // Same shared helper the super-admin override uses — one source of truth for
+  // module validation + dependency resolution. RLS keeps this scoped to own practice.
+  const result = await setPracticeModule(supabase, practice.id as string, String(moduleId), Boolean(enabled));
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
+  return NextResponse.json({ ok: true, modules: result.modules });
 }

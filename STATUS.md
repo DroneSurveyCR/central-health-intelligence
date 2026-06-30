@@ -4,7 +4,7 @@
 **Patient layer concept:** Personal Health Intelligence (what patients own inside CHI)
 **Updated:** 2026-06-29
 
-**Last action:** CP1 — super-admin per-practice **module override** (`/superadmin/[id]` + `/api/superadmin/modules`). tsc clean, 82/82 unit green. Committed, not yet pushed.
+**Last action:** CP1 — super-admin per-practice **module override** (`/superadmin/[id]` + `/api/superadmin/modules`), live + gated. Module enable/dependency logic DRY'd into one helper (`lib/modules/setModule.ts`) shared by the staff toggle + admin override; admin API now MFA-gated (`requireSuperAdminApi`). tsc clean, 82/82 unit green.
 **Next action:** CP2 — super-admin **create + hand-off a new instance** (`/superadmin/new` + provision API reusing onboarding).
 
 > Single source of truth. Score detail → `SCORECARD.md`. What's left to go live → `ACTIVATION.md`.
