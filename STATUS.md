@@ -2,7 +2,10 @@
 
 **Company:** Health Intelligency · **Product:** Central Health Intelligence (multi-tenant SaaS EHR)
 **Patient layer concept:** Personal Health Intelligence (what patients own inside CHI)
-**Updated:** 2026-06-28
+**Updated:** 2026-06-29
+
+**Last action:** CP1 — super-admin per-practice **module override** (`/superadmin/[id]` + `/api/superadmin/modules`). tsc clean, 82/82 unit green. Committed, not yet pushed.
+**Next action:** CP2 — super-admin **create + hand-off a new instance** (`/superadmin/new` + provision API reusing onboarding).
 
 > Single source of truth. Score detail → `SCORECARD.md`. What's left to go live → `ACTIVATION.md`.
 > Older wave-by-wave narrative is in `SCORECARD.md`'s Wave log. This file is the current snapshot only.
@@ -29,7 +32,7 @@ The sellable multi-tenant app is complete and live. Not a scaffold — the full 
 - **Tenancy** — `practice_id NOT NULL` on every tenant table, RLS + tenant policies, `current_practice_id()`,
   `requireModule()` gating. Tenant #1 = Casa Elev8 (Randi), 168 patients ETL'd. Cloud DB `aezudceznxclvexfpdvr`,
   migrations 001–003 (tenancy) + module/feature migrations through 013.
-- **Platform super-admin** — `/superadmin` cross-tenant dashboard (email-allowlist gated, `SUPERADMIN_EMAILS`).
+- **Platform super-admin** — `/superadmin` cross-tenant dashboard + **per-practice detail with module override** (`/superadmin/[id]`, service-role write via `/api/superadmin/modules`, email-allowlist gated, `SUPERADMIN_EMAILS`).
 - **All vertical modules** with working surfaces: peptide, psychedelic/KAP, longevity, hrt, labs, wearables,
   nutrition, weight, rx (printable script v1), telehealth (Jitsi), dispensary.
 - **Intelligence layer (Part 9)** — `/focus` morning briefing (buildDelta + nightly cron), alerts engine + `/triage`,

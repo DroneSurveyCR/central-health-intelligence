@@ -80,8 +80,10 @@ export default async function SuperAdminPage() {
             ) : list.map((p) => (
               <tr key={p.id}>
                 <td style={td}>
-                  <div style={{ fontWeight: 600 }}>{p.name}</div>
-                  <div className="muted" style={{ fontSize: 12 }}>{p.slug}</div>
+                  <Link href={`/superadmin/${p.id}`} style={{ color: "inherit" }}>
+                    <div style={{ fontWeight: 600 }}>{p.name}</div>
+                    <div className="muted" style={{ fontSize: 12 }}>{p.slug}</div>
+                  </Link>
                 </td>
                 <td style={td}><span className="badge">{p.plan}</span></td>
                 <td style={td}>{p.vertical ?? "—"}</td>
@@ -97,8 +99,8 @@ export default async function SuperAdminPage() {
       </div>
 
       <p className="muted" style={{ fontSize: 12, marginTop: 16 }}>
-        Cross-tenant view (RLS-bypassed, super-admin only). Per-tenant detail, impersonation, plan/module
-        management, and MRR are next. <Link href="/login" style={{ color: "var(--berry)" }}>Sign out</Link>
+        Cross-tenant view (RLS-bypassed, super-admin only). Click a practice to override its modules.
+        Impersonation and MRR are next. <Link href="/login" style={{ color: "var(--berry)" }}>Sign out</Link>
       </p>
     </div>
   );
