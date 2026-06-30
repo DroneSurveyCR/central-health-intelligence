@@ -16,6 +16,7 @@ type Lead = {
   options: string[] | null;
   message: string | null;
   source: string | null;
+  ref: string | null;
 };
 
 export default async function SuperAdminLeadsPage() {
@@ -24,7 +25,7 @@ export default async function SuperAdminLeadsPage() {
   // Service-role read: the leads table has RLS on with no policies, so only this path can read it.
   const { data } = await createAdminClient()
     .from("leads")
-    .select("id, created_at, name, email, phone, clinic, vertical, intent, options, message, source")
+    .select("id, created_at, name, email, phone, clinic, vertical, intent, options, message, source, ref")
     .order("created_at", { ascending: false })
     .limit(300);
   const leads = (data ?? []) as Lead[];
@@ -52,13 +53,14 @@ export default async function SuperAdminLeadsPage() {
               <th style={th}>Clinic</th>
               <th style={th}>Intent</th>
               <th style={th}>Vertical</th>
+              <th style={th}>Ref</th>
               <th style={th}>Needs</th>
-              <th style={th}></th>
+              <th style={th} aria-label="actions"></th>
             </tr>
           </thead>
           <tbody>
             {leads.length === 0 ? (
-              <tr><td style={td} colSpan={8}><span className="muted">No leads yet.</span></td></tr>
+              <tr><td style={td} colSpan={9}><span className="muted">No leads yet.</span></td></tr>
             ) : leads.map((l) => (
               <tr key={l.id}>
                 <td style={{ ...td, whiteSpace: "nowrap" }} className="muted">{new Date(l.created_at).toLocaleString()}</td>
@@ -70,6 +72,7 @@ export default async function SuperAdminLeadsPage() {
                 <td style={td}>{l.clinic ?? "—"}</td>
                 <td style={td}><span className="badge">{l.intent}</span></td>
                 <td style={td}>{l.vertical ?? "—"}</td>
+                <td style={td}>{l.ref ? <span className="badge">{l.ref}</span> : "—"}</td>
                 <td style={td}>
                   <span style={{ fontSize: 13 }}>{(l.options ?? []).join(", ") || "—"}</span>
                   {l.message && <div className="muted" style={{ fontSize: 12.5, marginTop: 3, maxWidth: 280 }}>{l.message}</div>}

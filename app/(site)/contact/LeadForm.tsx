@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { VERTICALS } from "@/lib/site/verticals";
 
 const OPTIONS = [
@@ -29,9 +29,22 @@ export default function LeadForm({
   const [vertical, setVertical] = useState("");
   const [options, setOptions] = useState<Set<string>>(new Set());
   const [message, setMessage] = useState("");
+  const [ref, setRef] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [sent, setSent] = useState(false);
+
+  // Prefill the referral code from the URL (?ref=) or a code persisted by RefCapture.
+  useEffect(() => {
+    try {
+      const fromUrl = new URLSearchParams(window.location.search).get("ref");
+      const stored = localStorage.getItem("chi_ref");
+      const code = (fromUrl || stored || "").trim().slice(0, 40);
+      if (code) setRef(code);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   function toggle(o: string) {
     setOptions((prev) => {
@@ -59,7 +72,7 @@ export default function LeadForm({
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name, email, phone, clinic, vertical, intent, options: [...options], message, source }),
+        body: JSON.stringify({ name, email, phone, clinic, vertical, intent, options: [...options], message, ref, source }),
       });
       const json = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok || json.error) setErr(json.error ?? "Something went wrong.");
@@ -103,6 +116,10 @@ export default function LeadForm({
           <div>
             <label htmlFor="lf-clinic" className="mkt-form-label">Clinic / practice</label>
             <input id="lf-clinic" className="mkt-form-input" value={clinic} onChange={(e) => setClinic(e.target.value)} autoComplete="organization" />
+          </div>
+          <div>
+            <label htmlFor="lf-ref" className="mkt-form-label">Referral code <span className="mkt-form-optional">(optional)</span></label>
+            <input id="lf-ref" className="mkt-form-input" value={ref} onChange={(e) => setRef(e.target.value)} placeholder="If a partner referred you" />
           </div>
           {err && <p className="mkt-form-err">{err}</p>}
           <div><button type="submit" className="mkt-btn lg">Continue →</button></div>

@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     options,
     message: clip(body.message, 2000),
     source: clip(body.source, 40) ?? "site",
+    ref: clip(body.ref, 40),
   };
 
   let stored = false;
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
       `Clinic:  ${lead.clinic ?? "—"}`,
       `Vertical:${lead.vertical ?? "—"}`,
       `Needs:   ${options.join(", ") || "—"}`,
+      `Ref:     ${lead.ref ?? "—"}`,
       ``,
       lead.message ?? "",
     ].join("\n");
