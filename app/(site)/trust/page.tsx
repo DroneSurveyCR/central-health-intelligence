@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Security & compliance",
+  title: "Compliance & security",
   description:
     "How Central Health Intelligence protects client data: worldwide out of the box, with US HIPAA and Canadian compliance provisioned through partners (AWS hosting + a BAA-signing AI provider, in-region), strict tenant isolation, MFA, audit logs and AES-256 encryption — plus dedicated Private Cloud (VPS) deployments for multi-location groups.",
 };
@@ -14,7 +14,7 @@ export default function SecurityPage() {
       <section className="mkt-section mkt-hero">
         <div className="mkt-wrap mkt-row">
           <div>
-            <p className="mkt-kicker">Security &amp; compliance</p>
+            <p className="mkt-kicker">Compliance &amp; security</p>
             <h1 className="mkt-display">
               Built for client data
               <br />
@@ -25,7 +25,7 @@ export default function SecurityPage() {
               isolate each clinic&apos;s data, who can see it, and what we record when they do.
             </p>
             <div className="mkt-hero-cta">
-              <Link href="/contact" className="mkt-btn lg">Talk to security</Link>
+              <Link href="/contact" className="mkt-btn lg">Talk to our team</Link>
               <Link href="/pricing" className="mkt-btn ghost lg">Compare editions</Link>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function SecurityPage() {
       {/* ---- FAQ ---- */}
       <section className="mkt-section mint">
         <div className="mkt-wrap">
-          <h2 className="mkt-h2 mkt-faq-heading">Security questions, answered.</h2>
+          <h2 className="mkt-h2 mkt-faq-heading">Compliance questions, answered.</h2>
           <div className="mkt-faq">
             {[
               ["Are you HIPAA compliant?", "Out of the box, CHI runs worldwide. For US HIPAA or Canadian compliance, we provision a compliant deployment through our partners — hosting on AWS in your region and an AI provider that signs a BAA (Claude or OpenAI). We set this up with you as part of onboarding."],
