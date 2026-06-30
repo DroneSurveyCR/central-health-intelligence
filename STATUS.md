@@ -4,7 +4,8 @@
 **Patient layer concept:** Personal Health Intelligence (what patients own inside CHI)
 **Updated:** 2026-06-29
 
-**Last action:** CP1 — super-admin per-practice **module override** (`/superadmin/[id]` + `/api/superadmin/modules`), live + gated. Module enable/dependency logic DRY'd into one helper (`lib/modules/setModule.ts`) shared by the staff toggle + admin override; admin API now MFA-gated (`requireSuperAdminApi`). tsc clean, 82/82 unit green.
+**Last action:** Marketing **lead-capture intake** — 2-step form on `/contact` (name/email/phone → vertical → options) → `/api/lead` → new `leads` table (migration 016, applied to prod via Management API) + best-effort team email. Live + verified.
+Earlier this session: CP1 super-admin **module override** (`/superadmin/[id]`) + CP2 **create/hand-off a new instance** (`/superadmin/new` → `/api/superadmin/provision`, magic-link). Module logic DRY'd (`lib/modules/setModule.ts`), vertical bundles DRY'd (`lib/modules/bundles.ts`), admin APIs MFA-gated.
 **Next action:** lead-capture intake form on the marketing site (basic name/email/phone → vertical → options).
 **Done:** CP2 — super-admin **create + hand-off a new instance** (`/superadmin/new` + `/api/superadmin/provision`, reuses onboarding creation, returns a magic-link handoff). Vertical bundles DRY'd into `lib/modules/bundles.ts` (shared by onboarding + admin). tsc clean, 82/82.
 
