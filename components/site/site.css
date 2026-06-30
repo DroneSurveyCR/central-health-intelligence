@@ -239,6 +239,19 @@
 /* wide hero lead for full-width hero sections (no media column) */
 .mkt-hero-lead-wide { max-width: 62ch; margin-top: 18px; }
 
+/* ---- multi-step lead form ---- */
+.mkt-lead-step { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--green); margin: 0 0 2px; }
+.mkt-form-err { color: #c0392b; font-size: 13px; margin: 2px 0 0; }
+.mkt-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.mkt-chip {
+  font-size: 13px; font-weight: 600; padding: 8px 13px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: #fff; color: var(--ink-2); cursor: pointer;
+  transition: border-color .14s, background .14s, color .14s;
+}
+.mkt-chip:hover { border-color: var(--green); }
+.mkt-chip.on { background: var(--green); border-color: var(--green); color: #fff; }
+.mkt-lead-actions { display: flex; gap: 10px; align-items: center; }
+
 /* ---- vertical (solutions) cards ---- */
 .mkt-vert-grid {
   display: grid;

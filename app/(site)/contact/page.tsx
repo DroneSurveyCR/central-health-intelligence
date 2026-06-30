@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import DemoForm from "./DemoForm";
+import LeadForm from "./LeadForm";
 
 export const metadata: Metadata = {
   title: "Book a demo",
@@ -48,7 +48,7 @@ export default function ContactPage() {
           </div>
 
           <div className="mkt-row-media">
-            <DemoForm />
+            <LeadForm />
           </div>
         </div>
       </section>
