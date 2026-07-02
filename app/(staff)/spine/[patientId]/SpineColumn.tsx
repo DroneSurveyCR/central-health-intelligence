@@ -68,7 +68,21 @@ export default function SpineColumn({
         const bw = REGION_W[v.region] ?? 56;
         const isSel = selected === v.id;
         return (
-          <g key={v.id} onClick={() => onSelect(v.id)} style={{ cursor: "pointer" }}>
+          <g
+            key={v.id}
+            role="button"
+            tabIndex={0}
+            aria-label={`${v.label} — ${sev === "normal" ? "normal" : sev}`}
+            aria-pressed={isSel}
+            onClick={() => onSelect(v.id)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSelect(v.id);
+              }
+            }}
+            style={{ cursor: "pointer" }}
+          >
             <rect
               x={cx - bw / 2}
               y={y}
