@@ -4,7 +4,9 @@ import { requireSuperAdmin } from "@/lib/auth/superadmin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MODULES } from "@/lib/modules/manifest";
 import type { ModuleDef } from "@/lib/modules/types";
+import { DEFAULT_DAILY_LIMIT } from "@/lib/assistant/limits";
 import ModuleOverride, { type Mod } from "./ModuleOverride";
+import AssistantLimitControl from "./AssistantLimitControl";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,7 @@ export default async function SuperAdminPracticePage({
   const [{ data: practice }, { count: patients }, { count: staff }] = await Promise.all([
     admin
       .from("practices")
-      .select("id, slug, name, plan, vertical, region, modules, created_at")
+      .select("id, slug, name, plan, vertical, region, modules, settings, created_at")
       .eq("id", id)
       .maybeSingle(),
     admin.from("patients").select("id", { count: "exact", head: true }).eq("practice_id", id),
@@ -37,6 +39,10 @@ export default async function SuperAdminPracticePage({
     alwaysOn: Boolean(m.alwaysOn),
     enabled: Boolean(m.alwaysOn) || enabled.has(m.id),
   }));
+
+  const engagementOn = enabled.has("engagement");
+  const dailyLimit =
+    Number((practice.settings as Record<string, unknown> | null)?.assistant_daily_limit) || DEFAULT_DAILY_LIMIT;
 
   const row: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, padding: "8px 0", borderBottom: "1px solid var(--line)", fontSize: 14 };
 
@@ -60,6 +66,17 @@ export default async function SuperAdminPracticePage({
         Override what this instance has enabled. Changes are immediate; dependencies are added automatically.
       </p>
       <ModuleOverride practiceId={practice.id} modules={mods} />
+
+      {engagementOn && (
+        <>
+          <h2 className="serif" style={{ fontSize: 19, margin: "26px 0 4px" }}>Patient assistant</h2>
+          <p className="muted" style={{ fontSize: 13, margin: "0 0 14px" }}>
+            Daily question cap for the patient AI assistant on this instance — a per-clinic product-tier limit,
+            separate from the hourly anti-abuse throttle.
+          </p>
+          <AssistantLimitControl practiceId={practice.id} current={dailyLimit} />
+        </>
+      )}
     </div>
   );
 }

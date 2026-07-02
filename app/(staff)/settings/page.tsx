@@ -46,6 +46,7 @@ export default async function SettingsPage() {
         <a className="btn ghost" href="/settings/billing">Plan &amp; billing</a>
         <a className="btn ghost" href="/settings/payments">Client payments</a>
         <a className="btn ghost" href="/settings/connectors">Connectors</a>
+        <a className="btn ghost" href="/settings/assistant">Patient AI assistant</a>
       </div>
 
       {/* Practice info */}
