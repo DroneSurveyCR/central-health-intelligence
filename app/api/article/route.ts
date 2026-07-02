@@ -47,3 +47,22 @@ export async function POST(request: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });
 }
+
+/** Publish/unpublish an existing article — the "disable it" toggle. RLS-scoped to own practice. */
+export async function PATCH(request: Request) {
+  const gate = await requireStaffApi();
+  if (!gate.ok) return gate.response;
+  const practitioner = gate.practitioner;
+  if (practitioner.role !== "doctor" && practitioner.role !== "admin")
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+
+  const body = await request.json().catch(() => ({}));
+  const id = String(body.id || "").trim();
+  const published = Boolean(body.published);
+  if (!id) return NextResponse.json({ error: "missing id" }, { status: 400 });
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("articles").update({ published }).eq("id", id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json({ ok: true, published });
+}
