@@ -5,6 +5,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { generateText, aiEnabled } from "@/lib/ai";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
+import { gatherPracticeKnowledge, practiceKnowledgeBlock } from "@/lib/ai/producers";
 
 export async function POST(request: Request) {
   const gate = await requireStaffApi();
@@ -67,6 +68,8 @@ export async function POST(request: Request) {
     ? JSON.stringify(scan.parsed_findings, null, 2).slice(0, 1500)
     : "No scan findings on file";
 
+  const kb = await gatherPracticeKnowledge();
+
   const prompt = `Patient: ${patient.first_name} ${patient.last_name} (${patient.sex ?? "unspecified sex"}), ${visitCount} prior visits.
 
 Chief complaint / reason for visit: ${chiefComplaint}
@@ -80,11 +83,13 @@ ${scanFindings}
 Recent labs:
 ${labLines}
 
-Write a concise clinical session briefing (2–3 paragraphs) for the practitioner to read before this visit. Summarize the key findings and patterns, highlight out-of-range markers or scan areas of concern, and suggest 2–3 focus areas for the session. Write in third person, clinically but plainly. Do not repeat the patient's name more than once. Do not include a title or headers.`;
+${practiceKnowledgeBlock(kb)}
+
+Write a concise clinical session briefing (2–3 paragraphs) for the practitioner to read before this visit. Summarize the key findings and patterns, highlight out-of-range markers or scan areas of concern, and suggest 2–3 focus areas for the session — preferring this clinic's own modalities and services listed above. Write in third person, clinically but plainly. Do not repeat the patient's name more than once. Do not include a title or headers.`;
 
   const synthesis = await generateText({
     system:
-      "You are a clinical synthesis assistant for an integrative medicine clinic (Casa Elev8). " +
+      "You are a clinical synthesis assistant for an integrative medicine clinic. " +
       "You help practitioners prepare for patient visits by summarizing health data into a brief, actionable briefing. " +
       "Be factual, concise, and never make diagnostic claims — frame findings as areas to explore.",
     prompt,

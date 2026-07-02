@@ -38,7 +38,7 @@ const TENANT_TABLES = [
   "locations", "messages", "orders", "patient_insurance", "patient_labels",
   "patients", "payments", "plan_completions", "plan_items", "plan_phases",
   "plans", "practice_connectors", "practice_settings", "practitioners", "products",
-  "progress_logs", "role_assignments", "scans", "services", "visits", "waitlist_entries",
+  "progress_logs", "role_assignments", "scans", "services", "spine_assessments", "visits", "waitlist_entries",
 ];
 
 let authUserId = null;

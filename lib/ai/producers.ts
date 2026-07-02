@@ -214,3 +214,66 @@ export function wearableLines(rows: PatientContext["wearables"]): string {
 
 /** The model id producers stamp on drafts (mirrors lib/ai.ts default). */
 export const PRODUCER_MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5-20251001";
+
+// ── CP1: the practice knowledge base — the doctor's own recommendation universe ──
+// The client assistant already grounds on the clinic's published articles (corpus B).
+// The DOCTOR producers historically grounded on patient data ONLY, so their drafts
+// read as generic AI rather than as THIS clinic's. gatherPracticeKnowledge() closes
+// that gap: it fetches the clinic's published protocols/articles, the services &
+// modalities it offers, and the product formulary it dispenses — practice-scoped via
+// the RLS server client (no cross-tenant leakage) — so the model can prefer what the
+// doctor actually stocks and provides.
+
+export type PracticeKnowledge = {
+  articles: Array<{ title: string; category: string | null; excerpt: string | null }>;
+  services: Array<Record<string, unknown>>;
+  products: Array<Record<string, unknown>>;
+};
+
+export async function gatherPracticeKnowledge(): Promise<PracticeKnowledge> {
+  const supabase = await createClient(); // RLS-scoped to the caller's practice
+  const [artRes, svcRes, prodRes] = await Promise.all([
+    supabase
+      .from("articles")
+      .select("title, category, excerpt")
+      .eq("published", true)
+      .order("sort_order", { ascending: true })
+      .limit(40),
+    supabase.from("services").select("*").order("sort_order", { ascending: true }).limit(60),
+    supabase.from("products").select("*").order("name", { ascending: true }).limit(60),
+  ]);
+  const rows = (d: unknown): Record<string, unknown>[] => (Array.isArray(d) ? (d as Record<string, unknown>[]) : []);
+  return {
+    articles: rows(artRes.data) as PracticeKnowledge["articles"],
+    services: rows(svcRes.data),
+    products: rows(prodRes.data),
+  };
+}
+
+/** Format the practice knowledge base into a compact prompt block. */
+export function practiceKnowledgeBlock(kb: PracticeKnowledge): string {
+  const s = (v: unknown) => (v == null ? "" : String(v));
+  const line = (name: unknown, tag: unknown, desc: unknown) => {
+    const t = s(tag);
+    const d = s(desc);
+    return `  - ${s(name)}${t ? ` [${t}]` : ""}${d ? `: ${d.slice(0, 120)}` : ""}`;
+  };
+  const svc = kb.services.length
+    ? kb.services.slice(0, 40).map((x) => line(x.name, x.category, x.description)).join("\n")
+    : "  (none listed)";
+  const prod = kb.products.length
+    ? kb.products.slice(0, 40).map((x) => line(x.name, x.type ?? x.category, x.description)).join("\n")
+    : "  (none listed)";
+  const art = kb.articles.length
+    ? kb.articles.slice(0, 30).map((a) => line(a.title, a.category, a.excerpt)).join("\n")
+    : "  (none published)";
+  return [
+    "=== THIS CLINIC'S KNOWLEDGE BASE — the doctor's own recommendation universe ===",
+    "Services & modalities this clinic offers:",
+    svc,
+    "Products / supplement formulary this clinic dispenses:",
+    prod,
+    "Published clinical protocols & articles:",
+    art,
+  ].join("\n");
+}

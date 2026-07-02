@@ -89,6 +89,13 @@ export const MODULES: Record<ModuleId, ModuleDef> = {
     id: "longevity", label: "Longevity & Biomarkers", price: 49, dependsOn: ["labs"],
     tables: ["biomarker_panels", "biological_age_scores"],
   },
+  chiro: {
+    id: "chiro", label: "Chiropractic (Spine Assessment)", price: 49,
+    // Per-vertebra findings + overall spine conditions; renders in the 2D map and the
+    // 3D viewer (admin picks 2d/3d/both per tenant via practice settings). Voice
+    // annotation reuses the core transcribe endpoint. Tytron thermal is an add-on import.
+    tables: ["spine_assessments"],
+  },
 
   // ---- Operations / commerce ------------------------------------------------
   telehealth: {

@@ -13,6 +13,7 @@ import { generateText, aiEnabled } from "@/lib/ai";
 import { logAudit } from "@/lib/auth/audit";
 import { NextResponse } from "next/server";
 import type { PlanLevel } from "@/lib/plan/helpers";
+import { gatherPracticeKnowledge, practiceKnowledgeBlock } from "@/lib/ai/producers";
 
 const LEVELS: PlanLevel[] = ["supplement", "modality", "habit", "measurement"];
 const coerceLevel = (v: unknown): PlanLevel =>
@@ -83,6 +84,8 @@ export async function POST(request: Request) {
       ? JSON.stringify(scan.parsed_findings).slice(0, 1200)
       : "No scan findings on file";
 
+  const kb = await gatherPracticeKnowledge();
+
   const prompt = `Client: ${client.first_name} ${client.last_name} (${client.sex ?? "unspecified sex"}), ${visitRes.count ?? 0} prior visits.
 
 Chief complaint / reason: ${pick("chief_complaint", "reason_visit", "main_concern")}
@@ -96,7 +99,9 @@ ${scanFindings}
 Recent labs:
 ${labLines}
 
-Draft a 90-day health plan for the doctor to review and approve. Use 3 phases that span the 90 days (roughly days 1-30, 31-60, 61-90). For each phase, list a small, realistic set of items the client can follow. Each item has a "level" of exactly one of: "supplement", "modality", "habit", "measurement". Give a concrete name; for supplements include a typical starting "dose"; keep "detail" to one short clause. Ground the plan in the data above; do NOT invent lab values or diagnoses. Keep it practical — at most 6 items per phase.
+${practiceKnowledgeBlock(kb)}
+
+Draft a 90-day health plan for the doctor to review and approve. Draw supplements from this clinic's own formulary and modalities from the services it offers above wherever clinically appropriate — the plan should read as THIS clinic's, using what the doctor actually stocks and provides. If nothing in the clinic's catalog fits a need, you may suggest a general option and keep it conservative. Use 3 phases that span the 90 days (roughly days 1-30, 31-60, 61-90). For each phase, list a small, realistic set of items the client can follow. Each item has a "level" of exactly one of: "supplement", "modality", "habit", "measurement". Give a concrete name; for supplements include a typical starting "dose"; keep "detail" to one short clause. Ground the plan in the data above; do NOT invent lab values or diagnoses. Keep it practical — at most 6 items per phase.
 
 Respond with ONLY valid minified JSON, no markdown, in exactly this shape:
 {"title":"...","phases":[{"name":"...","start_day":1,"end_day":30,"items":[{"level":"supplement","name":"...","dose":"...","detail":"..."}]}]}`;

@@ -10,6 +10,8 @@ import { logAudit } from "@/lib/auth/audit";
 import {
   guardProducer,
   gatherPatientContext,
+  gatherPracticeKnowledge,
+  practiceKnowledgeBlock,
   intakeSummary,
   labLines,
   PRODUCER_MODEL,
@@ -35,6 +37,7 @@ export async function POST(request: Request) {
 
   const ctx = await gatherPatientContext(patient.id);
   const intake = intakeSummary(ctx.intake);
+  const kb = await gatherPracticeKnowledge();
 
   const visitLines = ctx.visits.length
     ? ctx.visits
@@ -60,6 +63,8 @@ ${
     : ""
 }
 
+${practiceKnowledgeBlock(kb)}
+
 Write a structured SOAP note for this visit using the patient data above${
     transcript && transcript.trim() ? " and the clinician's notes for this visit" : ""
   }. Use exactly these four headed sections:
@@ -69,7 +74,7 @@ Objective:
 Assessment:
 Plan:
 
-Ground every statement in the data provided; do not invent findings. Frame the Assessment as clinical impressions / areas to explore, never as a definitive diagnosis. Keep it concise and clinically plain.`;
+Ground every statement in the data provided; do not invent findings. Frame the Assessment as clinical impressions / areas to explore, never as a definitive diagnosis. For the Plan section, prefer this clinic's own services, modalities and product formulary listed above. Keep it concise and clinically plain.`;
 
   const draftContent = await generateText({
     system:

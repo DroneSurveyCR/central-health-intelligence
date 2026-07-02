@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 const VALID_MODULE_IDS = new Set(Object.keys(MODULES));
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VALID_VERTICALS = new Set(["integrative", "longevity", "peptide", "psychedelic", "functional", "womens"]);
+const VALID_VERTICALS = new Set(["integrative", "longevity", "peptide", "psychedelic", "functional", "womens", "chiropractic"]);
 
 function resolveModules(requested: unknown): ModuleId[] {
   const set = new Set<string>(DEFAULT_ON as string[]);

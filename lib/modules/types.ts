@@ -19,6 +19,7 @@ export type ModuleId =
   | "telehealth"    // real embedded video
   | "dispensary"    // supplement dispensary (Fullscript/Wellevate)
   | "longevity"     // biomarker timeline + biological age
+  | "chiro"         // chiropractic: per-vertebra spine assessment, curves/Cobb, 2D+3D viewer
   | "reports"       // finance + patient reports, QuickBooks/Xero export
   | "multisite"     // multi-location
   | "marketplace";  // modality marketplace + outcomes engine (Part 10)
