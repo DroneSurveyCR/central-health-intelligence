@@ -24,7 +24,7 @@ import { scoreSpine } from "@/lib/spine/score";
 import SpineScoreTrend from "./SpineScoreTrend";
 import SpineColumn from "./SpineColumn";
 import VoiceButton from "./VoiceButton";
-import ThermalUpload from "./ThermalUpload";
+import ScanUpload from "./ScanUpload";
 import BodyMapTabs from "@/lib/body3d/BodyMapTabs";
 
 type RegionFinding = { id: string; severity: SpineSeverity; note: string };
@@ -37,6 +37,7 @@ type Existing = {
   regions?: unknown;
   voice_notes?: unknown;
   thermal_ref?: unknown;
+  scan_files?: unknown;
   status?: string;
 } | null;
 
@@ -485,9 +486,9 @@ export default function SpineAssessmentEditor({
         </div>
       </section>
 
-      <ThermalUpload
+      <ScanUpload
         assessmentId={assessmentId}
-        existingRef={typeof existing?.thermal_ref === "string" ? existing.thermal_ref : null}
+        existing={Array.isArray(existing?.scan_files) ? (existing.scan_files as { type: string; ref: string; name: string }[]) : []}
       />
 
       {(viewer === "3d" || viewer === "both") && (

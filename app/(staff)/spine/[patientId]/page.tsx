@@ -49,7 +49,7 @@ export default async function StaffSpinePage({
 
   const { data: history } = await supabase
     .from("spine_assessments")
-    .select("id, assessment_date, vertebrae, conditions, regions, voice_notes, thermal_ref, status")
+    .select("id, assessment_date, vertebrae, conditions, regions, voice_notes, thermal_ref, scan_files, status")
     .eq("patient_id", patientId)
     .order("assessment_date", { ascending: true })
     .order("created_at", { ascending: true })
