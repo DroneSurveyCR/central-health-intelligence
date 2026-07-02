@@ -4,6 +4,13 @@ import { requireModule } from "@/lib/modules/requireModule";
 import { createClient } from "@/lib/supabase/server";
 import { logAudit } from "@/lib/auth/audit";
 import SpineAssessmentEditor from "./SpineAssessmentEditor";
+import { scoreSpine } from "@/lib/spine/score";
+import {
+  blankSpineConditions,
+  type SpineConditions,
+  type SpineSeverity,
+  type VertebraFinding,
+} from "@/lib/spine/schema";
 
 export default async function StaffSpinePage({
   params,
@@ -40,14 +47,24 @@ export default async function StaffSpinePage({
   // PHI read — must be audited (no SELECT trigger).
   await logAudit({ action: "view", resource: "spine", patientId });
 
-  const { data: latest } = await supabase
+  const { data: history } = await supabase
     .from("spine_assessments")
     .select("id, assessment_date, vertebrae, conditions, regions, voice_notes, thermal_ref, status")
     .eq("patient_id", patientId)
-    .order("assessment_date", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .order("assessment_date", { ascending: true })
+    .order("created_at", { ascending: true })
+    .limit(50);
+
+  const list = history ?? [];
+  const latest = list.length ? list[list.length - 1] : null;
+  const scoreHistory = list.map((a) => ({
+    date: String(a.assessment_date ?? ""),
+    score: scoreSpine(
+      Array.isArray(a.vertebrae) ? (a.vertebrae as VertebraFinding[]) : [],
+      (a.conditions && typeof a.conditions === "object" ? a.conditions : blankSpineConditions()) as SpineConditions,
+      Array.isArray(a.regions) ? (a.regions as { severity: SpineSeverity }[]) : [],
+    ).score,
+  }));
 
   return (
     <div style={{ maxWidth: 940 }}>
@@ -65,7 +82,7 @@ export default async function StaffSpinePage({
       </div>
       <p className="muted">Spine assessment</p>
 
-      <SpineAssessmentEditor patientId={patientId} existing={latest ?? null} viewer={spineViewer} />
+      <SpineAssessmentEditor patientId={patientId} existing={latest ?? null} viewer={spineViewer} scoreHistory={scoreHistory} />
     </div>
   );
 }

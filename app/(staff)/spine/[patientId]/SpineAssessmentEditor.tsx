@@ -20,6 +20,8 @@ import {
   type VertebraFinding,
   type SpineConditions,
 } from "@/lib/spine/schema";
+import { scoreSpine } from "@/lib/spine/score";
+import SpineScoreTrend from "./SpineScoreTrend";
 import SpineColumn from "./SpineColumn";
 import VoiceButton from "./VoiceButton";
 import ThermalUpload from "./ThermalUpload";
@@ -56,6 +58,14 @@ const MOTION: { value: MotionState; label: string }[] = [
   { value: "fixated", label: "Fixated" },
 ];
 
+const SCORE_HEX: Record<string, string> = {
+  excellent: "#14834e",
+  good: "#6fae84",
+  fair: "#f4a63c",
+  guarded: "#ee7a4f",
+  poor: "#c0392b",
+};
+
 function initVertebrae(existing: unknown): Record<string, VertebraFinding> {
   const map: Record<string, VertebraFinding> = {};
   for (const v of VERTEBRAE) map[v.id] = blankVertebra(v.id);
@@ -91,10 +101,12 @@ export default function SpineAssessmentEditor({
   patientId,
   existing,
   viewer = "both",
+  scoreHistory = [],
 }: {
   patientId: string;
   existing: Existing;
   viewer?: string;
+  scoreHistory?: { date: string; score: number }[];
 }) {
   const [assessmentId, setAssessmentId] = useState<string | null>(existing?.id ?? null);
   const [vertebrae, setVertebrae] = useState<Record<string, VertebraFinding>>(() => initVertebrae(existing?.vertebrae));
@@ -117,6 +129,11 @@ export default function SpineAssessmentEditor({
   const flaggedCount = useMemo(
     () => VERTEBRAE.filter((v) => severityByCode[v.id] !== "normal").length,
     [severityByCode],
+  );
+
+  const spineScore = useMemo(
+    () => scoreSpine(Object.values(vertebrae), conditions, regions, "s2"),
+    [vertebrae, conditions, regions],
   );
 
   const sel = vertebrae[selected];
@@ -187,6 +204,29 @@ export default function SpineAssessmentEditor({
 
   return (
     <div style={{ marginTop: 16 }}>
+      {/* alignment score */}
+      <section className="card" style={{ marginBottom: 14, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+        <div style={{ textAlign: "center", minWidth: 74 }}>
+          <div style={{ fontSize: 44, fontWeight: 800, lineHeight: 1, color: SCORE_HEX[spineScore.band] }}>{spineScore.score}</div>
+          <div className="muted" style={{ fontSize: 11, letterSpacing: 0.5 }}>/ 100</div>
+        </div>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: SCORE_HEX[spineScore.band], textTransform: "capitalize" }}>
+            {spineScore.band} alignment
+          </div>
+          <p className="muted" style={{ fontSize: 12, margin: "3px 0 0" }}>
+            Composite alignment index for tracking — not a diagnosis. 100 = ideal alignment.
+          </p>
+          {spineScore.deductions.length > 0 && (
+            <p className="muted" style={{ fontSize: 12, margin: "6px 0 0" }}>
+              {spineScore.deductions.map((d) => `${d.label} −${d.points}`).join(" · ")}
+            </p>
+          )}
+        </div>
+      </section>
+
+      <SpineScoreTrend points={scoreHistory} />
+
       {/* legend */}
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
         {SEVERITY_OPTIONS.map((s) => (
