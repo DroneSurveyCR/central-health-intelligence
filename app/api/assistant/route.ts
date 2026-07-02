@@ -26,6 +26,7 @@ import {
   SYSTEM_PROMPT,
 } from "@/lib/assistant/safety";
 import { buildGrounding, answerFromFacts } from "@/lib/assistant/grounding";
+import { getAssistantDailyLimit } from "@/lib/assistant/limits";
 import { captureError } from "@/lib/observability/logger";
 
 export async function POST(request: Request) {
@@ -70,12 +71,26 @@ async function handlePost(request: Request) {
     });
   }
 
-  // Rate limit (fails open). Protects the model spend per patient.
+  // Rate limit (fails open). Protects the model spend per patient — burst guard.
   if (!(await rateLimit(`assistant:${me.id}`, 30, 3600))) {
     return NextResponse.json(
       { error: "You've sent a lot of messages. Please try again in a little while." },
       { status: 429 },
     );
+  }
+
+  // Daily cap — a per-clinic configurable product-tier limit (default 20/day),
+  // distinct from the hourly burst guard above. Chat-native reply (not a raw 429)
+  // since hitting it is an expected product moment, not abuse.
+  const dailyLimit = await getAssistantDailyLimit(me.practice_id);
+  if (!(await rateLimit(`assistant-daily:${me.id}`, dailyLimit, 86400))) {
+    return NextResponse.json({
+      reply:
+        "You've reached today's question limit. It resets tomorrow — for anything urgent, please message your care team.",
+      dailyLimitReached: true,
+      aiEnabled,
+      disclaimer: DISCLAIMER,
+    });
   }
 
   // 4. Grounding — patient's own data + approved library only.

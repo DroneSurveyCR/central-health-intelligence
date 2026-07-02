@@ -4,8 +4,10 @@ import { requireSuperAdmin } from "@/lib/auth/superadmin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MODULES } from "@/lib/modules/manifest";
 import type { ModuleDef } from "@/lib/modules/types";
+import { DEFAULT_DAILY_LIMIT } from "@/lib/assistant/limits";
 import ModuleOverride, { type Mod } from "./ModuleOverride";
 import SpineViewerToggle from "./SpineViewerToggle";
+import AssistantLimitControl from "./AssistantLimitControl";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +44,9 @@ export default async function SuperAdminPracticePage({
   const chiroOn = enabled.has("chiro");
   const spineViewer =
     ((practice.settings as Record<string, unknown> | null)?.spine_viewer as string) ?? "both";
+  const engagementOn = enabled.has("engagement");
+  const dailyLimit =
+    Number((practice.settings as Record<string, unknown> | null)?.assistant_daily_limit) || DEFAULT_DAILY_LIMIT;
 
   const row: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, padding: "8px 0", borderBottom: "1px solid var(--line)", fontSize: 14 };
 
@@ -73,6 +78,17 @@ export default async function SuperAdminPracticePage({
             Which spine visualization this clinic sees — 2D map, 3D viewer, or both.
           </p>
           <SpineViewerToggle practiceId={practice.id} current={spineViewer} />
+        </>
+      )}
+
+      {engagementOn && (
+        <>
+          <h2 className="serif" style={{ fontSize: 19, margin: "26px 0 4px" }}>Patient assistant</h2>
+          <p className="muted" style={{ fontSize: 13, margin: "0 0 14px" }}>
+            Daily question cap for the patient AI assistant on this instance — a per-clinic product-tier limit,
+            separate from the hourly anti-abuse throttle.
+          </p>
+          <AssistantLimitControl practiceId={practice.id} current={dailyLimit} />
         </>
       )}
     </div>
