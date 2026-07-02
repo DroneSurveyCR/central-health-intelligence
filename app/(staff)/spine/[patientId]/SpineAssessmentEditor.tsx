@@ -24,7 +24,7 @@ import { scoreSpine } from "@/lib/spine/score";
 import SpineScoreTrend from "./SpineScoreTrend";
 import SpineColumn from "./SpineColumn";
 import VoiceButton from "./VoiceButton";
-import ScanUpload from "./ScanUpload";
+import ScanUpload, { type Scan } from "./ScanUpload";
 import BodyMapTabs from "@/lib/body3d/BodyMapTabs";
 
 type RegionFinding = { id: string; severity: SpineSeverity; note: string };
@@ -116,6 +116,9 @@ export default function SpineAssessmentEditor({
   const [voiceNotes, setVoiceNotes] = useState<VoiceNote[]>(
     Array.isArray(existing?.voice_notes) ? (existing?.voice_notes as VoiceNote[]) : [],
   );
+  const [scans, setScans] = useState<Scan[]>(
+    Array.isArray(existing?.scan_files) ? (existing?.scan_files as Scan[]) : [],
+  );
   const [selected, setSelected] = useState<string>("c1");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -139,6 +142,7 @@ export default function SpineAssessmentEditor({
 
   const sel = vertebrae[selected];
   const selLabel = VERTEBRAE.find((v) => v.id === selected)?.label ?? selected;
+  const scansForSelected = useMemo(() => scans.filter((s) => s.vertebra_code === selected), [scans, selected]);
 
   function setPoint(code: string, patch: Partial<VertebraFinding["s2"]>) {
     setSaved(false);
@@ -224,6 +228,11 @@ export default function SpineAssessmentEditor({
             </p>
           )}
         </div>
+        {scans.length > 0 && (
+          <span className="badge" title="Device scans backing this assessment">
+            {scans.length} scan{scans.length === 1 ? "" : "s"} attached
+          </span>
+        )}
       </section>
 
       <SpineScoreTrend points={scoreHistory} />
@@ -255,6 +264,13 @@ export default function SpineAssessmentEditor({
           </div>
           {dermatomeFor(selected) && (
             <p className="muted" style={{ fontSize: 12, margin: "5px 0 0" }}>Dermatome · {dermatomeFor(selected)}</p>
+          )}
+          {scansForSelected.length > 0 && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", margin: "8px 0 0" }}>
+              {scansForSelected.map((s, i) => (
+                <span key={i} className="badge" title={s.name}>{s.type} scan</span>
+              ))}
+            </div>
           )}
 
           {/* severity */}
@@ -488,7 +504,8 @@ export default function SpineAssessmentEditor({
 
       <ScanUpload
         assessmentId={assessmentId}
-        existing={Array.isArray(existing?.scan_files) ? (existing.scan_files as { type: string; ref: string; name: string }[]) : []}
+        scans={scans}
+        onAdd={(scan) => setScans((prev) => [...prev, scan])}
       />
 
       {(viewer === "3d" || viewer === "both") && (

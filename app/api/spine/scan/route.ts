@@ -4,15 +4,19 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimit } from "@/lib/ratelimit";
 import { logAudit } from "@/lib/auth/audit";
+import { VERTEBRA_IDS } from "@/lib/spine/schema";
 import { NextResponse } from "next/server";
 
 // Generalized spine-scan import: attach any device scan to a spine assessment.
 // One flexible path covers the top low-hanging-fruit devices — Tytron (thermal),
 // PostureScreen (posture), digital X-ray (DICOM), MyoVision (sEMG), CLA INSiGHT
 // (CoreScore). Raw file is stored + typed; automated parsing comes later per device.
+// An optional vertebraCode ties the scan to a specific segment so it surfaces in
+// that vertebra's findings panel (e.g. a Tytron reading flagging C3).
 
 const MAX_BYTES = 30 * 1024 * 1024; // 30 MB (DICOM can be large)
 const VALID_TYPES = new Set(["thermal", "xray", "semg", "posture", "corescore", "other"]);
+const VERTEBRA_SET = new Set(VERTEBRA_IDS);
 
 export async function POST(request: Request) {
   await requireModule("chiro");
@@ -29,6 +33,8 @@ export async function POST(request: Request) {
   const file = form.get("file") as File | null;
   const assessmentId = String(form.get("assessmentId") ?? "").trim();
   const scanType = String(form.get("scanType") ?? "other").trim().toLowerCase();
+  const vertebraRaw = String(form.get("vertebraCode") ?? "").trim().toLowerCase();
+  const vertebraCode = vertebraRaw && VERTEBRA_SET.has(vertebraRaw) ? vertebraRaw : null;
   if (!file) return NextResponse.json({ error: "Missing file" }, { status: 400 });
   if (!assessmentId) return NextResponse.json({ error: "Missing assessmentId" }, { status: 400 });
   if (!VALID_TYPES.has(scanType)) return NextResponse.json({ error: "Invalid scan type" }, { status: 400 });
@@ -58,7 +64,13 @@ export async function POST(request: Request) {
   if (upErr) return NextResponse.json({ error: `Storage upload failed: ${upErr.message}` }, { status: 500 });
 
   const existing = Array.isArray(asmt.scan_files) ? (asmt.scan_files as unknown[]) : [];
-  const entry = { type: scanType, ref: storagePath, name: file.name, uploaded_at: new Date().toISOString() };
+  const entry = {
+    type: scanType,
+    ref: storagePath,
+    name: file.name,
+    vertebra_code: vertebraCode,
+    uploaded_at: new Date().toISOString(),
+  };
   const { error: updErr } = await supabase
     .from("spine_assessments")
     .update({ scan_files: [...existing, entry], updated_at: new Date().toISOString() })

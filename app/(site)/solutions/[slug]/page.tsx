@@ -1,8 +1,12 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { VERTICALS, getVertical } from "@/lib/site/verticals";
 import { Browser } from "@/components/site/Device";
+
+// Chiropractic has a dedicated, richer landing page (real screenshots, the spine
+// assessment story) — send this slug there instead of the generic template.
+const REDIRECTS: Record<string, string> = { chiropractic: "/for-chiropractors" };
 
 export function generateStaticParams() {
   return VERTICALS.map((v) => ({ slug: v.slug }));
@@ -28,6 +32,7 @@ export default async function VerticalPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  if (REDIRECTS[slug]) redirect(REDIRECTS[slug]);
   const v = getVertical(slug);
   if (!v) notFound();
 
