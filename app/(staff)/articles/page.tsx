@@ -1,15 +1,9 @@
 import { requireStaff } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/server";
+import { listDefaultLibraries } from "@/lib/knowledge/defaultLibraries";
 import ArticleEditor from "./ArticleEditor";
-
-type Article = {
-  id: string;
-  slug: string;
-  title: string;
-  category: string | null;
-  published: boolean;
-  sort_order: number | null;
-};
+import ArticleList, { type Article } from "./ArticleList";
+import KnowledgeLibraries from "./KnowledgeLibraries";
 
 export default async function ArticlesAdminPage() {
   await requireStaff(["doctor", "admin"]);
@@ -21,6 +15,12 @@ export default async function ArticlesAdminPage() {
     .order("sort_order", { ascending: true });
 
   const articles = (data ?? []) as Article[];
+  const libraries = listDefaultLibraries().map((l) => ({
+    slug: l.slug,
+    label: l.label,
+    description: l.description,
+    articleCount: l.articles.length,
+  }));
 
   return (
     <div style={{ maxWidth: 760 }}>
@@ -28,44 +28,17 @@ export default async function ArticlesAdminPage() {
         Articles
       </h1>
       <p className="muted">
-        Manage the patient Education Hub. Add or update articles below.
+        Manage the patient Education Hub — and what grounds the AI. Both the doctor AI and the patient
+        assistant read from published articles here.
       </p>
+
+      <KnowledgeLibraries libraries={libraries} />
 
       <section style={{ marginTop: 24 }}>
         <h2 className="serif" style={{ fontSize: 19, margin: "0 0 12px" }}>
           All articles
         </h2>
-        {articles.length === 0 ? (
-          <p className="muted">No articles yet — add your first one below.</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            {articles.map((a) => (
-              <li
-                key={a.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  padding: "10px 12px",
-                  border: "1px solid var(--line)",
-                  borderRadius: 10,
-                  marginBottom: 8,
-                }}
-              >
-                <span>
-                  <b>{a.title}</b>{" "}
-                  <span className="muted">
-                    {a.category ?? "Uncategorized"} · /{a.slug}
-                  </span>
-                </span>
-                <span className={`badge ${a.published ? "existing" : "new"}`}>
-                  {a.published ? "Published" : "Draft"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ArticleList articles={articles} />
       </section>
 
       <section style={{ marginTop: 28 }}>
