@@ -10,8 +10,12 @@ export type SeedResult = { ok: true; count: number } | { ok: false; error: strin
  *
  * Idempotent: slugs are deterministic per (library, practice), so re-running
  * this for the same practice upserts the same rows rather than duplicating.
- * Pass the RLS-scoped (user) client — the insert lands in the caller's own
- * practice via the practice_id default, matching every other staff-write path.
+ *
+ * Works with EITHER client: the RLS-scoped (user) client for the staff
+ * self-serve import, or the service-role admin client for provisioning-time
+ * auto-seed. practice_id is set EXPLICITLY on every row rather than relying on
+ * the column's current_practice_id() default — that default needs an active
+ * RLS session (auth.uid()), which the admin client doesn't have.
  */
 export async function seedDefaultLibrary(
   supabase: SupabaseClient,
@@ -23,6 +27,7 @@ export async function seedDefaultLibrary(
 
   const suffix = practiceId.replace(/-/g, "").slice(0, 8);
   const rows = lib.articles.map((a, i) => ({
+    practice_id: practiceId,
     slug: `${a.slugBase}-${suffix}`,
     title: a.title,
     category: a.category,

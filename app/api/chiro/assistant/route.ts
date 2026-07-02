@@ -3,12 +3,15 @@ import { requireModule } from "@/lib/modules/requireModule";
 import { rateLimit } from "@/lib/ratelimit";
 import { generateText, aiEnabled } from "@/lib/ai";
 import { gatherPracticeKnowledge, practiceKnowledgeBlock } from "@/lib/ai/producers";
-import { CHIRO_SYSTEM_PROMPT, CHIRO_KB, REFUSAL, classifyScope } from "@/lib/chiro/knowledge";
+import { CHIRO_SYSTEM_PROMPT, REFUSAL, classifyScope } from "@/lib/chiro/knowledge";
 import { NextResponse } from "next/server";
 
 // Guardrailed chiropractic knowledge assistant. Chiro-module tenants only.
-// Answers strictly from the chiro KB + the clinic's own published content, and only
-// on in-scope subjects. Not a diagnosis tool. No PHI is read, so no audit entry.
+// Answers strictly from the clinic's own published articles (the chiropractic
+// default library auto-seeds at provisioning, and the doctor can add/edit/
+// disable individual articles from /articles) — not a hardcoded content blob,
+// so it stays in sync with whatever the doctor has actually approved. Only
+// answers in-scope subjects. Not a diagnosis tool. No PHI is read, so no audit entry.
 
 export async function POST(request: Request) {
   await requireModule("chiro");
@@ -29,12 +32,9 @@ export async function POST(request: Request) {
   if (!(await rateLimit(`chiro-assistant:${me.id}`, 40, 3600)))
     return NextResponse.json({ error: "Too many requests. Try again in an hour." }, { status: 429 });
 
-  // Grounding — the vertical KB + the clinic's own published content (RLS-scoped).
+  // Grounding — the clinic's own published articles + services/products (RLS-scoped).
   const kb = await gatherPracticeKnowledge();
-  const prompt = `Knowledge base:
-${CHIRO_KB}
-
-${practiceKnowledgeBlock(kb)}
+  const prompt = `${practiceKnowledgeBlock(kb)}
 
 Question: ${q}
 

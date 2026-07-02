@@ -2,7 +2,14 @@ import { requireSuperAdminApi } from "@/lib/auth/superadmin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MODULES, DEFAULT_ON } from "@/lib/modules/manifest";
 import type { ModuleId } from "@/lib/modules/types";
+import { DEFAULT_LIBRARIES } from "@/lib/knowledge/defaultLibraries";
+import { seedDefaultLibrary } from "@/lib/knowledge/seedDefaultLibrary";
 import { NextResponse } from "next/server";
+
+// A practice's vertical maps 1:1 to a default knowledge library of the same
+// slug, where one exists — auto-seeded at provisioning so the AI is grounded
+// from day one instead of starting empty.
+const VERTICAL_TO_LIBRARY: Record<string, string> = { chiropractic: "chiropractic" };
 
 const VALID_MODULE_IDS = new Set(Object.keys(MODULES));
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;
@@ -90,7 +97,18 @@ export async function POST(request: Request) {
     /* settings can be filled in later */
   }
 
-  // 5. The handoff: a magic-link the admin sends to the client to log in.
+  // 5. Auto-seed the matching default knowledge library (best-effort — the
+  // doctor can also import/manage libraries later from /articles regardless).
+  const librarySlug = vertical ? VERTICAL_TO_LIBRARY[vertical] : undefined;
+  if (librarySlug && DEFAULT_LIBRARIES[librarySlug]) {
+    try {
+      await seedDefaultLibrary(admin, practiceId, librarySlug);
+    } catch {
+      /* non-fatal — provisioning succeeds either way */
+    }
+  }
+
+  // 6. The handoff: a magic-link the admin sends to the client to log in.
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://healthsync-cloud-mu.vercel.app";
   let handoffLink: string | null = null;
   const { data: linkData } = await admin.auth.admin.generateLink({
